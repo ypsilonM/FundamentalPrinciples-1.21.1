@@ -1,5 +1,25 @@
 {
   "item.ypfundamentals.orb": "Mana Orb",
   "item.ypfundamentals.pure_orb": "Pure Orb",
-  "block.ypfundamentals.mana_block": "Mana Block"
+  "item.ypfundamentals.chisel": "Chisel Tool",
+
+  "item.ypfundamentals.radish": "Radish",
+
+  "item.ypfundamentals.frostfire_ice": "Frostfire Ice",
+  "item.ypfundamentals.starlight_ashes": "Starlight Ashes",
+
+  "block.ypfundamentals.mana_block": "Mana Block",
+  "block.ypfundamentals.mana_ore": "Mana Ore",
+  "block.ypfundamentals.magic_block": "Magic Block",
+
+  "creativetab.ypfundamentals.mana_items": "Mana Items",
+  "creativetab.ypfundamentals.mana_blocks": "Mana Blocks",
+
+  "effect.ypfundamentals.mindful": "Mindful",
+  "effect.ypfundamentals.reinforcement": "Mana Reinforcement",
+
+  "attribute.name.technique.exhaustion": "Exhaustion",
+
+  "tooltip.ypfundamentals.magic_block.tooltip": "An interesting magic block."
+
 }

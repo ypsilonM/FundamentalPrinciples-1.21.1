@@ -1,8 +1,15 @@
 package com.ypsi.fundamentalism;
-
+import com.ypsi.fundamentalism.attributes.ModAttributes;
 import com.ypsi.fundamentalism.block.ModBlocks;
+import com.ypsi.fundamentalism.effect.ModEffects;
+import com.ypsi.fundamentalism.entity.ModEntities;
+import com.ypsi.fundamentalism.entity.imp.ImpRenderer;
+import com.ypsi.fundamentalism.item.ModCreativeModTabs;
 import com.ypsi.fundamentalism.item.ModItems;
+import com.ypsi.fundamentalism.keybind.ModKeyBinds;
+import com.ypsi.fundamentalism.network.ModNetwork;
 import net.minecraft.world.item.CreativeModeTabs;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -21,31 +28,34 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
-
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(FundamentalPrinciples.MOD_ID)
-public class FundamentalPrinciples
-{
-    // Define mod id in a common place for everything to reference
+public class FundamentalPrinciples {
     public static final String MOD_ID = "ypfundamentals";
-    // Directly reference a slf4j logger
+
     private static final Logger LOGGER = LogUtils.getLogger();
-    // The constructor for the mod class is the first code that is run when your mod is loaded.
-    // FML will recognize some parameter types like IEventBus or ModContainer and pass them in automatically.
+
     public FundamentalPrinciples(IEventBus modEventBus, ModContainer modContainer) {
-        // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
-        // Register ourselves for server and other game events we are interested in.
-        // Note that this is necessary if and only if we want *this* class (ExampleMod) to respond directly to events.
-        // Do not add this line if there are no @SubscribeEvent-annotated functions in this class, like onServerStarting() below.
+
         NeoForge.EVENT_BUS.register(this);
 
+        ModCreativeModTabs.register(modEventBus);
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
+        ModEffects.register(modEventBus);
+        ModKeyBinds.register(modEventBus);
+
+        ModNetwork.register(modEventBus);
+
+        ModEntities.register(modEventBus);
+
+        ModAttributes.register(modEventBus);
+//        ModDataComponents.register(modEventBus);
 
         // Register the item to a creative tab
-        modEventBus.addListener(this::addCreative);
 
+        modEventBus.addListener(this::addCreative);
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
@@ -72,6 +82,9 @@ public class FundamentalPrinciples
         if(event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES){
             event.accept(ModBlocks.MANA_BLOCK);
         }
+        if(event.getTabKey() == CreativeModeTabs.INGREDIENTS){
+            event.accept(ModBlocks.MANA_ORE);
+        }
     }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
@@ -88,5 +101,11 @@ public class FundamentalPrinciples
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
         }
+
+        @SubscribeEvent
+        public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
+            event.registerEntityRenderer(ModEntities.IMP.get(), ImpRenderer::new);
+        }
     }
+
 }
