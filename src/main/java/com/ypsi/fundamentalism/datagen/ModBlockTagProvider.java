@@ -18,13 +18,13 @@ public class ModBlockTagProvider extends BlockTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.Provider provider) {
-        tag(BlockTags.MINEABLE_WITH_PICKAXE)
-                .add(ModBlocks.MAGIC_BLOCK.get())
-                .add(ModBlocks.MANA_BLOCK.get())
-                .add(ModBlocks.MANA_ORE.get());
-
-        tag(BlockTags.NEEDS_IRON_TOOL)
-                .add(ModBlocks.MANA_ORE.get());
+//        tag(BlockTags.MINEABLE_WITH_PICKAXE)
+//                .add(ModBlocks.MAGIC_BLOCK.get())
+//                .add(ModBlocks.MANA_BLOCK.get())
+//                .add(ModBlocks.MANA_ORE.get());
+//
+//        tag(BlockTags.NEEDS_IRON_TOOL)
+//                .add(ModBlocks.MANA_ORE.get());
 
     }
 }

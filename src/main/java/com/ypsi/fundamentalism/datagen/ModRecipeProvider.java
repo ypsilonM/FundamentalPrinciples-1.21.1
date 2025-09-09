@@ -18,26 +18,26 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
 
     @Override
     protected void buildRecipes(RecipeOutput recipeOutput) {
-        List<ItemLike> MANA_SMELTABLES = List.of(ModItems.PURE_ORB,
-                ModBlocks.MANA_ORE);
-
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.MANA_BLOCK.get())
-                .pattern("BBB")
-                .pattern("BBB")
-                .pattern("BBB")
-                .define('B', ModItems.ORB.get())
-                .unlockedBy("has_orb", has(ModItems.ORB)).save(recipeOutput);
-
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.ORB.get(), 9)
-                .requires(ModBlocks.MANA_BLOCK)
-                .unlockedBy("has_mana_block", has(ModBlocks.MANA_BLOCK)).save(recipeOutput);
-
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.ORB.get(), 18)
-                .requires(ModBlocks.MAGIC_BLOCK)
-                .unlockedBy("has_magic_block", has(ModBlocks.MAGIC_BLOCK))
-                .save(recipeOutput, "ypfundamentals:orb_from_magic_block");
-
-        oreSmelting(recipeOutput,MANA_SMELTABLES, RecipeCategory.MISC, ModItems.ORB.get(), 0.25f,200, "mana");
-        oreBlasting(recipeOutput,MANA_SMELTABLES, RecipeCategory.MISC, ModItems.ORB.get(), 0.25f,100, "mana");
+//        List<ItemLike> MANA_SMELTABLES = List.of(ModItems.PURE_ORB,
+//                ModBlocks.MANA_ORE);
+//
+//        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.MANA_BLOCK.get())
+//                .pattern("BBB")
+//                .pattern("BBB")
+//                .pattern("BBB")
+//                .define('B', ModItems.ORB.get())
+//                .unlockedBy("has_orb", has(ModItems.ORB)).save(recipeOutput);
+//
+//        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.ORB.get(), 9)
+//                .requires(ModBlocks.MANA_BLOCK)
+//                .unlockedBy("has_mana_block", has(ModBlocks.MANA_BLOCK)).save(recipeOutput);
+//
+//        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.ORB.get(), 18)
+//                .requires(ModBlocks.MAGIC_BLOCK)
+//                .unlockedBy("has_magic_block", has(ModBlocks.MAGIC_BLOCK))
+//                .save(recipeOutput, "ypfundamentals:orb_from_magic_block");
+//
+//        oreSmelting(recipeOutput,MANA_SMELTABLES, RecipeCategory.MISC, ModItems.ORB.get(), 0.25f,200, "mana");
+//        oreBlasting(recipeOutput,MANA_SMELTABLES, RecipeCategory.MISC, ModItems.ORB.get(), 0.25f,100, "mana");
     }
 }

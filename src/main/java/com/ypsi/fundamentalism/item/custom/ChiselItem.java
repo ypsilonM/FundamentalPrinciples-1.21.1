@@ -25,8 +25,7 @@ public class ChiselItem extends Item {
                     Blocks.END_STONE, Blocks.END_STONE_BRICKS,
                     Blocks.DEEPSLATE, Blocks.DEEPSLATE_BRICKS,
                     Blocks.GOLD_BLOCK, Blocks.IRON_BLOCK,
-                    Blocks.IRON_BLOCK, Blocks.STONE,
-                    Blocks.NETHERRACK, ModBlocks.MANA_BLOCK.get()
+                    Blocks.IRON_BLOCK, Blocks.STONE
             );
 
     public ChiselItem(Properties properties) {

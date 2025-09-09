@@ -3,11 +3,33 @@ import com.ypsi.fundamentalism.attributes.ModAttributes;
 import com.ypsi.fundamentalism.block.ModBlocks;
 import com.ypsi.fundamentalism.effect.ModEffects;
 import com.ypsi.fundamentalism.entity.ModEntities;
-import com.ypsi.fundamentalism.entity.imp.ImpRenderer;
+import com.ypsi.fundamentalism.entity.mobs.hemomancer.HemomancerRenderer;
+import com.ypsi.fundamentalism.entity.mobs.imp.ImpRenderer;
+import com.ypsi.fundamentalism.entity.mobs.venemerus.VenemerusRenderer;
+import com.ypsi.fundamentalism.entity.spells.chains.ChainsRenderer;
+import com.ypsi.fundamentalism.entity.spells.pull.PullRenderer;
+import com.ypsi.fundamentalism.entity.spells.holy_lightning.HolyLightningRenderer;
+import com.ypsi.fundamentalism.attachments.ModAttachments;
+import com.ypsi.fundamentalism.entity.spells.sol.SolRenderer;
+import com.ypsi.fundamentalism.entity.spells.thorn.ThornRenderer;
 import com.ypsi.fundamentalism.item.ModCreativeModTabs;
 import com.ypsi.fundamentalism.item.ModItems;
 import com.ypsi.fundamentalism.keybind.ModKeyBinds;
 import com.ypsi.fundamentalism.network.ModNetwork;
+import com.ypsi.fundamentalism.spells.ModSpells;
+import com.ypsi.fundamentalism.spells.SpellAnimatorClass;
+import dev.kosmx.playerAnim.api.TransformType;
+import dev.kosmx.playerAnim.api.layered.ModifierLayer;
+import dev.kosmx.playerAnim.api.layered.modifier.AdjustmentModifier;
+import dev.kosmx.playerAnim.api.layered.modifier.MirrorModifier;
+import dev.kosmx.playerAnim.core.util.Vec3f;
+import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationFactory;
+import io.redspace.ironsspellbooks.api.magic.SpellSelectionManager;
+import io.redspace.ironsspellbooks.api.spells.SpellAnimations;
+import io.redspace.ironsspellbooks.compat.tetra.TetraProxy;
+import io.redspace.ironsspellbooks.player.ClientMagicData;
+import io.redspace.ironsspellbooks.setup.IronsAdjustmentModifier;
+import net.minecraft.util.Mth;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import org.slf4j.Logger;
@@ -28,6 +50,9 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
+
+import java.util.Optional;
+
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(FundamentalPrinciples.MOD_ID)
 public class FundamentalPrinciples {
@@ -51,13 +76,17 @@ public class FundamentalPrinciples {
         ModEntities.register(modEventBus);
 
         ModAttributes.register(modEventBus);
-//        ModDataComponents.register(modEventBus);
 
+        ModAttachments.register(modEventBus);
+
+        ModSpells.register(modEventBus);
         // Register the item to a creative tab
+
 
         modEventBus.addListener(this::addCreative);
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+
     }
 
     private void commonSetup(final FMLCommonSetupEvent event)
@@ -79,12 +108,6 @@ public class FundamentalPrinciples {
             event.accept(ModItems.ORB);
             event.accept(ModItems.PURE_ORB);
         }
-        if(event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES){
-            event.accept(ModBlocks.MANA_BLOCK);
-        }
-        if(event.getTabKey() == CreativeModeTabs.INGREDIENTS){
-            event.accept(ModBlocks.MANA_ORE);
-        }
     }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
@@ -95,17 +118,68 @@ public class FundamentalPrinciples {
     }
 
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
-    @EventBusSubscriber(modid = MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    @EventBusSubscriber(modid = MOD_ID, value = Dist.CLIENT)
     public static class ClientModEvents
     {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
+            PlayerAnimationFactory.ANIMATION_DATA_FACTORY.registerFactory(
+                    SpellAnimatorClass.ANIMATIONS,
+                    43,
+                    (player) -> {
+                        var animation = new ModifierLayer<>();
+                        IronsAdjustmentModifier.INSTANCE = new IronsAdjustmentModifier((partName, partialTick) -> {
+                            boolean handleHead = animation.getAnimation() != null && !animation.getAnimation().get3DTransform("head", TransformType.ROTATION, 0.5f, Vec3f.ZERO).equals(Vec3f.ZERO);
+                            switch (partName) {
+                                case "head" -> {
+                                    if (handleHead) {
+                                        return Optional.of(new AdjustmentModifier.PartModifier(new Vec3f(0, Mth.lerp(partialTick, (player.yHeadRotO - player.yBodyRotO), (player.yHeadRot - player.yBodyRot)) * Mth.DEG_TO_RAD, 0), Vec3f.ZERO));
+                                    } else {
+                                        return Optional.empty();
+                                    }
+                                }
+                                case "rightArm", "leftArm" -> {
+                                    float x = Mth.lerp(partialTick, player.xRotO, player.getXRot());
+                                    float y = Mth.lerp(partialTick, (player.yHeadRotO - player.yBodyRotO), (player.yHeadRot - player.yBodyRot));
+                                    return Optional.of(new AdjustmentModifier.PartModifier(new Vec3f(x * Mth.DEG_TO_RAD, y * Mth.DEG_TO_RAD, 0), Vec3f.ZERO));
+                                }
+                                default -> {
+                                    return Optional.empty();
+                                }
+                            }
+                        });
+                        animation.addModifier(IronsAdjustmentModifier.INSTANCE,0);
+                        animation.addModifierLast(new MirrorModifier() {
+                            @Override
+                            public boolean isEnabled() {
+                                return ClientMagicData.getSyncedSpellData(player).getCastingEquipmentSlot().equals(SpellSelectionManager.OFFHAND);
+                            }
+                        });
+
+                        return animation;
+                    });
+
+            TetraProxy.PROXY.initClient();
         }
+
 
         @SubscribeEvent
         public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
             event.registerEntityRenderer(ModEntities.IMP.get(), ImpRenderer::new);
+            event.registerEntityRenderer(ModEntities.HEMOMANCER.get(), HemomancerRenderer::new);
+            event.registerEntityRenderer(ModEntities.VENEMERUS.get(), VenemerusRenderer::new);
+
+            event.registerEntityRenderer(ModEntities.HOLY_LIGHTNING_PROJECTILE.get(), HolyLightningRenderer::new);
+            event.registerEntityRenderer(ModEntities.CHAINS.get(), ChainsRenderer::new);
+
+            event.registerEntityRenderer(ModEntities.PULL_PROJECTILE.get(), PullRenderer::new);
+            event.registerEntityRenderer(ModEntities.SOL_PROJECTILE.get(), SolRenderer::new);
+            event.registerEntityRenderer(ModEntities.THORN_PROJECTILE.get(), ThornRenderer::new);
         }
+
+
     }
+
+
 
 }

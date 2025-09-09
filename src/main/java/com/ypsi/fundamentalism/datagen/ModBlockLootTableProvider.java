@@ -29,12 +29,12 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
 
     @Override
     protected void generate() {
-        dropSelf(ModBlocks.MAGIC_BLOCK.get());
-        add(ModBlocks.MANA_ORE.get(),
-                block -> createOreDrop(ModBlocks.MANA_ORE.get(), ModItems.PURE_ORB.get()));
-
-        add(ModBlocks.MANA_BLOCK.get(),
-                block -> createMultipleOreDrops(ModBlocks.MANA_BLOCK.get(), ModItems.ORB.get(),1,5));
+//        dropSelf(ModBlocks.MAGIC_BLOCK.get());
+//        add(ModBlocks.MANA_ORE.get(),
+//                block -> createOreDrop(ModBlocks.MANA_ORE.get(), ModItems.PURE_ORB.get()));
+//
+//        add(ModBlocks.MANA_BLOCK.get(),
+//                block -> createMultipleOreDrops(ModBlocks.MANA_BLOCK.get(), ModItems.ORB.get(),1,5));
     }
 
 
@@ -47,7 +47,6 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
     }
     @Override
     protected Iterable<Block> getKnownBlocks() {
-
         return ModBlocks.BLOCKS.getEntries().stream().map(Holder::value)::iterator;
     }
 }

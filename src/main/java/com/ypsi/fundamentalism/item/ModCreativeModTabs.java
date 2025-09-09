@@ -25,27 +25,25 @@ public class ModCreativeModTabs {
                     .displayItems((parameters, output) -> {
                         output.accept(ModItems.PURE_ORB);
                         output.accept(ModItems.ORB);
-
-                        output.accept(ModItems.CHISEL);
-                        output.accept(ModItems.RADISH);
+                        output.accept(ModItems.MANA_FRUIT);
 
                     })
                     .build());
-    public static final Supplier<CreativeModeTab> MANA_BLOCKS_TAB = CREATIVE_MODE_TAB.register("mana_blocks_tab",
-            () -> CreativeModeTab.builder()
-                    .icon(() -> new ItemStack(ModBlocks.MANA_BLOCK.get()))
-                    .withTabsBefore(ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "mana_items_tab"))
-                    .title(Component.translatable("creativetab.ypfundamentals.mana_blocks"))
-                    .displayItems((parameters, output) -> {
-                        output.accept(ModBlocks.MANA_BLOCK);
-                        output.accept(ModBlocks.MANA_ORE);
-                        output.accept(ModBlocks.MAGIC_BLOCK);
-
-                        output.accept(ModItems.FROSTFIRE_ICE);
-                        output.accept(ModItems.STARLIGHT_ASHES);
-
-                    })
-                    .build());
+//    public static final Supplier<CreativeModeTab> MANA_BLOCKS_TAB = CREATIVE_MODE_TAB.register("mana_blocks_tab",
+//            () -> CreativeModeTab.builder()
+//                    .icon(() -> new ItemStack(ModBlocks.MANA_BLOCK.get()))
+//                    .withTabsBefore(ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "mana_items_tab"))
+//                    .title(Component.translatable("creativetab.ypfundamentals.mana_blocks"))
+//                    .displayItems((parameters, output) -> {
+//                        output.accept(ModBlocks.MANA_BLOCK);
+//                        output.accept(ModBlocks.MANA_ORE);
+//                        output.accept(ModBlocks.MAGIC_BLOCK);
+//
+//                        output.accept(ModItems.FROSTFIRE_ICE);
+//                        output.accept(ModItems.STARLIGHT_ASHES);
+//
+//                    })
+//                    .build());
 
     public static void register(IEventBus eventBus){
         CREATIVE_MODE_TAB.register(eventBus);
