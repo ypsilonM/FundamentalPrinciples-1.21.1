@@ -1,6 +1,7 @@
 package com.ypsi.fundamentalism.effect.custom;
 
 import com.ypsi.fundamentalism.effect.ModEffects;
+import com.ypsi.fundamentalism.util.Pair;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.registry.AttributeRegistry;
 import io.redspace.ironsspellbooks.effect.MagicMobEffect;
@@ -12,13 +13,18 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @EventBusSubscriber
 public class ReinforcementEffect extends MagicMobEffect {
+
     private static final int CUSTOM_COLOR = 0xFFFFA500;
 
     public ReinforcementEffect(MobEffectCategory category, int color) {
@@ -26,8 +32,11 @@ public class ReinforcementEffect extends MagicMobEffect {
     }
 
     @Override
-    public boolean applyEffectTick(LivingEntity livingEntity, int amplifier) {
-        return true;
+    public boolean applyEffectTick(LivingEntity livingEntity, int amplifier) {return false;}
+
+    @Override
+    public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
+        return false;
     }
 
     @SubscribeEvent
@@ -73,20 +82,15 @@ public class ReinforcementEffect extends MagicMobEffect {
     }
 
     @Override
-    public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
-        return true;
-    }
-
-    @Override
     public void onEffectAdded(LivingEntity pLivingEntity, int pAmplifier) {
         super.onEffectAdded(pLivingEntity, pAmplifier);
-        pLivingEntity.setGlowingTag(true);
+//        pLivingEntity.setGlowingTag(true);
     }
 
     @Override
     public void onEffectRemoved(LivingEntity pLivingEntity, int pAmplifier) {
         super.onEffectRemoved(pLivingEntity, pAmplifier);
-        pLivingEntity.setGlowingTag(false);
+//        pLivingEntity.setGlowingTag(false);
     }
 
     @Override
@@ -94,5 +98,35 @@ public class ReinforcementEffect extends MagicMobEffect {
         return CUSTOM_COLOR;
     }
 
+    public Integer getMagicAff(Player player){
+        List<Pair> list = new ArrayList<>();
+        list.add(new Pair(player.getAttributeValue(AttributeRegistry.FIRE_SPELL_POWER), 0xf57c00));
+        list.add(new Pair(player.getAttributeValue(AttributeRegistry.ICE_SPELL_POWER), 0x42a5f5));
+        list.add(new Pair(player.getAttributeValue(AttributeRegistry.LIGHTNING_SPELL_POWER), 0x1a237e));
+        list.add(new Pair(player.getAttributeValue(AttributeRegistry.EVOCATION_SPELL_POWER), 0xffffff));
+        list.add(new Pair(player.getAttributeValue(AttributeRegistry.NATURE_SPELL_POWER), 0x76ff03));
+        list.add(new Pair(player.getAttributeValue(AttributeRegistry.BLOOD_SPELL_POWER), 0xd50000));
+        list.add(new Pair(player.getAttributeValue(AttributeRegistry.HOLY_SPELL_POWER), 0xffeb3b));
+        list.add(new Pair(player.getAttributeValue(AttributeRegistry.ENDER_SPELL_POWER), 0x9c27b0));
+        list.add(new Pair(player.getAttributeValue(AttributeRegistry.ELDRITCH_SPELL_POWER), 0x000000));
+
+        double max = list.stream()
+                .mapToDouble(Pair::getNumber)
+                .max()
+                .orElse(Double.NEGATIVE_INFINITY);
+
+        long countMax = list.stream()
+                .filter(p -> p.getNumber() == max)
+                .count();
+
+        if (countMax > 1) {
+            return 0xffffff;
+        }
+        return list.stream()
+                .filter(p -> p.getNumber() == max)
+                .findFirst()
+                .map(Pair::getColor)
+                .orElse(0xffffff);
+    }
 
 }

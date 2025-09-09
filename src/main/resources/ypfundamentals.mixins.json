@@ -1,14 +1,3 @@
 {
-  "required": true,
-  "package": "com.ypsi.fundamentalism.mixin",  // Ajustado a tu paquete real
-  "compatibilityLevel": "JAVA_21",
-  "mixins": [
 
-  ],
-  "client": [
-    "ClientEntityMixinM"
-  ],
-  "injectors": {
-    "defaultRequire": 1
-  }
 }

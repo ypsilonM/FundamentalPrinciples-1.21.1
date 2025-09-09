@@ -5,6 +5,8 @@ import com.ypsi.fundamentalism.item.ModFoodProperties;
 import com.ypsi.fundamentalism.network.packets.SyncExhaustionPacket;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -27,4 +29,8 @@ public class ManaFruit extends Item {
         return super.finishUsingItem(stack, level, livingEntity);
     }
 
+    @Override
+    public SoundEvent getEatingSound() {
+        return SoundEvents.HONEY_DRINK;
+    }
 }

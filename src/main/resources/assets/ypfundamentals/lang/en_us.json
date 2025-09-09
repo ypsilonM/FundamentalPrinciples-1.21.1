@@ -12,6 +12,10 @@
   "effect.ypfundamentals.marked": "Marked",
   "effect.ypfundamentals.bloodstream": "Bloodstream",
 
+  "entity.ypfundamentals.hemomancer": "Hemomancer",
+  "entity.ypfundamentals.imp": "Imp",
+  "entity.ypfundamentals.venemerus": "Venemerus",
+
   "attribute.name.technique.exhaustion": "Exhaustion",
 
   "spell.ypfundamentals.grantstrength": "Burning Spirit",

@@ -33,9 +33,6 @@ public class FlameStrengthSpell extends AbstractSpell {
     public List<MutableComponent> getUniqueInfo(int spellLevel, LivingEntity caster) {
         return List.of(
                 Component.translatable("ui.irons_spellbooks.effect_length", Utils.timeFromTicks(getSpellPower(spellLevel, caster) * 20, 1))
-//                ,
-//                Component.translatable("attribute.modifier.plus.1", Utils.stringTruncation(getPercentFireSpellPower(spellLevel, caster), 0), Component.translatable("attribute.irons_spellbooks.fire_spell_power")),
-//                Component.translatable("attribute.modifier.plus.1", Utils.stringTruncation(getPercentFireMagicResist(spellLevel, caster), 0), Component.translatable("attribute.irons_spellbooks.fire_magic_resist"))
         );
     }
 

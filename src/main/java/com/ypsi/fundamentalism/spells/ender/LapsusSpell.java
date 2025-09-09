@@ -50,7 +50,7 @@ public class LapsusSpell extends AbstractSpell {
     @Override
     public List<MutableComponent> getUniqueInfo(int spellLevel, LivingEntity caster) {
         return List.of(
-                Component.translatable("ui.irons_spellbooks.blast_count", (int) (getRecastCount(spellLevel, caster)))
+                Component.translatable("ui.irons_spellbooks.duration", getTicksToLive(spellLevel)/20+"s")
         );
     }
 
@@ -90,6 +90,10 @@ public class LapsusSpell extends AbstractSpell {
     @Override
     public int getRecastCount(int spellLevel, @Nullable LivingEntity entity) {
         return 2;
+    }
+
+    public int getTicksToLive(int spellLevel){
+        return (20*3)*spellLevel;
     }
 
     @Override

@@ -121,46 +121,46 @@ public class FundamentalPrinciples {
     @EventBusSubscriber(modid = MOD_ID, value = Dist.CLIENT)
     public static class ClientModEvents
     {
-        @SubscribeEvent
-        public static void onClientSetup(FMLClientSetupEvent event) {
-            PlayerAnimationFactory.ANIMATION_DATA_FACTORY.registerFactory(
-                    SpellAnimatorClass.ANIMATIONS,
-                    43,
-                    (player) -> {
-                        var animation = new ModifierLayer<>();
-                        IronsAdjustmentModifier.INSTANCE = new IronsAdjustmentModifier((partName, partialTick) -> {
-                            boolean handleHead = animation.getAnimation() != null && !animation.getAnimation().get3DTransform("head", TransformType.ROTATION, 0.5f, Vec3f.ZERO).equals(Vec3f.ZERO);
-                            switch (partName) {
-                                case "head" -> {
-                                    if (handleHead) {
-                                        return Optional.of(new AdjustmentModifier.PartModifier(new Vec3f(0, Mth.lerp(partialTick, (player.yHeadRotO - player.yBodyRotO), (player.yHeadRot - player.yBodyRot)) * Mth.DEG_TO_RAD, 0), Vec3f.ZERO));
-                                    } else {
-                                        return Optional.empty();
-                                    }
-                                }
-                                case "rightArm", "leftArm" -> {
-                                    float x = Mth.lerp(partialTick, player.xRotO, player.getXRot());
-                                    float y = Mth.lerp(partialTick, (player.yHeadRotO - player.yBodyRotO), (player.yHeadRot - player.yBodyRot));
-                                    return Optional.of(new AdjustmentModifier.PartModifier(new Vec3f(x * Mth.DEG_TO_RAD, y * Mth.DEG_TO_RAD, 0), Vec3f.ZERO));
-                                }
-                                default -> {
-                                    return Optional.empty();
-                                }
-                            }
-                        });
-                        animation.addModifier(IronsAdjustmentModifier.INSTANCE,0);
-                        animation.addModifierLast(new MirrorModifier() {
-                            @Override
-                            public boolean isEnabled() {
-                                return ClientMagicData.getSyncedSpellData(player).getCastingEquipmentSlot().equals(SpellSelectionManager.OFFHAND);
-                            }
-                        });
-
-                        return animation;
-                    });
-
-            TetraProxy.PROXY.initClient();
-        }
+//        @SubscribeEvent
+//        public static void onClientSetup(FMLClientSetupEvent event) {
+//            PlayerAnimationFactory.ANIMATION_DATA_FACTORY.registerFactory(
+//                    SpellAnimatorClass.ANIMATIONS,
+//                    43,
+//                    (player) -> {
+//                        var animation = new ModifierLayer<>();
+//                        IronsAdjustmentModifier.INSTANCE = new IronsAdjustmentModifier((partName, partialTick) -> {
+//                            boolean handleHead = animation.getAnimation() != null && !animation.getAnimation().get3DTransform("head", TransformType.ROTATION, 0.5f, Vec3f.ZERO).equals(Vec3f.ZERO);
+//                            switch (partName) {
+//                                case "head" -> {
+//                                    if (handleHead) {
+//                                        return Optional.of(new AdjustmentModifier.PartModifier(new Vec3f(0, Mth.lerp(partialTick, (player.yHeadRotO - player.yBodyRotO), (player.yHeadRot - player.yBodyRot)) * Mth.DEG_TO_RAD, 0), Vec3f.ZERO));
+//                                    } else {
+//                                        return Optional.empty();
+//                                    }
+//                                }
+//                                case "rightArm", "leftArm" -> {
+//                                    float x = Mth.lerp(partialTick, player.xRotO, player.getXRot());
+//                                    float y = Mth.lerp(partialTick, (player.yHeadRotO - player.yBodyRotO), (player.yHeadRot - player.yBodyRot));
+//                                    return Optional.of(new AdjustmentModifier.PartModifier(new Vec3f(x * Mth.DEG_TO_RAD, y * Mth.DEG_TO_RAD, 0), Vec3f.ZERO));
+//                                }
+//                                default -> {
+//                                    return Optional.empty();
+//                                }
+//                            }
+//                        });
+//                        animation.addModifier(IronsAdjustmentModifier.INSTANCE,0);
+//                        animation.addModifierLast(new MirrorModifier() {
+//                            @Override
+//                            public boolean isEnabled() {
+//                                return ClientMagicData.getSyncedSpellData(player).getCastingEquipmentSlot().equals(SpellSelectionManager.OFFHAND);
+//                            }
+//                        });
+//
+//                        return animation;
+//                    });
+//
+//            TetraProxy.PROXY.initClient();
+//        }
 
 
         @SubscribeEvent

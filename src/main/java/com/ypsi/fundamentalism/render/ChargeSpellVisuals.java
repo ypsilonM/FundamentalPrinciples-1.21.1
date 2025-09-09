@@ -12,6 +12,10 @@ import io.redspace.ironsspellbooks.entity.spells.magic_arrow.MagicArrowRenderer;
 import io.redspace.ironsspellbooks.entity.spells.poison_arrow.PoisonArrowRenderer;
 import io.redspace.ironsspellbooks.player.ClientMagicData;
 import io.redspace.ironsspellbooks.util.DefaultBipedBoneIdents;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -33,6 +37,10 @@ public class ChargeSpellVisuals{
 
         @Override
         public void render(PoseStack poseStack, MultiBufferSource bufferSource, int pPackedLight, T entity, float pLimbSwing, float pLimbSwingAmount, float pPartialTick, float pAgeInTicks, float pNetHeadYaw, float pHeadPitch) {
+
+            if (isRenderingInGUI()) {
+                return;
+            }
             var syncedSpellData = ClientMagicData.getSyncedSpellData(entity);
             if (!syncedSpellData.isCasting()) {
                 return;
@@ -43,6 +51,26 @@ public class ChargeSpellVisuals{
             handleRender(poseStack, bufferSource, pPackedLight, entity, spellId, false);
             poseStack.popPose();
         }
+        private boolean isRenderingInGUI() {
+            Minecraft mc = Minecraft.getInstance();
+            if (mc.screen != null) {
+                if (mc.screen instanceof CreativeModeInventoryScreen) {
+                    return true; // No es GUI para nuestros propósitos
+                }
+            }
+            // El resto del código para detectar por stack trace...
+            StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+            for (int i = 0; i < Math.min(stack.length, 12); i++) {
+                if (stack[i].getClassName().contains("InventoryScreen") ||
+                        stack[i].getMethodName().contains("renderEntityInInventory")) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+
     }
 
     private static <T extends LivingEntity> void handleRender(PoseStack poseStack, MultiBufferSource bufferSource, int pPackedLight, T entity, String spellId, boolean offhand) {

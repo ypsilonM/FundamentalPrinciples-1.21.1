@@ -35,45 +35,62 @@ public class ClientEntityMixinM{
 
     @Inject(method = "getTeamColor", at = @At(value = "HEAD"), cancellable = true, remap = false)
     public void changeGlowOutline(CallbackInfoReturnable<Integer> cir) {
-        Entity entity = (Entity)(Object)this;
-        if (entity instanceof LivingEntity living && living.hasEffect(ModEffects.REINFORCEMENT_EFFECT)) {
-            if (living instanceof Player player) {
-                int magicColor = getMagicAff(player);
-                cir.setReturnValue(magicColor);
-            }
-        }
+//        Entity entity = (Entity)(Object)this;
+//        if (!isGlowEffectContext()) {
+//            return;
+//        }
+//        if (entity instanceof LivingEntity living && living.hasEffect(ModEffects.REINFORCEMENT_EFFECT)) {
+//            if (living instanceof Player player) {
+//                int magicColor = getMagicAff(player);
+//                cir.setReturnValue(magicColor);
+//            }
+//        }
+    }
+    private boolean isGlowEffectContext() {
+//        // Verificar que estamos en el contexto correcto para evitar afectar el inventario
+//        Minecraft mc = Minecraft.getInstance();
+//
+//        // 1. No aplicar si estamos en cualquier pantalla
+//        if (mc.screen != null) {
+//            return false;
+//        }
+//
+//        // 2. No aplicar si no hay mundo (contexto de GUI)
+//        if (mc.level == null) {
+//            return false;
+//        }
+//
+//        // 3. Verificar el stack de llamadas para asegurarnos que es para glow
+//        try {
+//            StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+//            for (int i = 0; i < Math.min(stack.length, 8); i++) {
+//                String methodName = stack[i].getMethodName();
+//                String className = stack[i].getClassName();
+//
+//                // Buscar métodos específicos de rendering de glow/outline
+//                if (methodName.contains("glow") ||
+//                        methodName.contains("Outline") ||
+//                        methodName.contains("renderGlow") ||
+//                        className.contains("Outline")) {
+//                    return true;
+//                }
+//
+//                // Evitar contextos de GUI/inventario
+//                if (className.contains("Screen") ||
+//                        className.contains("Gui") ||
+//                        methodName.contains("renderEntityInInventory")) {
+//                    return false;
+//                }
+//            }
+//        } catch (Exception e) {
+//            return false; // En caso de error, mejor no modificar
+//        }
+//
+//        // Por defecto, no modificar para evitar problemas
+//        return false;
+        return true;
     }
 
-    public Integer getMagicAff(Player player){
-        List<Pair> list = new ArrayList<>();
-        list.add(new Pair(player.getAttributeValue(AttributeRegistry.FIRE_SPELL_POWER), 0xf57c00));
-        list.add(new Pair(player.getAttributeValue(AttributeRegistry.ICE_SPELL_POWER), 0x42a5f5));
-        list.add(new Pair(player.getAttributeValue(AttributeRegistry.LIGHTNING_SPELL_POWER), 0x1a237e));
-        list.add(new Pair(player.getAttributeValue(AttributeRegistry.EVOCATION_SPELL_POWER), 0xffffff));
-        list.add(new Pair(player.getAttributeValue(AttributeRegistry.NATURE_SPELL_POWER), 0x76ff03));
-        list.add(new Pair(player.getAttributeValue(AttributeRegistry.BLOOD_SPELL_POWER), 0xd50000));
-        list.add(new Pair(player.getAttributeValue(AttributeRegistry.HOLY_SPELL_POWER), 0xffeb3b));
-        list.add(new Pair(player.getAttributeValue(AttributeRegistry.ENDER_SPELL_POWER), 0x9c27b0));
-        list.add(new Pair(player.getAttributeValue(AttributeRegistry.ELDRITCH_SPELL_POWER), 0x000000));
-
-        double max = list.stream()
-                .mapToDouble(Pair::getNumber)
-                .max()
-                .orElse(Double.NEGATIVE_INFINITY);
-
-        long countMax = list.stream()
-                .filter(p -> p.getNumber() == max)
-                .count();
-
-        if (countMax > 1) {
-            return 0xffffff;
-        }
-        return list.stream()
-                .filter(p -> p.getNumber() == max)
-                .findFirst()
-                .map(Pair::getColor)
-                .orElse(0xffffff);
-    }
 
 
 }

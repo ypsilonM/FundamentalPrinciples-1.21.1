@@ -39,6 +39,8 @@ public class ModEffects {
                             BloodstreamEffect.JUMP_PER_LEVEL, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
                     .addAttributeModifier(Attributes.STEP_HEIGHT, ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "bloodstream"),
                             0.4, AttributeModifier.Operation.ADD_VALUE)
+                    .addAttributeModifier(Attributes.SCALE, ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "bloodstream"),
+                            0.03, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
     );
 
 //    public static final Holder<MobEffect> SHAPELESS_MOTHER = MOB_EFFECTS.register("shapeless_mother",

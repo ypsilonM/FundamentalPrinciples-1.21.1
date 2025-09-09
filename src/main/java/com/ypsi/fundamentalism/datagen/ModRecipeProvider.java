@@ -2,9 +2,11 @@ package com.ypsi.fundamentalism.datagen;
 
 import com.ypsi.fundamentalism.block.ModBlocks;
 import com.ypsi.fundamentalism.item.ModItems;
+import io.redspace.ironsspellbooks.registries.ItemRegistry;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 import net.neoforged.neoforge.common.conditions.IConditionBuilder;
 
@@ -21,12 +23,14 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
 //        List<ItemLike> MANA_SMELTABLES = List.of(ModItems.PURE_ORB,
 //                ModBlocks.MANA_ORE);
 //
-//        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.MANA_BLOCK.get())
-//                .pattern("BBB")
-//                .pattern("BBB")
-//                .pattern("BBB")
-//                .define('B', ModItems.ORB.get())
-//                .unlockedBy("has_orb", has(ModItems.ORB)).save(recipeOutput);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.MANA_FRUIT.get())
+                .pattern("EFE")
+                .pattern("FAF")
+                .pattern("EFE")
+                .define('A', Items.GOLDEN_APPLE)
+                .define('F', Items.CHORUS_FRUIT)
+                .define('E', ItemRegistry.ARCANE_ESSENCE.get())
+                .unlockedBy("has_essence", has(ItemRegistry.ARCANE_ESSENCE.get())).save(recipeOutput);
 //
 //        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.ORB.get(), 9)
 //                .requires(ModBlocks.MANA_BLOCK)
