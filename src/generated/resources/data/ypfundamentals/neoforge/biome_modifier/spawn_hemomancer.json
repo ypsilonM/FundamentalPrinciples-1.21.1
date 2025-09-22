@@ -1,0 +1,13 @@
+{
+  "type": "neoforge:add_spawns",
+  "biomes": [
+    "minecraft:soul_sand_valley",
+    "minecraft:basalt_deltas"
+  ],
+  "spawners": {
+    "type": "ypfundamentals:hemomancer",
+    "maxCount": 1,
+    "minCount": 1,
+    "weight": 2
+  }
+}
