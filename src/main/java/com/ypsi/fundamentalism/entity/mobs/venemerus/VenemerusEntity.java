@@ -62,7 +62,7 @@ public class VenemerusEntity extends AbstractSpellCastingMob implements Enemy {
     protected void registerGoals() {
 //        super.registerGoals();
         this.goalSelector.addGoal(1, new FloatGoal(this));
-        this.goalSelector.addGoal(2, new WarlockAttackGoal(this, 1f, 60, 120, 2f)
+        this.goalSelector.addGoal(2, new WarlockAttackGoal(this, 1, 100, 140)
                 .setSpells(
                         List.of(SpellRegistry.ACID_ORB_SPELL.get()),
                         List.of(),
@@ -70,10 +70,10 @@ public class VenemerusEntity extends AbstractSpellCastingMob implements Enemy {
                         List.of()
                 )
                         .setSpellQuality(.1f, .5f)
-                        .setMeleeBias(.9f,1f)
+                        .setMeleeBias(1f,1f)
                 .setSingleUseSpell(SpellRegistry.SPIDER_ASPECT_SPELL.get(), 80, 15*20, 8,8)
                 .setSingleUseSpell(SpellRegistry.POISON_BREATH_SPELL.get(), 40, 120, 2, 3)
-
+                .setMeleeAttackInverval(15, 20)
         );
         this.goalSelector.addGoal(3, new PatrolNearLocationGoal(this, 30, .75f));
         this.goalSelector.addGoal(3, new LeapAtTargetGoal(this, 0.8F));
@@ -92,7 +92,9 @@ public class VenemerusEntity extends AbstractSpellCastingMob implements Enemy {
                 .add(Attributes.MAX_HEALTH, 40.0)
                 .add(Attributes.MOVEMENT_SPEED, 0.5)
                 .add(Attributes.ARMOR, 12.0)
-                .add(Attributes.ATTACK_DAMAGE, 5.0)
+                .add(Attributes.ATTACK_DAMAGE, 2.0)
+                .add(Attributes.ENTITY_INTERACTION_RANGE, 3)
+                .add(Attributes.ATTACK_SPEED, 2)
                 .add(Attributes.FOLLOW_RANGE, 25.0);
     }
 

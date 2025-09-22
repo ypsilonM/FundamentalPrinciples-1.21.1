@@ -9,7 +9,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 import net.minecraft.world.entity.ai.attributes.Attribute;
 
-public class ModAttributes {
+public class YpsAttributes {
     public static final DeferredRegister<Attribute> ATTRIBUTES =
             DeferredRegister.create(Registries.ATTRIBUTE, FundamentalPrinciples.MOD_ID);
 

@@ -8,6 +8,7 @@ import com.ypsi.fundamentalism.entity.mobs.witch.SummonedWitch;
 import com.ypsi.fundamentalism.entity.spells.chains.ChainsEntity;
 import com.ypsi.fundamentalism.entity.spells.holy_lightning.HolyLightningProjectile;
 import com.ypsi.fundamentalism.entity.spells.pull.PullProjectile;
+import com.ypsi.fundamentalism.entity.spells.sacredDisk.SacredDiskProjectile;
 import com.ypsi.fundamentalism.entity.spells.sol.SolProjectile;
 import com.ypsi.fundamentalism.entity.spells.thorn.ThornProjectile;
 import io.redspace.ironsspellbooks.entity.spells.root.RootEntity;
@@ -51,6 +52,13 @@ public class ModEntities {
                     .clientTrackingRange(64)
                     .build(ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "thorn").toString()));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<SacredDiskProjectile>> SACRED_DISK =
+            ENTITY_TYPES.register("disk", () -> EntityType.Builder.<SacredDiskProjectile>of(SacredDiskProjectile::new, MobCategory.MISC)
+                    .sized(.8f, .2f)
+                    .clientTrackingRange(10)
+                    .build(ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "disk").toString())
+            );
+
     public static final DeferredHolder<EntityType<?>, EntityType<ChainsEntity>> CHAINS =
             ENTITY_TYPES.register("chains", () -> EntityType.Builder.<ChainsEntity>of(ChainsEntity::new, MobCategory.MISC)
                         .sized(1.0F, 1.0F)
@@ -76,17 +84,17 @@ public class ModEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<VenemerusEntity>> VENEMERUS =
             ENTITY_TYPES.register("venemerus", () ->
                     EntityType.Builder.<VenemerusEntity>of(VenemerusEntity::new, MobCategory.MONSTER)
-                            .sized(2f, 1.5f)
+                            .sized(2f, 1.2f)
                             .clientTrackingRange(10)
                             .build(String.valueOf(ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "venemerus")))
             );
 
     //Summons
-    public static final DeferredHolder<EntityType<?>, EntityType<SummonedWitch>> SUMMONED_WITCH =
-            ENTITY_TYPES.register("summoned_witch", () -> EntityType.Builder.<SummonedWitch>of(SummonedWitch::new, MobCategory.MONSTER)
-                    .sized(.6f, 1.8f)
-                    .clientTrackingRange(64)
-                    .build(ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "summoned_witch").toString()));
+//    public static final DeferredHolder<EntityType<?>, EntityType<SummonedWitch>> SUMMONED_WITCH =
+//            ENTITY_TYPES.register("summoned_witch", () -> EntityType.Builder.<SummonedWitch>of(SummonedWitch::new, MobCategory.MONSTER)
+//                    .sized(.6f, 1.8f)
+//                    .clientTrackingRange(64)
+//                    .build(ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "summoned_witch").toString()));
 
     public static void register(IEventBus eventBus){
         ENTITY_TYPES.register(eventBus);

@@ -49,10 +49,10 @@ public class SummonedWitch extends Witch implements IMagicSummon {
         xpReward = 0;
     }
 
-    public SummonedWitch(Level level, LivingEntity owner) {
-        this(ModEntities.SUMMONED_WITCH.get(), level);
-        setSummoner(owner);
-    }
+//    public SummonedWitch(Level level, LivingEntity owner) {
+//        this(ModEntities.SUMMONED_WITCH.get(), level);
+//        setSummoner(owner);
+//    }
 
     protected LivingEntity cachedSummoner;
     protected UUID summonerUUID;

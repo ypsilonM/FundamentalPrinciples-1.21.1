@@ -1,7 +1,6 @@
 package com.ypsi.fundamentalism.datagen;
 
 import com.ypsi.fundamentalism.FundamentalPrinciples;
-import com.ypsi.fundamentalism.block.ModBlocks;
 import net.minecraft.data.PackOutput;
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
@@ -14,9 +13,9 @@ public class ModBlockStatesProvider extends BlockStateProvider {
 
     @Override
     protected void registerStatesAndModels() {
-//        blockWithItem(ModBlocks.MAGIC_BLOCK);
-//        blockWithItem(ModBlocks.MANA_BLOCK);
-//        blockWithItem(ModBlocks.MANA_ORE);
+//        blockWithItem(YpsBlocks.MAGIC_BLOCK);
+//        blockWithItem(YpsBlocks.MANA_BLOCK);
+//        blockWithItem(YpsBlocks.MANA_ORE);
     }
 
     private void blockWithItem(DeferredBlock<?> deferredBlock){

@@ -14,10 +14,10 @@ public class ModItemModelProvider extends ItemModelProvider {
 
     @Override
     protected void registerModels() {
-        basicItem(ModItems.ORB.get());
-        basicItem(ModItems.PURE_ORB.get());
-
         basicItem(ModItems.MANA_FRUIT.get());
 
+        withExistingParent(ModItems.HEMOMANCER_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
+        withExistingParent(ModItems.IMP_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
+        withExistingParent(ModItems.VENEMERUS_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
     }
 }

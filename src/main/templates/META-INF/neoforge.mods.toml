@@ -88,7 +88,7 @@ config="${mod_id}.mixins.json"
 [[dependencies.${mod_id}]]
     modId = "irons_spellbooks"
     mandatory = true
-    versionRange = "[1.21-3.9.0,)"
+    versionRange = "[${irons_spells_version}, )"
     ordering = "AFTER"
     side = "BOTH"
 
@@ -113,6 +113,12 @@ config="${mod_id}.mixins.json"
     ordering="NONE"
     side="BOTH"
 
+[[dependencies.${mod_id}]]
+    modId = "additional_attributes"
+    type="required"
+    versionRange="[1.2.2,)"
+    ordering="NONE"
+    side="BOTH"
 
 
 

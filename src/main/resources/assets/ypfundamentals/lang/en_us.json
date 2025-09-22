@@ -1,7 +1,4 @@
 {
-  "item.ypfundamentals.orb": "Mana Orb",
-  "item.ypfundamentals.pure_orb": "Pure Orb",
-
   "item.ypfundamentals.mana_fruit": "Mana Fruit",
 
   "creativetab.ypfundamentals.mana_items": "Mana Items",
@@ -16,6 +13,10 @@
   "entity.ypfundamentals.imp": "Imp",
   "entity.ypfundamentals.venemerus": "Venemerus",
 
+  "item.ypfundamentals.hemomancer_spawn_egg": "Hemomancer Spawn Egg",
+  "item.ypfundamentals.imp_spawn_egg": "Imp Spawn Egg",
+  "item.ypfundamentals.venemerus_spawn_egg": "Venemerus Spawn Egg",
+
   "attribute.name.technique.exhaustion": "Exhaustion",
 
   "spell.ypfundamentals.grantstrength": "Burning Spirit",
@@ -29,11 +30,12 @@
   "spell.ypfundamentals.lapsus": "Lapsus",
   "spell.ypfundamentals.sol": "Sol",
   "spell.ypfundamentals.bloodmoon": "Blood Moon",
-
+  "spell.ypfundamentals.sacred_disk": "Sacred Disk",
   "spell.ypfundamentals.yggdrasil": "Yggdrasil",
 
   "key.category.fundamentalism": "Fundamentalism",
-  "key.fundamentalism.reinforce": "Mana Reinforcement"
+  "key.fundamentalism.reinforce": "Mana Reinforcement",
+  "key.fundamentalism.selection": "Spell Level Wheel"
 
 
 

@@ -3,33 +3,26 @@ package com.ypsi.fundamentalism.event;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.ypsi.fundamentalism.FundamentalPrinciples;
+import com.ypsi.fundamentalism.entity.spells.sacredDisk.SacredDiskRenderer;
 import com.ypsi.fundamentalism.entity.spells.thorn.ThornRenderer;
 import com.ypsi.fundamentalism.gui.TierWheelOverlay;
 import com.ypsi.fundamentalism.keybind.ModKeyBinds;
 import com.ypsi.fundamentalism.network.packets.ClientExhaustionData;
 import com.ypsi.fundamentalism.network.packets.ToggleReinforcementPacket;
 import com.ypsi.fundamentalism.render.ChargeSpellVisuals;
-import io.redspace.ironsspellbooks.IronsSpellbooks;
-import io.redspace.ironsspellbooks.config.ClientConfigs;
-import io.redspace.ironsspellbooks.gui.overlays.ManaBarOverlay;
-import io.redspace.ironsspellbooks.gui.overlays.SpellBarOverlay;
-import io.redspace.ironsspellbooks.gui.overlays.SpellWheelOverlay;
-import io.redspace.ironsspellbooks.network.casting.CastPacket;
-import io.redspace.ironsspellbooks.network.casting.QuickCastPacket;
+import com.ypsi.fundamentalism.render.ReinforcementLayer;
 import io.redspace.ironsspellbooks.player.ClientSpellCastHelper;
-import io.redspace.ironsspellbooks.player.KeyMappings;
 import io.redspace.ironsspellbooks.player.KeyState;
-import io.redspace.ironsspellbooks.render.SpellTargetingLayer;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -37,10 +30,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.network.PacketDistributor;
-
-import java.awt.*;
 import java.util.ArrayList;
-import java.util.Random;
 
 
 public class ClientEvents {
@@ -61,18 +51,13 @@ public class ClientEvents {
 
                         int exhaustion = ClientExhaustionData.getCurrentExhaustion();
                         if (exhaustion <= 0) return;
-
-                        // Calculate position to the LEFT of hotbar
                         int screenWidth = minecraft.getWindow().getGuiScaledWidth();
                         int screenHeight = minecraft.getWindow().getGuiScaledHeight();
-
-                        // Hotbar is centered, so get its left edge position
                         int hotbarCenterX = screenWidth / 2;
-                        int hotbarLeftEdge = hotbarCenterX - 91; // Hotbar width is 182px, so left edge is center - 91
+                        int hotbarRightEdge = hotbarCenterX + 91;
 
-                        // Position: fixed left position with spacing
-                        int x = hotbarLeftEdge - 20; // 20px to the left of hotbar edge
-                        int y = screenHeight - 25; // Fixed position at bottom (align with hotbar)
+                        int x = hotbarRightEdge + 20;
+                        int y = screenHeight - 25;
 
                         renderBottleExhaustionBar(guiGraphics, x, y, exhaustion);
                     }
@@ -91,47 +76,84 @@ public class ClientEvents {
 
             int size = 16;
 
-            // Botella vacía - posición FIJA
             gui.blit(EMPTY_BOTTLE_TEXTURE, x, y - size, 0, 0, size, size, size, size);
 
-            // Líquido - se llena hacia arriba pero la botella no se mueve
             if (progress > 0) {
                 int fillHeight = (int) (size * progress);
                 int textureV = getLiquidTextureV(progress);
 
-                // Render liquid from BOTTOM UP at fixed position
                 gui.blit(LIQUID_TEXTURE,
-                        x, y - fillHeight,           // Posición fija, solo cambia el fill height
-                        0, textureV + (size - fillHeight), // Crop texture from top
-                        size, fillHeight,            // Solo renderizar la parte llena
+                        x, y - fillHeight,
+                        0, textureV + (size - fillHeight),
+                        size, fillHeight,
                         size, size);
             }
+            renderExhaustionCounter(gui, x, y, exhaustion, size);
+        }
+        private static void renderExhaustionCounter(GuiGraphics gui, int bottleX, int bottleY, int exhaustion, int size) {
+            Minecraft minecraft = Minecraft.getInstance();
+            Font font = minecraft.font;
+
+            int counterX = bottleX - 2;
+            int counterY = bottleY - size - 2;
+            String text = String.valueOf(exhaustion);
+
+            PoseStack poseStack = gui.pose();
+            poseStack.pushPose();
+            poseStack.scale(0.7f, 0.7f, 1.0f);
+
+            float inverseScale = 1 / 0.7f;
+            int scaledX = (int) (counterX * inverseScale);
+            int scaledY = (int) (counterY * inverseScale);
+
+            int textColor = getExhaustionTextColor(exhaustion);
+
+            gui.drawString(font, text, scaledX + 1, scaledY + 1, 0x000000, false);
+            gui.drawString(font, text, scaledX, scaledY, textColor, false);
+
+            poseStack.popPose();
         }
 
         private static int getLiquidTextureV(float progress) {
-            // Select color row based on exhaustion level
             if (progress < 0.25f) return 0;     // Green
             if (progress < 0.5f) return 16;     // Yellow
             if (progress < 0.75f) return 32;    // Orange
             return 48;                          // Red
+        }
+        private static int getExhaustionTextColor(int exhaustion) {
+            if (exhaustion < 25) return 0x00FF00; // Green
+            if (exhaustion < 50) return 0xFFFF00; // Yellow
+            if (exhaustion < 75) return 0xFFA500; // Orange
+            return 0xFF0000; // Red
         }
 
 
         @SubscribeEvent
         public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
             event.registerLayerDefinition(ThornRenderer.MODEL_LAYER_LOCATION, ThornRenderer::createBodyLayer);
+            event.registerLayerDefinition(SacredDiskRenderer.MODEL_LAYER_LOCATION, SacredDiskRenderer::createDiskLayer);
         }
 
 
         @SubscribeEvent
-        public static void registerRenderers(final EntityRenderersEvent.AddLayers event) {
+        public static void registerRenderers(EntityRenderersEvent.AddLayers event) {
             addLayerToPlayerSkin(event, PlayerSkin.Model.SLIM);
             addLayerToPlayerSkin(event, PlayerSkin.Model.WIDE);
-            for (EntityType type : event.getEntityTypes()) {
-                var renderer = event.getRenderer(type);
-                if (renderer instanceof LivingEntityRenderer livingRenderer) {
-                    livingRenderer.addLayer(new SpellTargetingLayer.Vanilla<>(livingRenderer));
-                }
+        }
+        @SubscribeEvent
+        public static void onRegisterRenderers(EntityRenderersEvent.AddLayers event) {
+            addReinforcementLayerToRenderer(event, PlayerSkin.Model.WIDE);
+            addReinforcementLayerToRenderer(event, PlayerSkin.Model.SLIM);
+        }
+
+        private static void addReinforcementLayerToRenderer(EntityRenderersEvent.AddLayers event, PlayerSkin.Model modelType) {
+            EntityRenderer<? extends Player> renderer = event.getSkin(modelType);
+            if (renderer instanceof LivingEntityRenderer) {
+                @SuppressWarnings("unchecked")
+                LivingEntityRenderer<Player, PlayerModel<Player>> playerRenderer =
+                        (LivingEntityRenderer<Player, PlayerModel<Player>>) renderer;
+
+                playerRenderer.addLayer(new ReinforcementLayer(playerRenderer, event.getEntityModels()));
             }
         }
         @SuppressWarnings({"rawtypes", "unchecked"})
@@ -168,7 +190,6 @@ public class ClientEvents {
                     return;
                 }
                handleRightClickSuppression(button, action);
-
                 if(REINFORCE.wasPressed()){
                     minecraft.player.playSound(SoundEvents.END_PORTAL_FRAME_FILL, 0.9f, 0.7f);
                     PacketDistributor.sendToServer(new ToggleReinforcementPacket());
@@ -190,15 +211,6 @@ public class ClientEvents {
                     k.update();
                 }
             }
-//            @SubscribeEvent
-//            public static void onKeyPress(ClientTickEvent.Post event) {
-//                Minecraft mc = Minecraft.getInstance();
-//
-//
-//                if (ModKeyBinds.REINFORCE_KEY.get().consumeClick()) {
-//
-//                }
-//            }
 
             private static KeyState register(KeyMapping key) {
                 var k = new KeyState(key);

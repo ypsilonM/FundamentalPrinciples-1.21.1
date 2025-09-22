@@ -1,16 +1,13 @@
 package com.ypsi.fundamentalism.datagen;
 
-import com.ypsi.fundamentalism.block.ModBlocks;
 import com.ypsi.fundamentalism.item.ModItems;
 import io.redspace.ironsspellbooks.registries.ItemRegistry;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.ItemLike;
 import net.neoforged.neoforge.common.conditions.IConditionBuilder;
 
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class ModRecipeProvider extends RecipeProvider implements IConditionBuilder {
@@ -21,7 +18,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
     @Override
     protected void buildRecipes(RecipeOutput recipeOutput) {
 //        List<ItemLike> MANA_SMELTABLES = List.of(ModItems.PURE_ORB,
-//                ModBlocks.MANA_ORE);
+//                YpsBlocks.MANA_ORE);
 //
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.MANA_FRUIT.get())
                 .pattern("EFE")
@@ -33,12 +30,12 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("has_essence", has(ItemRegistry.ARCANE_ESSENCE.get())).save(recipeOutput);
 //
 //        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.ORB.get(), 9)
-//                .requires(ModBlocks.MANA_BLOCK)
-//                .unlockedBy("has_mana_block", has(ModBlocks.MANA_BLOCK)).save(recipeOutput);
+//                .requires(YpsBlocks.MANA_BLOCK)
+//                .unlockedBy("has_mana_block", has(YpsBlocks.MANA_BLOCK)).save(recipeOutput);
 //
 //        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.ORB.get(), 18)
-//                .requires(ModBlocks.MAGIC_BLOCK)
-//                .unlockedBy("has_magic_block", has(ModBlocks.MAGIC_BLOCK))
+//                .requires(YpsBlocks.MAGIC_BLOCK)
+//                .unlockedBy("has_magic_block", has(YpsBlocks.MAGIC_BLOCK))
 //                .save(recipeOutput, "ypfundamentals:orb_from_magic_block");
 //
 //        oreSmelting(recipeOutput,MANA_SMELTABLES, RecipeCategory.MISC, ModItems.ORB.get(), 0.25f,200, "mana");

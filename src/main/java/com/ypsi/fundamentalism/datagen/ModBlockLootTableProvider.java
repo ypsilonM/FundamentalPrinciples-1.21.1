@@ -1,12 +1,10 @@
 package com.ypsi.fundamentalism.datagen;
 
-import com.ypsi.fundamentalism.block.ModBlocks;
-import com.ypsi.fundamentalism.item.ModItems;
+import com.ypsi.fundamentalism.block.YpsBlocks;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.loot.BlockLootSubProvider;
-import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -17,7 +15,6 @@ import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.ApplyBonusCount;
 import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
-import net.neoforged.fml.common.Mod;
 
 import java.util.Set;
 
@@ -29,12 +26,12 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
 
     @Override
     protected void generate() {
-//        dropSelf(ModBlocks.MAGIC_BLOCK.get());
-//        add(ModBlocks.MANA_ORE.get(),
-//                block -> createOreDrop(ModBlocks.MANA_ORE.get(), ModItems.PURE_ORB.get()));
+//        dropSelf(YpsBlocks.MAGIC_BLOCK.get());
+//        add(YpsBlocks.MANA_ORE.get(),
+//                block -> createOreDrop(YpsBlocks.MANA_ORE.get(), ModItems.PURE_ORB.get()));
 //
-//        add(ModBlocks.MANA_BLOCK.get(),
-//                block -> createMultipleOreDrops(ModBlocks.MANA_BLOCK.get(), ModItems.ORB.get(),1,5));
+//        add(YpsBlocks.MANA_BLOCK.get(),
+//                block -> createMultipleOreDrops(YpsBlocks.MANA_BLOCK.get(), ModItems.ORB.get(),1,5));
     }
 
 
@@ -47,6 +44,6 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
     }
     @Override
     protected Iterable<Block> getKnownBlocks() {
-        return ModBlocks.BLOCKS.getEntries().stream().map(Holder::value)::iterator;
+        return YpsBlocks.BLOCKS.getEntries().stream().map(Holder::value)::iterator;
     }
 }

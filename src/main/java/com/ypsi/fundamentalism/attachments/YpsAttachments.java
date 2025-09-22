@@ -9,7 +9,7 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
 import java.util.function.Supplier;
 
-public class ModAttachments {
+public class YpsAttachments {
     private static final DeferredRegister<AttachmentType<?>> ATTACHMENTS =
             DeferredRegister.create(NeoForgeRegistries.Keys.ATTACHMENT_TYPES, FundamentalPrinciples.MOD_ID);
 

@@ -53,7 +53,7 @@ public class ModEffects {
 //            () -> new TreesBlessingEffect(MobEffectCategory.BENEFICIAL, 0x0722a9));
 
     public static final Holder<MobEffect> REINFORCEMENT_EFFECT = MOB_EFFECTS.register("reinforcement",
-            () -> new ReinforcementEffect(MobEffectCategory.NEUTRAL, 0x0722a9)
+            () -> new ReinforcementEffect(MobEffectCategory.BENEFICIAL, 0x0722a9)
                     .addAttributeModifier(AttributeRegistry.SPELL_RESIST,
                             ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "reinforcement"), 0.3, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
                     .addAttributeModifier(AttributeRegistry.SPELL_POWER,

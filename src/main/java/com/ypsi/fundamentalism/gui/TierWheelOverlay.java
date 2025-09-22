@@ -204,7 +204,7 @@ public class TierWheelOverlay implements LayeredDraw.Layer {
                 int iconWidth = 16 / 2;
                 int borderWidth = 32 / 2;
                 int cdWidth = 16 / 2;
-                //blit(poseStack, centerX + (int) locations[i].x + 3, centerY + (int) locations[i].y + 3, 0, 0, 16, 16, 16, 16);
+
                 guiHelper.blit(texture, (int) locations[i].x - iconWidth, (int) locations[i].y - iconWidth, 0, 0, 16, 16, 16, 16);
                 /*
                 Border
@@ -217,7 +217,7 @@ public class TierWheelOverlay implements LayeredDraw.Layer {
                 if (f > 0) {
                     RenderSystem.enableBlend();
                     int pixels = (int) (16 * f + 1f);
-//                    gui.blit(poseStack, centerX + (int) locations[i].x + 3, centerY + (int) locations[i].y + 19 - pixels, 47, 87, 16, pixels);
+
                     guiHelper.blit(TEXTURE, (int) locations[i].x - cdWidth, (int) locations[i].y + cdWidth - pixels, 47, 87, 16, pixels);
                 }
                 poseStack.popPose();
@@ -232,9 +232,6 @@ public class TierWheelOverlay implements LayeredDraw.Layer {
         guiHelper.fill(0, 0, (int) (centerX * 2), (int) (centerY * 2), 0);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        //final Tesselator tesselator = Tesselator.getInstance();
-        //final BufferBuilder buffer = tesselator.getBuilder();
-        //buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
 
         centerY = centerY - textYOffset - 2;
         int heightMax = textHeight / 2 + 4;
@@ -260,15 +257,6 @@ public class TierWheelOverlay implements LayeredDraw.Layer {
         vertexConsumer.addVertex(m, centerX + widthMin, centerY + heightMax + heightMax, 0f).setColor(radialButtonColor.x(), radialButtonColor.y(), radialButtonColor.z(), 0);
         vertexConsumer.addVertex(m, centerX + widthMax, centerY + heightMax + heightMax, 0f).setColor(radialButtonColor.x(), radialButtonColor.y(), radialButtonColor.z(), 0);
         vertexConsumer.addVertex(m, centerX + widthMax, centerY + heightMin + heightMax, 0f).setColor(radialButtonColor.x(), radialButtonColor.y(), radialButtonColor.z(), radialButtonColor.w());
-//
-//        buffer.vertex(centerX - widthMax, centerY - heightMax, getBlitOffset()).setColor(radialButtonColor.x(), radialButtonColor.y(), radialButtonColor.z(), 0);
-//        buffer.vertex(centerX - widthMax, centerY - heightMin, getBlitOffset()).setColor(radialButtonColor.x(), radialButtonColor.y(), radialButtonColor.z(), radialButtonColor.w());
-//        buffer.vertex(centerX + widthMin, centerY - heightMin, getBlitOffset()).setColor(radialButtonColor.x(), radialButtonColor.y(), radialButtonColor.z(), radialButtonColor.w());
-//        buffer.vertex(centerX + widthMin, centerY - heightMax, getBlitOffset()).setColor(radialButtonColor.x(), radialButtonColor.y(), radialButtonColor.z(), 0);
-
-
-        //tesselator.end();
-        //FIXME: 1.21: still necessary after removal of buffer builder? still necessary post 1.20 at all?
         RenderSystem.disableBlend();
     }
 
@@ -364,32 +352,6 @@ public class TierWheelOverlay implements LayeredDraw.Layer {
             vertexConsumer.addVertex(m, centerX + x2m2, centerY + y2m2, 0).setColor(color.x(), color.y(), color.z(), 0);
             vertexConsumer.addVertex(m, centerX + x1m2, centerY + y1m2, 0).setColor(color.x(), color.y(), color.z(), 0);
         }
-    }
-
-    private void setOpaqueTexture(ResourceLocation texture) {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-        RenderSystem.setShaderTexture(0, texture);
-    }
-
-    private void setTranslucentTexture(ResourceLocation texture) {
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.setShader(GameRenderer::getRendertypeTranslucentShader);
-        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-        RenderSystem.setShaderTexture(0, texture);
-    }
-
-    private boolean inTriangle(final double x1, final double y1, final double x2, final double y2,
-                               final double x3, final double y3, final double x, final double y) {
-        final double ab = (x1 - x) * (y2 - y) - (x2 - x) * (y1 - y);
-        final double bc = (x2 - x) * (y3 - y) - (x3 - x) * (y2 - y);
-        final double ca = (x3 - x) * (y1 - y) - (x1 - x) * (y3 - y);
-        return sign(ab) == sign(bc) && sign(bc) == sign(ca);
-    }
-
-    private int sign(final double n) {
-        return n > 0 ? 1 : -1;
     }
 
 }

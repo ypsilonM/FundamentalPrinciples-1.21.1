@@ -1,19 +1,14 @@
 package com.ypsi.fundamentalism.datagen;
 
 import com.ypsi.fundamentalism.FundamentalPrinciples;
-import com.ypsi.fundamentalism.block.ModBlocks;
-import com.ypsi.fundamentalism.item.ModItems;
+import com.ypsi.fundamentalism.entity.ModEntityTagProvider;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.LootTableProvider;
-import net.minecraft.data.recipes.*;
-import net.minecraft.world.item.crafting.*;
-import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.common.conditions.IConditionBuilder;
 import net.neoforged.neoforge.common.data.BlockTagsProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
@@ -50,6 +45,8 @@ public class DataGenerators {
         generator.addProvider(event.includeClient(), new ModBlockStatesProvider(packOutput,existingFileHelper));
 
         generator.addProvider(event.includeServer(), new ModDataPackProvider(packOutput, lookupProvider));
+
+        generator.addProvider(event.includeServer(), new ModEntityTagProvider(packOutput, lookupProvider, existingFileHelper));
 
 
     }

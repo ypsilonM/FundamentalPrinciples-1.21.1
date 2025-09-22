@@ -1,6 +1,7 @@
 package com.ypsi.fundamentalism.entity.mobs.hemomancer;
 
 import com.ypsi.fundamentalism.spells.ModSpells;
+import io.redspace.ironsspellbooks.api.entity.IMagicEntity;
 import io.redspace.ironsspellbooks.api.registry.AttributeRegistry;
 import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
@@ -18,6 +19,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
@@ -57,13 +59,16 @@ public class HemomancerEntity extends AbstractSpellCastingMob implements Enemy {
     protected void registerGoals() {
 //        super.registerGoals();
         this.goalSelector.addGoal(1, new FloatGoal(this));
-        this.goalSelector.addGoal(2, new WarlockAttackGoal(this, 1.25f, 40, 80, 4f)
+        this.goalSelector.addGoal(2, new WarlockAttackGoal(this, 1.25, 80, 160)
                 .setSpells(
                         List.of(SpellRegistry.DEVOUR_SPELL.get() , SpellRegistry.ACUPUNCTURE_SPELL.get()),
                         List.of(),
                         List.of(SpellRegistry.BLOOD_STEP_SPELL.get()),
                         List.of()
-                ).setSingleUseSpell(SpellRegistry.BLOOD_SLASH_SPELL.get(), 200, 300, 1, 1 )
+                )
+                        .setMeleeBias(1, 1)
+                .setSingleUseSpell(SpellRegistry.BLOOD_SLASH_SPELL.get(), 200, 300, 1, 1 )
+                .setMeleeAttackInverval(30, 40)
         );
         this.goalSelector.addGoal(3, new PatrolNearLocationGoal(this, 30, .75f));
         this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 8.0F));
@@ -78,7 +83,13 @@ public class HemomancerEntity extends AbstractSpellCastingMob implements Enemy {
                 .add(Attributes.ARMOR, 12.0)
                 .add(Attributes.ATTACK_DAMAGE, 8.0)
                 .add(Attributes.FOLLOW_RANGE, 25.0)
+                .add(Attributes.ENTITY_INTERACTION_RANGE, 2.5)
                 .add(AttributeRegistry.SPELL_POWER, 1.0);
+    }
+
+    @Override
+    public boolean isInvertedHealAndHarm() {
+        return true;
     }
 
     @Override

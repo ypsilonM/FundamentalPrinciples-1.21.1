@@ -13,7 +13,7 @@ public class ImpModel extends GeoModel<ImpEntity> {
 
     @Override
     public ResourceLocation getTextureResource(ImpEntity animatable) {
-        return ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "textures/entity/imp_texture.png");
+        return ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "textures/entity/imp/imp_texture.png");
     }
 
     @Override

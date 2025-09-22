@@ -1,24 +1,29 @@
 package com.ypsi.fundamentalism.effect.custom;
 
+import com.ypsi.fundamentalism.attachments.YpsAttachments;
 import com.ypsi.fundamentalism.effect.ModEffects;
+import com.ypsi.fundamentalism.network.packets.SyncExhaustionPacket;
+import com.ypsi.fundamentalism.particle.ModParticles;
 import com.ypsi.fundamentalism.util.Pair;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.registry.AttributeRegistry;
 import io.redspace.ironsspellbooks.effect.MagicMobEffect;
-import io.redspace.ironsspellbooks.effect.guiding_bolt.GuidingBoltManager;
 import io.redspace.ironsspellbooks.network.SyncManaPacket;
+import net.minecraft.core.particles.*;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.effect.MobEffect;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,31 +37,37 @@ public class ReinforcementEffect extends MagicMobEffect {
     }
 
     @Override
-    public boolean applyEffectTick(LivingEntity livingEntity, int amplifier) {return false;}
+    public ParticleOptions createParticleOptions(MobEffectInstance effect) {
+        return ModParticles.REINFORCEMENT_PARTICLE.get();
+    }
 
     @Override
     public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
-        return false;
+        return duration % 15 == 0;
     }
 
     @SubscribeEvent
-    public static void onPlayerReforcedHurt(LivingDamageEvent.Pre event) {
+    public static void onPlayerReinforcedHurt(LivingDamageEvent.Pre event) {
         if(event.getEntity() instanceof ServerPlayer serverPlayer) {
             if(serverPlayer.hasEffect(ModEffects.REINFORCEMENT_EFFECT)) {
+
                 MagicData magicData = MagicData.getPlayerMagicData(event.getEntity());
 
                 float originalDamage = event.getNewDamage();
                 float currentMana = magicData.getMana();
 
                 double maxMana = serverPlayer.getAttributeValue(AttributeRegistry.MAX_MANA);
-                double spellPower = serverPlayer.getAttributeValue(AttributeRegistry.SPELL_POWER);
+                double baseSpellPower = serverPlayer.getAttributeBaseValue(AttributeRegistry.SPELL_POWER);
+                double removeSpellBase = baseSpellPower*0.2;
+                double spellPower = serverPlayer.getAttributeValue(AttributeRegistry.SPELL_POWER)+removeSpellBase;
 
                 float mitigatedDamage = (float)(Math.sqrt((maxMana/100))*spellPower);
+
                 float modifiedDamage = originalDamage;
 
-                float manaToConsume = (float)(maxMana*0.1);
+                float manaToConsume = (float)(maxMana*0.05);
 
-                if(currentMana>=(maxMana*.1)) {
+                if(currentMana>=(maxMana*.5)) {
                     if (originalDamage < mitigatedDamage) {
                         modifiedDamage = 0.0f;
                         manaToConsume/=2;
@@ -76,21 +87,14 @@ public class ReinforcementEffect extends MagicMobEffect {
 
                     PacketDistributor.sendToPlayer(serverPlayer, new SyncManaPacket(magicData));
                 }
+                int currentExhaustion = serverPlayer.getData(YpsAttachments.CURRENT_EXHAUSTION.get());
+                serverPlayer.setData(YpsAttachments.CURRENT_EXHAUSTION,
+                        Mth.clamp(currentExhaustion+2,0,100));
+                SyncExhaustionPacket.sendToPlayer(serverPlayer,serverPlayer.getData(YpsAttachments.CURRENT_EXHAUSTION));
+
                 event.setNewDamage(modifiedDamage);
             }
         }
-    }
-
-    @Override
-    public void onEffectAdded(LivingEntity pLivingEntity, int pAmplifier) {
-        super.onEffectAdded(pLivingEntity, pAmplifier);
-//        pLivingEntity.setGlowingTag(true);
-    }
-
-    @Override
-    public void onEffectRemoved(LivingEntity pLivingEntity, int pAmplifier) {
-        super.onEffectRemoved(pLivingEntity, pAmplifier);
-//        pLivingEntity.setGlowingTag(false);
     }
 
     @Override
@@ -98,35 +102,5 @@ public class ReinforcementEffect extends MagicMobEffect {
         return CUSTOM_COLOR;
     }
 
-    public Integer getMagicAff(Player player){
-        List<Pair> list = new ArrayList<>();
-        list.add(new Pair(player.getAttributeValue(AttributeRegistry.FIRE_SPELL_POWER), 0xf57c00));
-        list.add(new Pair(player.getAttributeValue(AttributeRegistry.ICE_SPELL_POWER), 0x42a5f5));
-        list.add(new Pair(player.getAttributeValue(AttributeRegistry.LIGHTNING_SPELL_POWER), 0x1a237e));
-        list.add(new Pair(player.getAttributeValue(AttributeRegistry.EVOCATION_SPELL_POWER), 0xffffff));
-        list.add(new Pair(player.getAttributeValue(AttributeRegistry.NATURE_SPELL_POWER), 0x76ff03));
-        list.add(new Pair(player.getAttributeValue(AttributeRegistry.BLOOD_SPELL_POWER), 0xd50000));
-        list.add(new Pair(player.getAttributeValue(AttributeRegistry.HOLY_SPELL_POWER), 0xffeb3b));
-        list.add(new Pair(player.getAttributeValue(AttributeRegistry.ENDER_SPELL_POWER), 0x9c27b0));
-        list.add(new Pair(player.getAttributeValue(AttributeRegistry.ELDRITCH_SPELL_POWER), 0x000000));
-
-        double max = list.stream()
-                .mapToDouble(Pair::getNumber)
-                .max()
-                .orElse(Double.NEGATIVE_INFINITY);
-
-        long countMax = list.stream()
-                .filter(p -> p.getNumber() == max)
-                .count();
-
-        if (countMax > 1) {
-            return 0xffffff;
-        }
-        return list.stream()
-                .filter(p -> p.getNumber() == max)
-                .findFirst()
-                .map(Pair::getColor)
-                .orElse(0xffffff);
-    }
 
 }

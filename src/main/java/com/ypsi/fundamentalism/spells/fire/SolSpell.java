@@ -17,6 +17,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 @AutoSpellConfig
@@ -75,31 +76,38 @@ public class SolSpell extends AbstractSpell {
     public CastType getCastType() {return CastType.LONG;}
 
     private float getDamage(int spellLevel, LivingEntity entity) {
-        return (float) (getSpellPower(spellLevel, entity)*(getTimeBoost(entity.level())));
+        return (float) (getSpellPower(spellLevel, entity)* (getTimeBoost(entity)));
     }
-    private double getTimeBoost(Level level){
-            long dayTime = level.getDayTime();
-            double buffScale = 1;
-            if (dayTime > 15000 && dayTime < 21000) {
-                //totally debuff
-                buffScale = 0.25;
-            } else if (dayTime >= 12000 && dayTime <= 15000 || dayTime >= 21000 && dayTime <= 24000) {
-                //debuff
-                buffScale = 0.75;
-            } else if (dayTime >= 0 && dayTime <= 3000 || dayTime >= 9000 && dayTime < 12000) {
-                //medium buff
-                buffScale = 1.0;
-            } else if (dayTime >= 4500 && dayTime <= 7500) {
-                //SUN
-                buffScale = 2.5;
-            } else if (dayTime > 3000 && dayTime < 9000) {
-                //good buff
-                buffScale = 1.5;
-            }
-            return buffScale;
+    private float getTimeBoost(LivingEntity entity){
+        if (entity == null) {
+            return 1.0f; // Valor por defecto cuando no hay entidad
+        }
+        Level level = entity.level();
+        if (level == null) {
+            return 1.0f; // Valor por defecto cuando no hay nivel
+        }
+        float buffScale = 1;
+        long dayTime = level.getDayTime();
+        if (dayTime > 15000 && dayTime < 21000) {
+            //totally debuff
+            buffScale = 0.25f;
+        } else if (dayTime >= 12000 && dayTime <= 15000 || dayTime >= 21000 && dayTime <= 24000) {
+            //debuff
+            buffScale = 0.75f;
+        } else if (dayTime >= 0 && dayTime <= 3000 || dayTime >= 9000 && dayTime < 12000) {
+            //medium buff
+            buffScale = 1.0f;
+        } else if (dayTime >= 4500 && dayTime <= 7500) {
+            //SUN
+            buffScale = 2.5f;
+        } else if (dayTime > 3000 && dayTime < 9000) {
+            //good buff
+            buffScale = 1.5f;
+        }
+        return buffScale;
     }
     private float getRadius(int spellLevel, LivingEntity entity) {
-        return (float) ((Math.sqrt(spellLevel)) + (.15f * getSpellPower(spellLevel, entity))*(getTimeBoost(entity.level())));
+        return (float) ((Math.sqrt(spellLevel)) + (.15f * getSpellPower(spellLevel, entity))*(getTimeBoost(entity)));
     }
     @Override
     public AnimationHolder getCastFinishAnimation() {

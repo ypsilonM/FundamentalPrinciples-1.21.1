@@ -9,11 +9,13 @@ import com.ypsi.fundamentalism.spells.ender.LapsusSpell;
 import com.ypsi.fundamentalism.spells.ender.PullSpell;
 import com.ypsi.fundamentalism.spells.evocation.CopycatSpell;
 import com.ypsi.fundamentalism.spells.blood.BloodstreamSpell;
+import com.ypsi.fundamentalism.spells.evocation.StealSummonSpell;
 import com.ypsi.fundamentalism.spells.evocation.TauntSpell;
 import com.ypsi.fundamentalism.spells.fire.FlameStrengthSpell;
 import com.ypsi.fundamentalism.spells.fire.PyrokinesisSpell;
 import com.ypsi.fundamentalism.spells.fire.SolSpell;
 import com.ypsi.fundamentalism.spells.holy.HolyLightningSpell;
+import com.ypsi.fundamentalism.spells.holy.SacredDiskSpell;
 import com.ypsi.fundamentalism.spells.ice.ChainsSpell;
 import com.ypsi.fundamentalism.spells.nature.YggdrasilSpell;
 import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
@@ -46,6 +48,7 @@ public class ModSpells {
 //    public static final Supplier<AbstractSpell> BLOOD_MOON_SPELL = registerSpell(new BloodMoonSpell());
     //------------>holy<----------------
     public static final Supplier<AbstractSpell> HOLY_LIGHTNING = registerSpell(new HolyLightningSpell());
+    public static final Supplier<AbstractSpell> SACRED_DISK = registerSpell(new SacredDiskSpell());
     //------------>nature<----------------
     //public static final Supplier<AbstractSpell> YGGDRASIL = registerSpell(new YggdrasilSpell());
     //------------>ender<----------------
@@ -53,8 +56,10 @@ public class ModSpells {
     public static final Supplier<AbstractSpell> LAPSUS = registerSpell(new LapsusSpell());
     //------------>evocation<----------------
     public static final Supplier<AbstractSpell> TAUNT = registerSpell(new TauntSpell());
+//    public static final Supplier<AbstractSpell> STEAL_SUMMON = registerSpell(new StealSummonSpell());
     //public static final Supplier<AbstractSpell> COPYCAT = registerSpell(new CopycatSpell());
-    //------------>eldritch<----------------
+//    //------------>eldritch<----------------
+//    public static final Supplier<AbstractSpell> MIRROR = registerSpell(new VoidMirrorSpell());
 
 
 }
