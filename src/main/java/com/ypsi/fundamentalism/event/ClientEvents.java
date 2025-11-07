@@ -3,11 +3,13 @@ package com.ypsi.fundamentalism.event;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.ypsi.fundamentalism.FundamentalPrinciples;
+import com.ypsi.fundamentalism.entity.spells.proiectumProjectile.ProiectumRenderer;
 import com.ypsi.fundamentalism.entity.spells.sacredDisk.SacredDiskRenderer;
 import com.ypsi.fundamentalism.entity.spells.thorn.ThornRenderer;
+import com.ypsi.fundamentalism.gui.SpellLevelsScreen;
 import com.ypsi.fundamentalism.gui.TierWheelOverlay;
 import com.ypsi.fundamentalism.keybind.ModKeyBinds;
-import com.ypsi.fundamentalism.network.packets.ClientExhaustionData;
+import com.ypsi.fundamentalism.network.packets.data.ClientExhaustionData;
 import com.ypsi.fundamentalism.network.packets.ToggleReinforcementPacket;
 import com.ypsi.fundamentalism.render.ChargeSpellVisuals;
 import com.ypsi.fundamentalism.render.ReinforcementLayer;
@@ -27,10 +29,13 @@ import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.network.PacketDistributor;
 import java.util.ArrayList;
+
+import static com.ypsi.fundamentalism.event.ModEvents.getMaxExPerLevel;
 
 
 public class ClientEvents {
@@ -48,9 +53,10 @@ public class ClientEvents {
                     (guiGraphics, partialTick) -> {
                         Minecraft minecraft = Minecraft.getInstance();
                         if (minecraft.player == null || minecraft.options.hideGui) return;
-
+                        Player player = minecraft.player;
                         int exhaustion = ClientExhaustionData.getCurrentExhaustion();
-                        if (exhaustion <= 0) return;
+                        int exhaustionLvl = ClientExhaustionData.getLevelExhaustion();
+                        if (exhaustion <= 0 && exhaustionLvl == 0) return;
                         int screenWidth = minecraft.getWindow().getGuiScaledWidth();
                         int screenHeight = minecraft.getWindow().getGuiScaledHeight();
                         int hotbarCenterX = screenWidth / 2;
@@ -59,13 +65,14 @@ public class ClientEvents {
                         int x = hotbarRightEdge + 20;
                         int y = screenHeight - 25;
 
-                        renderBottleExhaustionBar(guiGraphics, x, y, exhaustion);
+                        renderBottleExhaustionBar(guiGraphics, x, y, exhaustion, exhaustionLvl, player);
                     }
             );
         }
 
-        private static void renderBottleExhaustionBar(GuiGraphics gui, int x, int y, int exhaustion) {
-            float progress = Math.min(1.0f, exhaustion / 100.0f);
+        private static void renderBottleExhaustionBar(GuiGraphics gui, int x, int y, int exhaustion, int exhaustionLvl, Player player) {
+            int maxEx = getMaxExPerLevel(exhaustionLvl, player);
+            float progress = Math.min(1.0f, exhaustion / (float)maxEx);
 
             ResourceLocation EMPTY_BOTTLE_TEXTURE = ResourceLocation.fromNamespaceAndPath(
                     FundamentalPrinciples.MOD_ID, "textures/gui/empty_bottle.png"
@@ -88,29 +95,40 @@ public class ClientEvents {
                         size, fillHeight,
                         size, size);
             }
-            renderExhaustionCounter(gui, x, y, exhaustion, size);
+            renderExhaustionCounter(gui, x, y, exhaustion, exhaustionLvl ,maxEx , size);
         }
-        private static void renderExhaustionCounter(GuiGraphics gui, int bottleX, int bottleY, int exhaustion, int size) {
+        private static void renderExhaustionCounter(GuiGraphics gui, int bottleX, int bottleY, int exhaustion, int exhaustionLvl, int maxEx,int size) {
             Minecraft minecraft = Minecraft.getInstance();
             Font font = minecraft.font;
 
-            int counterX = bottleX - 2;
-            int counterY = bottleY - size - 2;
-            String text = String.valueOf(exhaustion);
+            String levelText = String.valueOf(exhaustionLvl);
+            int levelX = bottleX;
+            int levelY = bottleY - size;
+
+            String exhaustionText = String.valueOf(exhaustion);
+            int exhaustionX = bottleX + size - 4;
+            int exhaustionY = bottleY + 2;
 
             PoseStack poseStack = gui.pose();
             poseStack.pushPose();
-            poseStack.scale(0.7f, 0.7f, 1.0f);
+            poseStack.scale(0.8f, 0.8f, 0.8f);
+            float inverseScale = 1 / 0.8f;
+            int scaledLevelX = (int) (levelX * inverseScale);
+            int scaledLevelY = (int) (levelY * inverseScale);
 
-            float inverseScale = 1 / 0.7f;
-            int scaledX = (int) (counterX * inverseScale);
-            int scaledY = (int) (counterY * inverseScale);
+            int exhaustionColor = getExhaustionTextColor(exhaustion, maxEx);
 
-            int textColor = getExhaustionTextColor(exhaustion);
+            gui.drawString(font, levelText, scaledLevelX + 1, scaledLevelY + 1, 0x000000, false);
+            gui.drawString(font, levelText, scaledLevelX, scaledLevelY, exhaustionColor, false);
+            poseStack.popPose();
 
-            gui.drawString(font, text, scaledX + 1, scaledY + 1, 0x000000, false);
-            gui.drawString(font, text, scaledX, scaledY, textColor, false);
+            poseStack.pushPose();
+            poseStack.scale(0.8f, 0.8f, 0.8f);
+            int scaledExhaustionX = (int) (exhaustionX * inverseScale);
+            int scaledExhaustionY = (int) (exhaustionY * inverseScale);
 
+            gui.drawString(font, exhaustionText, scaledExhaustionX + 1, scaledExhaustionY + 1, 0x000000, false);
+            gui.drawString(font, exhaustionText, scaledExhaustionX, scaledExhaustionY, exhaustionColor, false);
             poseStack.popPose();
         }
 
@@ -120,18 +138,19 @@ public class ClientEvents {
             if (progress < 0.75f) return 32;    // Orange
             return 48;                          // Red
         }
-        private static int getExhaustionTextColor(int exhaustion) {
-            if (exhaustion < 25) return 0x00FF00; // Green
-            if (exhaustion < 50) return 0xFFFF00; // Yellow
-            if (exhaustion < 75) return 0xFFA500; // Orange
-            return 0xFF0000; // Red
+        private static int getExhaustionTextColor(int exhaustion, int maxEx) {
+            double percentage = ((double) exhaustion /maxEx);
+            if(percentage < 0.25) return 0x3BBDF5;
+            if(percentage < 0.50) return 0x338CF2;
+            if(percentage < 0.75) return 0x225DF2;
+            return 0x4636F5;
         }
-
 
         @SubscribeEvent
         public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
             event.registerLayerDefinition(ThornRenderer.MODEL_LAYER_LOCATION, ThornRenderer::createBodyLayer);
             event.registerLayerDefinition(SacredDiskRenderer.MODEL_LAYER_LOCATION, SacredDiskRenderer::createDiskLayer);
+            event.registerLayerDefinition(ProiectumRenderer.MODEL_LAYER_LOCATION, ProiectumRenderer::createBodyLayer);
         }
 
 
@@ -175,6 +194,7 @@ public class ClientEvents {
             private static final ArrayList<KeyState> KEY_STATES = new ArrayList<>();
             private static final KeyState SELECTION = register(ModKeyBinds.SELECTION_KEY.get());
             private static final KeyState REINFORCE = register(ModKeyBinds.REINFORCE_KEY.get());
+            private static final KeyState CATEGORIES = register(ModKeyBinds.SPELL_CATEGORIES.get());
 
             @SubscribeEvent
             public static void onKeyInput(InputEvent.Key event) {
@@ -193,6 +213,11 @@ public class ClientEvents {
                 if(REINFORCE.wasPressed()){
                     minecraft.player.playSound(SoundEvents.END_PORTAL_FRAME_FILL, 0.9f, 0.7f);
                     PacketDistributor.sendToServer(new ToggleReinforcementPacket());
+                }
+                if(CATEGORIES.wasPressed()){
+                    if (minecraft.screen == null) {
+                        minecraft.setScreen(new SpellLevelsScreen());
+                    }
                 }
                 if (SELECTION.wasPressed()) {
                     if (minecraft.screen == null) {

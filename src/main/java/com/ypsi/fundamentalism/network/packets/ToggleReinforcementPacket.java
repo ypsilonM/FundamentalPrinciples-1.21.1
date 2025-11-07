@@ -46,41 +46,15 @@ public record ToggleReinforcementPacket() implements CustomPacketPayload {
                                 true
                         );
                         player.addEffect(effectInstance);
-                        FundamentalPrinciples.LOGGER.info("Efecto aplicado en servidor a {}", player.getScoreboardName());
-                        syncEffectToAllClients(player, effectInstance);
+                        PacketDistributor.sendToAllPlayers(new SyncReinforcementPacket(player.getId(), true));
                     }
                 } else {
                     player.removeEffect(ModEffects.REINFORCEMENT_EFFECT);
-                    syncEffectRemovalToAllClients(player);
+                    PacketDistributor.sendToAllPlayers(new SyncReinforcementPacket(player.getId(), false));
                 }
 
             }
         });
-    }
-    private static void syncEffectToAllClients(ServerPlayer player, MobEffectInstance effectInstance) {
-        if (player.level() instanceof ServerLevel serverLevel) {
-            // Usar el sistema de envío del servidor directamente
-            serverLevel.getServer().getPlayerList().broadcastAll(
-                    new ClientboundUpdateMobEffectPacket(
-                            player.getId(),
-                            effectInstance,
-                            true
-                    ),
-                    serverLevel.dimension() // enviar solo a esta dimensión
-            );
-        }
-    }
-
-    private static void syncEffectRemovalToAllClients(ServerPlayer player) {
-        if (player.level() instanceof ServerLevel serverLevel) {
-            serverLevel.getServer().getPlayerList().broadcastAll(
-                    new ClientboundRemoveMobEffectPacket(
-                            player.getId(),
-                            ModEffects.REINFORCEMENT_EFFECT
-                    ),
-                    serverLevel.dimension() // enviar solo a esta dimensión
-            );
-        }
     }
 
     private static boolean hasEnoughMana(ServerPlayer player) {

@@ -1,0 +1,29 @@
+{
+  "textures": [
+    "ypfundamentals:constellations/particle1/constellation_1",
+    "ypfundamentals:constellations/particle1/constellation_2",
+    "ypfundamentals:constellations/particle1/constellation_3",
+    "ypfundamentals:constellations/particle1/constellation_4",
+    "ypfundamentals:constellations/particle1/constellation_5",
+    "ypfundamentals:constellations/particle1/constellation_6",
+    "ypfundamentals:constellations/particle1/constellation_7",
+    "ypfundamentals:constellations/particle1/constellation_8",
+    "ypfundamentals:constellations/particle1/constellation_9",
+    "ypfundamentals:constellations/particle1/constellation_10",
+    "ypfundamentals:constellations/particle1/constellation_11",
+    "ypfundamentals:constellations/particle1/constellation_12",
+
+    "ypfundamentals:constellations/particle2/constellation_1",
+    "ypfundamentals:constellations/particle2/constellation_2",
+    "ypfundamentals:constellations/particle2/constellation_3",
+    "ypfundamentals:constellations/particle2/constellation_4",
+    "ypfundamentals:constellations/particle2/constellation_5",
+    "ypfundamentals:constellations/particle2/constellation_6",
+    "ypfundamentals:constellations/particle2/constellation_7",
+    "ypfundamentals:constellations/particle2/constellation_8",
+    "ypfundamentals:constellations/particle2/constellation_9",
+    "ypfundamentals:constellations/particle2/constellation_10",
+    "ypfundamentals:constellations/particle2/constellation_11",
+    "ypfundamentals:constellations/particle2/constellation_12"
+  ]
+}

@@ -1,5 +1,19 @@
-// 1.21.1	2025-09-15T18:25:22.704946	Item Models: ypfundamentals
+// 1.21.1	2025-09-28T18:44:22.2292471	Item Models: ypfundamentals
+70f8c64eccf2deef2ace4821114d73da3827b5cf assets/ypfundamentals/models/item/arcane_mixture.json
 63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/ypfundamentals/models/item/hemomancer_spawn_egg.json
 63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/ypfundamentals/models/item/imp_spawn_egg.json
+6eb1326b5e8fc3cc5837dcb0071007763755dbb6 assets/ypfundamentals/models/item/luminaire_extract.json
 9a1a9fcdcc48dad1c5f6150482b304b06f339d5a assets/ypfundamentals/models/item/mana_fruit.json
+6938fbc99a01b875aa4204e830d8c282e1b02ab9 assets/ypfundamentals/models/item/test_tube.json
+b225175e8eb5f65c205f23aa469c8d908b8c3141 assets/ypfundamentals/models/item/tonic_0.json
+4ba649162fa3f1d509ab3d331462f9aa7964c4aa assets/ypfundamentals/models/item/tonic_1.json
+7826b38260e1e977014c2510129dba2a06ed97dd assets/ypfundamentals/models/item/tonic_10.json
+404c92c14c1bebc09ddd3f6c4a41d8d5c47a9207 assets/ypfundamentals/models/item/tonic_2.json
+22d88f98e1b2fbf4e2d162d2972b6c2fe6498eb9 assets/ypfundamentals/models/item/tonic_3.json
+b782d1ba46f556d1a2a51f26a7d507bb2d0e7b32 assets/ypfundamentals/models/item/tonic_4.json
+d7caac59501863940a2d2689c7de4e8fcd6194dc assets/ypfundamentals/models/item/tonic_5.json
+964465018f89900e638d279281a8cbf8383a6983 assets/ypfundamentals/models/item/tonic_6.json
+f1e6b156aff21860924583a73346c8979d6b5458 assets/ypfundamentals/models/item/tonic_7.json
+40e5973b3c5b4b0d1e77bb7a2d99cbb060b75cee assets/ypfundamentals/models/item/tonic_8.json
+6cb839133d5baa14ca9579a38f429f7acf03f0f4 assets/ypfundamentals/models/item/tonic_9.json
 63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/ypfundamentals/models/item/venemerus_spawn_egg.json

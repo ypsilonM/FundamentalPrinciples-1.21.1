@@ -23,7 +23,7 @@ public class ModEffects {
     public static final Holder<MobEffect> MINDFUL_EFFECT = MOB_EFFECTS.register("mindful",
             () -> new MindfulEffect(MobEffectCategory.BENEFICIAL, 0x0722a9)
                     .addAttributeModifier(AttributeRegistry.MANA_REGEN,
-                            ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "mindful"), 1.5,
+                            ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "mindful"), 0.5,
                             AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
 
     public static final Holder<MobEffect> FLAME_GRANT_STRENGTH = MOB_EFFECTS.register("flame_boost",
@@ -43,19 +43,10 @@ public class ModEffects {
                             0.03, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
     );
 
-//    public static final Holder<MobEffect> SHAPELESS_MOTHER = MOB_EFFECTS.register("shapeless_mother",
-//            () -> new ShapelessMotherEffect(MobEffectCategory.BENEFICIAL, 0xA52A2A)
-//                    .addAttributeModifier(AttributeRegistry.BLOOD_SPELL_POWER, ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "shapeless_mother"),
-//                            0.15, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-//    );
-
-//    public static final Holder<MobEffect> TREES_BLESSING = MOB_EFFECTS.register("treesblessing",
-//            () -> new TreesBlessingEffect(MobEffectCategory.BENEFICIAL, 0x0722a9));
-
     public static final Holder<MobEffect> REINFORCEMENT_EFFECT = MOB_EFFECTS.register("reinforcement",
             () -> new ReinforcementEffect(MobEffectCategory.BENEFICIAL, 0x0722a9)
-                    .addAttributeModifier(AttributeRegistry.SPELL_RESIST,
-                            ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "reinforcement"), 0.3, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
+                    .addAttributeModifier(AttributeRegistry.SPELL_RESIST, //0.3->0.5
+                            ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "reinforcement"), 0.5, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
                     .addAttributeModifier(AttributeRegistry.SPELL_POWER,
                             ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "reinforcement"), -0.2, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
         );

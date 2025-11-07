@@ -30,6 +30,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -103,13 +104,12 @@ public class LapsusSpell extends AbstractSpell {
         }
         if(!level.isClientSide()) {
             if (location!=null) {
-                entity.teleportTo(location.getX(), location.getY()+1,location.getZ());
-                entity.setDeltaMovement(0, 0, 0);
-                entity.fallDistance = 0;
+                Vec3 dest = new Vec3(location.getX(), location.getY()+1,location.getZ());
+                Utils.handleSpellTeleport(this, entity, dest);
+                entity.resetFallDistance();
                 location=null;
             } else {
-                location = entity.blockPosition().below(); // Posición debajo del jugador
-
+                location = entity.blockPosition().below();
             }
         }
         super.onCast(level, spellLevel, entity, castSource, playerMagicData);

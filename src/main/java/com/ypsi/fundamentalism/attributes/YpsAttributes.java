@@ -15,7 +15,7 @@ public class YpsAttributes {
 
     public static final DeferredHolder<Attribute, Attribute> MAX_EXHAUSTION =
             ATTRIBUTES.register("exhaustion.max", () ->
-                    new RangedAttribute("attribute.ypfundamentals.exhaustion.max", 100, 0, 100)
+                    new RangedAttribute("attribute.ypfundamentals.exhaustion.max", 0, 0, 10000)
                             .setSyncable(true)
             );
 

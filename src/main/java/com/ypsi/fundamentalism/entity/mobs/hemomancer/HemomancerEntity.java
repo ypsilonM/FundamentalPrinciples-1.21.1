@@ -137,7 +137,7 @@ public class HemomancerEntity extends AbstractSpellCastingMob implements Enemy {
     }
 
     public void triggerMeleeAttack(){
-        this.meleeTimer = 20;
+        this.meleeTimer = 10;
         if(this.random.nextBoolean()){
             this.triggerAnim("melee_controller", "attack");
         }else{

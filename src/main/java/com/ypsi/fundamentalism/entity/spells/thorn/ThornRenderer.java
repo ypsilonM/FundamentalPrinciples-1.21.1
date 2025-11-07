@@ -42,7 +42,9 @@ public class ThornRenderer extends EntityRenderer<Projectile> {
     public static LayerDefinition createBodyLayer() {
         MeshDefinition meshdefinition = new MeshDefinition();
         PartDefinition partdefinition = meshdefinition.getRoot();
-        partdefinition.addOrReplaceChild("body", CubeListBuilder.create().texOffs(0, 0).addBox(-1.0F, -1.0F, -4.0F, 2.0F, 2.0F, 8.0F), PartPose.ZERO);
+        partdefinition.addOrReplaceChild("body", CubeListBuilder.create()
+                .texOffs(0, 0)
+                .addBox(-1.0F, -1.0F, -4.0F, 2.0F, 2.0F, 8.0F), PartPose.ZERO);
         return LayerDefinition.create(meshdefinition, 20, 10);
     }
 

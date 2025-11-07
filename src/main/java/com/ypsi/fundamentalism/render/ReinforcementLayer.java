@@ -58,7 +58,7 @@ public class ReinforcementLayer extends RenderLayer<Player, PlayerModel<Player>>
             float gameTime = minecraft.level.getGameTime() + partialTicks;
 
             renderPartWithScale(poseStack, currentModel.head, buffer,gameTime,
-                    1.1f, whiteTexture, color, currentModel);
+                    1.15f, whiteTexture, color, currentModel);
 
             renderPartWithScale(poseStack, currentModel.rightArm, buffer,gameTime,
                     1.2f, whiteTexture, color, currentModel);
@@ -88,23 +88,23 @@ public class ReinforcementLayer extends RenderLayer<Player, PlayerModel<Player>>
         boolean isArm = part == model.rightArm || part == model.leftArm;
 
         if (isLeg) {
-            centerY += 0.6f; // Las piernas son más largas, centro más abajo
+            centerY += 0.6f;
         } else if (isArm) {
-            centerY += 0.5f; // Los brazos son largos, centro más abajo
+            centerY += 0.5f;
         } else if (part == model.head) {
-            centerY -= 0.3f; // La cabeza necesita ajuste vertical
+            centerY -= 0.2f;
         }
-
-        float pulse = (float) Math.sin(gameTime * 0.1f) * 0.5f + 0.5f;
+//        float pulse = (float) Math.sin(gameTime * 0.1f) * 0.5f + 0.5f;
+        float pulse = 0.01f;
         float scale;
         poseStack.translate(centerX, centerY, centerZ);
 
         if(part == model.body){
             scale = baseScale + 0.2f * pulse;
-            poseStack.scale(baseScale, baseScale, scale+(scale*0.1f));
+            poseStack.scale(baseScale, baseScale-.1f, scale+(scale*0.1f));
         }else{
             if(part == model.head){
-                scale = baseScale + 0.08f * pulse;
+                scale = baseScale + 0.05f * pulse;
                 float nScale = Math.clamp(scale, baseScale, scale);
                 poseStack.scale(nScale, nScale, nScale);
             }else {

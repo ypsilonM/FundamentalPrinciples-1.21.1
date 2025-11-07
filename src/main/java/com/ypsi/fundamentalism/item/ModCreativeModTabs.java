@@ -21,6 +21,10 @@ public class ModCreativeModTabs {
                     .title(Component.translatable("creativetab.ypfundamentals.mana_items"))
                     .displayItems((parameters, output) -> {
                         output.accept(ModItems.MANA_FRUIT);
+                        output.accept(ModItems.ARCANE_MIXTURE);
+                        output.accept(ModItems.TEST_TUBE);
+                        output.accept(ModItems.LUMINAIRE_EXTRACT);
+                        output.accept(ModItems.TONIC);
                         output.accept(ModItems.IMP_SPAWN_EGG);
                         output.accept(ModItems.HEMOMANCER_SPAWN_EGG);
                         output.accept(ModItems.VENEMERUS_SPAWN_EGG);

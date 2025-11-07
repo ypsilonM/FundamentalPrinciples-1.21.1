@@ -33,4 +33,6 @@ public class Util {
             return Component.literal(String.valueOf(levelTotal));
         }
     }
+
+
 }

@@ -1,0 +1,19 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "ypfundamentals:item/tonic_0"
+  },
+  "overrides": [
+    {"predicate": {"custom_model_data": 0}, "model": "ypfundamentals:item/tonic_0"},
+    {"predicate": {"custom_model_data": 1}, "model": "ypfundamentals:item/tonic_1"},
+    {"predicate": {"custom_model_data": 2}, "model": "ypfundamentals:item/tonic_2"},
+    {"predicate": {"custom_model_data": 3}, "model": "ypfundamentals:item/tonic_3"},
+    {"predicate": {"custom_model_data": 4}, "model": "ypfundamentals:item/tonic_4"},
+    {"predicate": {"custom_model_data": 5}, "model": "ypfundamentals:item/tonic_5"},
+    {"predicate": {"custom_model_data": 6}, "model": "ypfundamentals:item/tonic_6"},
+    {"predicate": {"custom_model_data": 7}, "model": "ypfundamentals:item/tonic_7"},
+    {"predicate": {"custom_model_data": 8}, "model": "ypfundamentals:item/tonic_8"},
+    {"predicate": {"custom_model_data": 9}, "model": "ypfundamentals:item/tonic_9"},
+    {"predicate": {"custom_model_data": 10}, "model": "ypfundamentals:item/tonic_10"}
+  ]
+}

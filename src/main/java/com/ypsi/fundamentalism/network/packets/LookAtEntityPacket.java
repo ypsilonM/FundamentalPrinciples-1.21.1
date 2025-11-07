@@ -20,7 +20,6 @@ public record LookAtEntityPacket(int casterId, float yRot, float xRot) implement
             ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "look_at_entity")
     );
 
-    // StreamCodec optimizado
     public static final StreamCodec<FriendlyByteBuf, LookAtEntityPacket> STREAM_CODEC =
             StreamCodec.of(
                     (buf, packet) -> {
@@ -40,11 +39,9 @@ public record LookAtEntityPacket(int casterId, float yRot, float xRot) implement
         context.enqueueWork(() -> {
             LocalPlayer player = Minecraft.getInstance().player;
             if (player != null) {
-                // Aplicación directa SIN interpolación
                 player.setYRot(packet.yRot());
                 player.setXRot(packet.xRot());
 
-                // Sincronización completa
                 player.yRotO = packet.yRot();
                 player.xRotO = packet.xRot();
                 player.yHeadRot = packet.yRot();
@@ -54,7 +51,6 @@ public record LookAtEntityPacket(int casterId, float yRot, float xRot) implement
     }
 
     public static void sendToPlayer(ServerPlayer targetPlayer, Entity caster) {
-        // Obtener el centro del hitbox del caster
         AABB aabb = caster.getBoundingBox();
         Vec3 center = aabb.getCenter(); // Método directo desde 1.17
 

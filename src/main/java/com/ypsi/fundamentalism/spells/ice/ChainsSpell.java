@@ -105,8 +105,8 @@ public class ChainsSpell extends AbstractSpell {
 
         super.onCast(level, spellLevel, entity, castSource, playerMagicData);
     }
-
-    private @Nullable LivingEntity findTarget(LivingEntity caster) {
+    @Nullable
+    private LivingEntity findTarget(LivingEntity caster) {
         HitResult target = Utils.raycastForEntity(caster.level(), caster, 32.0F, true, 0.35F);
         if (target instanceof EntityHitResult entityHit) {
             Entity var5 = entityHit.getEntity();

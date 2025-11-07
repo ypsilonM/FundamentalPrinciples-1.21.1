@@ -1,3 +1,17 @@
 {
-
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.ypsi.fundamentalism.mixins",
+  "compatibilityLevel": "JAVA_21",
+  "refmap": "yourmod.refmap.json",
+  "client": [
+    "GuiMixin",
+    "SpellWheelOverlayMixin"
+  ],
+  "mixins": [
+    "PostCastSpellMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
 }

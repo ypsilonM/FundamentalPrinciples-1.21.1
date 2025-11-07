@@ -1,6 +1,7 @@
 package com.ypsi.fundamentalism.network.packets;
 
 import com.ypsi.fundamentalism.FundamentalPrinciples;
+import com.ypsi.fundamentalism.network.packets.data.ClientExhaustionData;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -14,10 +15,9 @@ public record SyncExhaustionPacket(int current) implements CustomPacketPayload {
             ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "sync_exhaustion")
     );
 
-    // StreamCodec correcto para records
     public static final StreamCodec<FriendlyByteBuf, SyncExhaustionPacket> STREAM_CODEC =
             StreamCodec.of(
-                    (buf, packet) -> buf.writeInt(packet.current), // Sin paréntesis
+                    (buf, packet) -> buf.writeInt(packet.current),
                     buf -> new SyncExhaustionPacket(buf.readInt())
             );
 
@@ -29,7 +29,7 @@ public record SyncExhaustionPacket(int current) implements CustomPacketPayload {
 
     public static void handle(SyncExhaustionPacket packet, IPayloadContext context) {
         context.enqueueWork(() -> {
-            ClientExhaustionData.setCurrentExhaustion(packet.current); // Sin paréntesis
+            ClientExhaustionData.setCurrentExhaustion(packet.current);
         });
     }
 

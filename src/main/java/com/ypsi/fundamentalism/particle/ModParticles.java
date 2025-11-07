@@ -15,6 +15,10 @@ public class ModParticles {
 
     public static final Supplier<SimpleParticleType> REINFORCEMENT_PARTICLE =
             PARTICLE_TYPES.register("reinforce_particles", () -> new SimpleParticleType(true));
+    public static final Supplier<SimpleParticleType> CONSTELLATION_PARTICLE  =
+            PARTICLE_TYPES.register("constellation_particle", () -> new SimpleParticleType(true));
+
+
 
     public static void register(IEventBus eventBus){
         PARTICLE_TYPES.register(eventBus);

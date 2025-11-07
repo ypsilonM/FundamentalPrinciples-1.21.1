@@ -2,22 +2,19 @@ package com.ypsi.fundamentalism.spells;
 
 
 import com.ypsi.fundamentalism.FundamentalPrinciples;
-import com.ypsi.fundamentalism.spells.blood.BloodMoonSpell;
 import com.ypsi.fundamentalism.spells.blood.ThornSpell;
-import com.ypsi.fundamentalism.spells.eldritch.VoidMirrorSpell;
 import com.ypsi.fundamentalism.spells.ender.LapsusSpell;
 import com.ypsi.fundamentalism.spells.ender.PullSpell;
-import com.ypsi.fundamentalism.spells.evocation.CopycatSpell;
 import com.ypsi.fundamentalism.spells.blood.BloodstreamSpell;
-import com.ypsi.fundamentalism.spells.evocation.StealSummonSpell;
 import com.ypsi.fundamentalism.spells.evocation.TauntSpell;
 import com.ypsi.fundamentalism.spells.fire.FlameStrengthSpell;
 import com.ypsi.fundamentalism.spells.fire.PyrokinesisSpell;
 import com.ypsi.fundamentalism.spells.fire.SolSpell;
+import com.ypsi.fundamentalism.spells.fundamentalism.ProiectumSpell;
+import com.ypsi.fundamentalism.spells.fundamentalism.VoidMirrorSpell;
 import com.ypsi.fundamentalism.spells.holy.HolyLightningSpell;
 import com.ypsi.fundamentalism.spells.holy.SacredDiskSpell;
 import com.ypsi.fundamentalism.spells.ice.ChainsSpell;
-import com.ypsi.fundamentalism.spells.nature.YggdrasilSpell;
 import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import net.neoforged.bus.api.IEventBus;
@@ -61,5 +58,9 @@ public class ModSpells {
 //    //------------>eldritch<----------------
 //    public static final Supplier<AbstractSpell> MIRROR = registerSpell(new VoidMirrorSpell());
 
+    //public static final Supplier<AbstractSpell> FUNDAMENTALFIRST = registerSpell(new VoidMirrorSpell());
+
+    //FUNDAMENTALISM
+    //public static final Supplier<AbstractSpell> PROIECTUM_PRINCIPLE = registerSpell(new ProiectumSpell());
 
 }

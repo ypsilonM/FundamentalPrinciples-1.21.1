@@ -1,12 +1,15 @@
 package com.ypsi.fundamentalism;
 import com.ypsi.fundamentalism.attributes.YpsAttributes;
 import com.ypsi.fundamentalism.block.YpsBlocks;
+import com.ypsi.fundamentalism.component.YpsDataComponents;
+import com.ypsi.fundamentalism.config.SpellCategoriesConfig;
 import com.ypsi.fundamentalism.effect.ModEffects;
 import com.ypsi.fundamentalism.entity.ModEntities;
 import com.ypsi.fundamentalism.entity.mobs.hemomancer.HemomancerRenderer;
 import com.ypsi.fundamentalism.entity.mobs.imp.ImpRenderer;
 import com.ypsi.fundamentalism.entity.mobs.venemerus.VenemerusRenderer;
 import com.ypsi.fundamentalism.entity.spells.chains.ChainsRenderer;
+import com.ypsi.fundamentalism.entity.spells.proiectumProjectile.ProiectumRenderer;
 import com.ypsi.fundamentalism.entity.spells.pull.PullRenderer;
 import com.ypsi.fundamentalism.entity.spells.holy_lightning.HolyLightningRenderer;
 import com.ypsi.fundamentalism.attachments.YpsAttachments;
@@ -16,11 +19,15 @@ import com.ypsi.fundamentalism.entity.spells.thorn.ThornRenderer;
 import com.ypsi.fundamentalism.item.ModCreativeModTabs;
 import com.ypsi.fundamentalism.item.ModItems;
 import com.ypsi.fundamentalism.keybind.ModKeyBinds;
+import com.ypsi.fundamentalism.network.ExhaustionCommand;
 import com.ypsi.fundamentalism.network.ModNetwork;
+import com.ypsi.fundamentalism.network.SpellCategoriesCommand;
+import com.ypsi.fundamentalism.particle.ConstellationParticle;
 import com.ypsi.fundamentalism.particle.ModParticles;
 import com.ypsi.fundamentalism.particle.ReinforceParticles;
 import com.ypsi.fundamentalism.render.ReinforcementLayer;
 import com.ypsi.fundamentalism.spells.ModSpells;
+import com.ypsi.fundamentalism.spells.YpsSchoolRegistry;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -30,6 +37,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -57,12 +65,18 @@ public class FundamentalPrinciples {
 
     public FundamentalPrinciples(IEventBus modEventBus, ModContainer modContainer) {
         modEventBus.addListener(this::commonSetup);
-
         NeoForge.EVENT_BUS.register(this);
+
+        SpellCategoriesConfig.initialize(
+                net.neoforged.fml.loading.FMLPaths.CONFIGDIR.get().toFile()
+        );
 
         ModCreativeModTabs.register(modEventBus);
         ModItems.register(modEventBus);
         YpsBlocks.register(modEventBus);
+
+        YpsDataComponents.register(modEventBus);
+
         ModEffects.register(modEventBus);
         ModParticles.register(modEventBus);
 
@@ -74,16 +88,21 @@ public class FundamentalPrinciples {
         YpsAttributes.register(modEventBus);
         YpsAttachments.register(modEventBus);
 
+        YpsSchoolRegistry.register(modEventBus);
         ModSpells.register(modEventBus);
+
         modEventBus.addListener(this::addCreative);
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
 
     }
+    @SubscribeEvent
+    public void registerCommands(RegisterCommandsEvent event) {
+        ExhaustionCommand.register(event.getDispatcher());
+        SpellCategoriesCommand.register(event.getDispatcher());
+    }
 
-    private void commonSetup(final FMLCommonSetupEvent event)
-    {
-        // Some common setup code
+    private void commonSetup(final FMLCommonSetupEvent event) {
         LOGGER.info("HELLO FROM COMMON SETUP");
 
         if (Config.logDirtBlock)
@@ -94,7 +113,6 @@ public class FundamentalPrinciples {
         Config.items.forEach((item) -> LOGGER.info("ITEM >> {}", item.toString()));
     }
 
-    // Add the example block item to the building blocks tab
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
         if(event.getTabKey() == CreativeModeTabs.COMBAT){
 //            event.accept(ModItems.ORB);
@@ -102,17 +120,11 @@ public class FundamentalPrinciples {
         }
     }
 
-    // You can use SubscribeEvent and let the Event Bus discover methods to call
     @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event)
-    {
+    public void onServerStarting(ServerStartingEvent event) { }
 
-    }
-
-    // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
     @EventBusSubscriber(modid = MOD_ID, value = Dist.CLIENT)
-    public static class ClientModEvents
-    {
+    public static class ClientModEvents {
 
         @SubscribeEvent
         public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
@@ -127,10 +139,13 @@ public class FundamentalPrinciples {
             event.registerEntityRenderer(ModEntities.SOL_PROJECTILE.get(), SolRenderer::new);
             event.registerEntityRenderer(ModEntities.THORN_PROJECTILE.get(), ThornRenderer::new);
             event.registerEntityRenderer(ModEntities.SACRED_DISK.get(), SacredDiskRenderer::new);
+
+            event.registerEntityRenderer(ModEntities.PROIECTUM_PROJECTILE.get(), ProiectumRenderer::new);
         }
         @SubscribeEvent
         public static void registerParticleFactories(RegisterParticleProvidersEvent event){
             event.registerSpriteSet(ModParticles.REINFORCEMENT_PARTICLE.get(), ReinforceParticles.Provider::new);
+            event.registerSpriteSet(ModParticles.CONSTELLATION_PARTICLE.get(), ConstellationParticle.Provider::new);
         }
 
 

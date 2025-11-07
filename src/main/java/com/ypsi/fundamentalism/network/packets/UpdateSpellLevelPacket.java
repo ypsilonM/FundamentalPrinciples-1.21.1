@@ -39,7 +39,6 @@ public class UpdateSpellLevelPacket implements CustomPacketPayload{
     public static void handle(UpdateSpellLevelPacket packet, IPayloadContext context) {
         context.enqueueWork(() -> {
             if (context.player() instanceof ServerPlayer serverPlayer) {
-                // Ejecutar en el servidor
                 SpellAttributeUtils.modifySpellLevelIfExists(serverPlayer, packet.spellId, packet.levelModifier);
             }
         });

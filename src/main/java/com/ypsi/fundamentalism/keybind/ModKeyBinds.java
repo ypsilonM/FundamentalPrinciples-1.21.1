@@ -27,6 +27,14 @@ public class ModKeyBinds {
                     InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_U,
                     "key.category.fundamentalism");
 
+    public static final Supplier<KeyMapping> SPELL_CATEGORIES =
+            registerKey(
+                "spell_categories",
+                    KeyConflictContext.IN_GAME,
+                    InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_P,
+                    "key.category.fundamentalism"
+            );
+
 
     private static Supplier<KeyMapping> registerKey(String name, KeyConflictContext conflictContext, InputConstants.Type inputType, int keyCode, String category) {
         return Suppliers.memoize(() -> new KeyMapping(
@@ -45,5 +53,6 @@ public class ModKeyBinds {
     private static void registerKeybinds(RegisterKeyMappingsEvent event) {
         event.register(REINFORCE_KEY.get());
         event.register(SELECTION_KEY.get());
+        event.register(SPELL_CATEGORIES.get());
     }
 }

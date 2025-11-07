@@ -38,11 +38,9 @@ public class SacredDiskRenderer extends EntityRenderer<Projectile> {
         MeshDefinition meshdefinition = new MeshDefinition();
         PartDefinition partdefinition = meshdefinition.getRoot();
 
-        // Crear un disco plano (cuadrado delgado)
         partdefinition.addOrReplaceChild("disk", CubeListBuilder.create()
                         .texOffs(0, 0)
-                        // El último parámetro scale ajusta cómo se aplica la textura
-                        .addBox(-8.0F, -0.4F, -8.0F, 16.0F, 0.4F, 16.0F), // Usar escala 1:1 para la textura
+                        .addBox(-8.0F, -0.4F, -8.0F, 16.0F, 0.4F, 16.0F),
                 PartPose.offset(0.0f, 0.0f, 0.0f));
 
         return LayerDefinition.create(meshdefinition, 16, 16);

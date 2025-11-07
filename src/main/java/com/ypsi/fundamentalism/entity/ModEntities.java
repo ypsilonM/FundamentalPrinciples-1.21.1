@@ -7,6 +7,7 @@ import com.ypsi.fundamentalism.entity.mobs.venemerus.VenemerusEntity;
 import com.ypsi.fundamentalism.entity.mobs.witch.SummonedWitch;
 import com.ypsi.fundamentalism.entity.spells.chains.ChainsEntity;
 import com.ypsi.fundamentalism.entity.spells.holy_lightning.HolyLightningProjectile;
+import com.ypsi.fundamentalism.entity.spells.proiectumProjectile.ProiectumProjectile;
 import com.ypsi.fundamentalism.entity.spells.pull.PullProjectile;
 import com.ypsi.fundamentalism.entity.spells.sacredDisk.SacredDiskProjectile;
 import com.ypsi.fundamentalism.entity.spells.sol.SolProjectile;
@@ -52,6 +53,12 @@ public class ModEntities {
                     .clientTrackingRange(64)
                     .build(ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "thorn").toString()));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<ProiectumProjectile>> PROIECTUM_PROJECTILE =
+            ENTITY_TYPES.register("proiectum", () -> EntityType.Builder.<ProiectumProjectile>of(ProiectumProjectile::new, MobCategory.MISC)
+                    .sized(.3f, .3f)
+                    .clientTrackingRange(64)
+                    .build(ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "proiectum").toString()));
+
     public static final DeferredHolder<EntityType<?>, EntityType<SacredDiskProjectile>> SACRED_DISK =
             ENTITY_TYPES.register("disk", () -> EntityType.Builder.<SacredDiskProjectile>of(SacredDiskProjectile::new, MobCategory.MISC)
                     .sized(.8f, .2f)
@@ -64,6 +71,8 @@ public class ModEntities {
                         .sized(1.0F, 1.0F)
                         .clientTrackingRange(64)
                         .build((ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "chains")).toString()));
+
+
 
     public static final DeferredHolder<EntityType<?>, EntityType<ImpEntity>> IMP =
             ENTITY_TYPES.register("imp", () ->

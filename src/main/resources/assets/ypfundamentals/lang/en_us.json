@@ -1,6 +1,4 @@
 {
-  "item.ypfundamentals.mana_fruit": "Mana Fruit",
-
   "creativetab.ypfundamentals.mana_items": "Mana Items",
 
   "effect.ypfundamentals.mindful": "Mindful",
@@ -16,6 +14,11 @@
   "item.ypfundamentals.hemomancer_spawn_egg": "Hemomancer Spawn Egg",
   "item.ypfundamentals.imp_spawn_egg": "Imp Spawn Egg",
   "item.ypfundamentals.venemerus_spawn_egg": "Venemerus Spawn Egg",
+  "item.ypfundamentals.mana_fruit": "Mana Fruit",
+  "item.ypfundamentals.arcane_mixture": "Arcane Mixture",
+  "item.ypfundamentals.test_tube": "Test Tube",
+  "item.ypfundamentals.luminaire_extract": "Luminaire Extract",
+  "item.ypfundamentals.tonic": "Tonic",
 
   "attribute.name.technique.exhaustion": "Exhaustion",
 
@@ -33,9 +36,26 @@
   "spell.ypfundamentals.sacred_disk": "Sacred Disk",
   "spell.ypfundamentals.yggdrasil": "Yggdrasil",
 
+  "spell.ypfundamentals.proiectum": "Proiectum Principle",
+
+  "spell.ypfundamentals.chains.guide": "Cast to summon icy chains that immobilize the enemy for a long time.",
+  "spell.ypfundamentals.grantstrength.guide": "Fill your soul with fiery determination, expelling bursts of fire that damage surrounding areas repeatedly over time. You also gain the power of flame in your hand, setting anyone you strike ablaze.",
+  "spell.ypfundamentals.pyrokinesis.guide": "Control the fire around you, dissipating any burns you may have and deflecting flaming projectiles.",
+  "spell.ypfundamentals.sol.guide": "The star closest to our world, burning intensely, the source of the first flame. It summons a smaller version that simulates a fraction of the original celestial power, increasing in power and size the closer it is to noon.",
+  "spell.ypfundamentals.bloodstream.guide": "Supplies your blood with magical power to enhance your efficiency, increasing your attack and movement speed.",
+  "spell.ypfundamentals.thorn.guide": "Launch a thorn projectile that marks a target upon impact. Hitting the same target again with the projectile while it is marked deals increased damage.",
+  "spell.ypfundamentals.holy_lightning.guide": "Throw an electric spear made of holy lightning. This spear has great speed and damage.",
+  "spell.ypfundamentals.sacred_disk.guide": "Sacred disc that after a delay or upon impacting a solid block, returns to you, being able to apply damage twice to multiple enemies.",
+  "spell.ypfundamentals.pull_spell.guide": "A mass that simulates a projectile that alters gravity as it passes, attracting everything that comes into contact with it within a certain radius.",
+  "spell.ypfundamentals.lapsus.guide": "Save a location that you may or may not return to in a short period of time.",
+  "spell.ypfundamentals.taunt.guide": "Attracts an enemy's attention, causing them to shift focus to you. Against other players, it causes them to turn to look at you.",
+
   "key.category.fundamentalism": "Fundamentalism",
   "key.fundamentalism.reinforce": "Mana Reinforcement",
-  "key.fundamentalism.selection": "Spell Level Wheel"
+  "key.fundamentalism.selection": "Spell Level Wheel",
+  "key.fundamentalism.spell_categories": "Magical Knowledge",
+
+  "school.ypfundamentals.fundamentalism": "Fundamentalism"
 
 
 

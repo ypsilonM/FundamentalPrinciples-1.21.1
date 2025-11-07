@@ -1,3 +1,9 @@
-// 1.21.1	2025-09-08T18:36:57.9207457	Recipes
+// 1.21.1	2025-09-28T19:15:43.6675558	Recipes
+1e88f33d9b82a5447d243654259d09b326686587 data/ypfundamentals/advancement/recipes/brewing/test_tube.json
+04f2fa9196e468dcf615c376f662a067e4080276 data/ypfundamentals/advancement/recipes/brewing/tonic.json
+14466c28dd30240f732c524dcb8bade8d841c4b8 data/ypfundamentals/advancement/recipes/misc/arcane_mixture.json
 9fead9d326e72263624ce1aafa0e57ba9d61d6db data/ypfundamentals/advancement/recipes/misc/mana_fruit.json
+ff9a550f0aeae46acd63cf98685703bd9d9879a0 data/ypfundamentals/recipe/arcane_mixture.json
 062ee5e0f72e92905edd53fc529fb705c5d2ad01 data/ypfundamentals/recipe/mana_fruit.json
+faf63e20a7d676e6f06f7614469e2bbfe9965951 data/ypfundamentals/recipe/test_tube.json
+2cd4960937a5ae2cf4a1b08991e2bf24f51a9d79 data/ypfundamentals/recipe/tonic.json

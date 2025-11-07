@@ -14,5 +14,6 @@ public class ModFoodProperties {
             .alwaysEdible()
             .build();
 
-
+    public static final FoodProperties TONIC = new FoodProperties.Builder()
+            .build();
 }

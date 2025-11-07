@@ -2,6 +2,7 @@ package com.ypsi.fundamentalism.attachments;
 
 import com.mojang.serialization.Codec;
 import com.ypsi.fundamentalism.FundamentalPrinciples;
+import com.ypsi.fundamentalism.spellCategories.SpellCategoryLevels;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -19,6 +20,21 @@ public class YpsAttachments {
                             .serialize(Codec.INT)
                             .copyOnDeath()
                             .build());
+
+    public static final Supplier<AttachmentType<Integer>> LEVEL_EXHAUSTION =
+            ATTACHMENTS.register("level_exhaustion", () ->
+                    AttachmentType.<Integer>builder(() -> 0)
+                            .serialize(Codec.INT)
+                            .copyOnDeath()
+                            .build());
+
+    public static final Supplier<AttachmentType<SpellCategoryLevels>> SPELL_CATEGORY_LEVELS =
+            ATTACHMENTS.register("spell_category_levels", () ->
+                    AttachmentType.<SpellCategoryLevels>builder(SpellCategoryLevels::new)
+                            .serialize(SpellCategoryLevels.CODEC)
+                            .copyOnDeath()
+                            .build()
+            );
 
     public static void register(IEventBus eventBus){
         ATTACHMENTS.register(eventBus);

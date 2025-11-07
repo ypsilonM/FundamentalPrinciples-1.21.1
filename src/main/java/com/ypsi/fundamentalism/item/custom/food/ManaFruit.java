@@ -11,6 +11,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
+import static com.ypsi.fundamentalism.event.ModEvents.getMaxExPerLevel;
+
 public class ManaFruit extends Item {
 
     public ManaFruit() {
@@ -21,7 +23,7 @@ public class ManaFruit extends Item {
     public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity livingEntity) {
         if(!level.isClientSide && livingEntity instanceof ServerPlayer player){
             int currentExhaustion = player.getData(YpsAttachments.CURRENT_EXHAUSTION.get());
-            player.setData(YpsAttachments.CURRENT_EXHAUSTION, Math.clamp(currentExhaustion-20, 0, 100));
+            player.setData(YpsAttachments.CURRENT_EXHAUSTION, Math.max(currentExhaustion-50, 0));
             SyncExhaustionPacket.sendToPlayer(player, player.getData(YpsAttachments.CURRENT_EXHAUSTION));
         }
         return super.finishUsingItem(stack, level, livingEntity);

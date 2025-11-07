@@ -1,36 +1,25 @@
-package com.ypsi.fundamentalism.spells.eldritch;
+package com.ypsi.fundamentalism.spells.fundamentalism;
 
 import com.ypsi.fundamentalism.FundamentalPrinciples;
+import com.ypsi.fundamentalism.spells.YpsSchoolRegistry;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
-import io.redspace.ironsspellbooks.api.events.SpellOnCastEvent;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
-import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
 import io.redspace.ironsspellbooks.api.spells.*;
-import io.redspace.ironsspellbooks.entity.spells.AbstractMagicProjectile;
-import io.redspace.ironsspellbooks.entity.spells.magic_missile.MagicMissileProjectile;
-import io.redspace.ironsspellbooks.spells.fire.FireboltSpell;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import org.jetbrains.annotations.Nullable;
 
 @AutoSpellConfig
 public class VoidMirrorSpell extends AbstractSpell {
-    private final ResourceLocation spellId = ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "void_mirror");
-
-    public AbstractSpell storedSpell = null;
-    public int spellLevel = 1;
-    public CastType castType = CastType.INSTANT;
+    private final ResourceLocation spellId = ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "mirror_spell");
 
     private final DefaultConfig defaultConfig = new DefaultConfig()
             .setMinRarity(SpellRarity.LEGENDARY)
-            .setSchoolResource(SchoolRegistry.ELDRITCH_RESOURCE)
+            .setSchoolResource(YpsSchoolRegistry.FUNDAMENTAL_RESOURCE)
             .setMaxLevel(1)
-            .setCooldownSeconds(120)
+            .setCooldownSeconds(5)
             .build();
 
     public VoidMirrorSpell() {
@@ -48,11 +37,20 @@ public class VoidMirrorSpell extends AbstractSpell {
     public DefaultConfig getDefaultConfig() { return defaultConfig; }
 
     @Override
-    public CastType getCastType() { return castType; }
+    public CastType getCastType() { return CastType.INSTANT; }
 
     @Override
     public void onCast(Level level, int spellLevel, LivingEntity entity, CastSource castSource, MagicData playerMagicData) {
-
+        entity.sendSystemMessage(Component.literal("Casteo de fundamental spell"));
     }
 
+    @Override
+    public boolean allowLooting() {
+        return true;
+    }
+
+    @Override
+    public boolean requiresLearning() {
+        return false;
+    }
 }

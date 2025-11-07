@@ -4,6 +4,7 @@ import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.entity.ModEntities;
 import com.ypsi.fundamentalism.item.custom.ChiselItem;
 import com.ypsi.fundamentalism.item.custom.FuelItem;
+import com.ypsi.fundamentalism.item.custom.TonicItem;
 import com.ypsi.fundamentalism.item.custom.food.ManaFruit;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SwordItem;
@@ -21,10 +22,16 @@ public class ModItems {
     public static final DeferredRegister.Items ITEMS =
             DeferredRegister.createItems(FundamentalPrinciples.MOD_ID);
 
-//    public static final DeferredItem<Item> ORB = ITEMS.register("orb",
-//            () -> new Item(new Item.Properties()));
-//    public static final DeferredItem<Item>  PURE_ORB = ITEMS.register("pure_orb",
-//            () -> new Item(new Item.Properties()));
+
+
+    public static final DeferredItem<Item> ARCANE_MIXTURE = ITEMS.register("arcane_mixture",
+            () -> new Item(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> TEST_TUBE = ITEMS.register("test_tube",
+            () -> new Item(new Item.Properties().stacksTo(16)));
+    public static final DeferredItem<Item> LUMINAIRE_EXTRACT = ITEMS.register("luminaire_extract",
+            () -> new Item(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> TONIC = ITEMS.register("tonic",
+            () -> new TonicItem());
 
     public static final DeferredItem<Item> MANA_FRUIT = ITEMS.register("mana_fruit",
             () -> new ManaFruit());
@@ -38,11 +45,6 @@ public class ModItems {
     public static final DeferredItem<Item> VENEMERUS_SPAWN_EGG = ITEMS.register("venemerus_spawn_egg",
             () -> new DeferredSpawnEggItem(ModEntities.VENEMERUS, 0x03941B, 0x74992E,
                     new Item.Properties()));
-
-//    public static final DeferredItem<Item> TEMPLAR_SWORD = ITEMS.register("templar_sword",
-//            () -> new SwordItem(Tiers.DIAMOND, new Item.Properties()
-//                    .attributes(SwordItem.createAttributes(Tiers.DIAMOND, 2, -2.4f))));
-
 
     private static <T extends Item> DeferredItem<T> registerItem(String name, Supplier<T> item){
         DeferredItem<T> toReturn = ITEMS.register(name, item);
