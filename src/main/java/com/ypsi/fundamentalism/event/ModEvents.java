@@ -3,7 +3,7 @@ package com.ypsi.fundamentalism.event;
 import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.attachments.YpsAttachments;
 import com.ypsi.fundamentalism.attributes.YpsAttributes;
-import com.ypsi.fundamentalism.config.SpellCategoriesConfig;
+import com.ypsi.fundamentalism.config.SpellCategoriesGenerator;
 import com.ypsi.fundamentalism.effect.ModEffects;
 import com.ypsi.fundamentalism.item.ModItems;
 import com.ypsi.fundamentalism.item.custom.TonicItem;
@@ -18,6 +18,7 @@ import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.registry.AttributeRegistry;
 import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
+import io.redspace.ironsspellbooks.api.spells.CastSource;
 import io.redspace.ironsspellbooks.api.spells.CastType;
 import io.redspace.ironsspellbooks.api.util.CameraShakeData;
 import io.redspace.ironsspellbooks.api.util.CameraShakeManager;
@@ -270,6 +271,7 @@ public class ModEvents {
     @SubscribeEvent
     public static void SpellNerfCast(SpellOnCastEvent event){
         Player player = event.getEntity();
+        CastSource castSource = event.getCastSource();
         int currentExhaustion = player.getData(YpsAttachments.CURRENT_EXHAUSTION.get());
         int currentExLvl = player.getData(YpsAttachments.LEVEL_EXHAUSTION.get());
         int manaUsed = event.getManaCost();
@@ -286,7 +288,7 @@ public class ModEvents {
                 default -> 0;
             };
             int modifiedManaUsed = (int) (manaUsed+(manaUsed*manaMult));
-            if(manaUsed != modifiedManaUsed) {
+            if(manaUsed != modifiedManaUsed && castSource!=CastSource.SCROLL) {
                 player.displayClientMessage(Component.literal("Mana used: " + modifiedManaUsed).withStyle(ChatFormatting.AQUA), true);
             }
             event.setManaCost(modifiedManaUsed);
@@ -300,7 +302,7 @@ public class ModEvents {
                 default -> 0;
             };
             int reduced = (int) (level-(totalLevel*levelRedMult));
-            if(reduced != level) {
+            if(reduced != level && castSource!=CastSource.SCROLL) {
                 player.displayClientMessage(Component.literal("Level casted: " + reduced).withStyle(ChatFormatting.GREEN), true);
             }
             event.setSpellLevel(reduced);
@@ -346,11 +348,14 @@ public class ModEvents {
                     Mth.clamp(addition,0,maxEx));
         }
 
+        //Leveling up
         String spellId = event.getSpellId();
-        Set<String> categories = SpellCategoriesConfig.getInstance().getCategoriesForSpell(spellId);
+        Set<String> categories = SpellCategoriesGenerator.getCategoriesForSpell(spellId);
         int levelBonus = (spellLevelResult);
-        for (String category : categories) {
-            SpellCategoryProgression.addCategoryExperience(player, category, levelBonus);
+        if(castSource != CastSource.SCROLL) {
+            for (String category : categories) {
+                SpellCategoryProgression.addCategoryExperience(player, category, levelBonus);
+            }
         }
 
         SyncExhaustionPacket.sendToPlayer((ServerPlayer) player, player.getData(YpsAttachments.CURRENT_EXHAUSTION));
@@ -583,13 +588,13 @@ public class ModEvents {
 //    }
 
     @SubscribeEvent
-    public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
+    public static void onPlayerLogin1(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             SyncCategoryLevelsPacket.sendToPlayer(player);
         }
     }
     @SubscribeEvent
-    public static void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
+    public static void onPlayerRespawn1(PlayerEvent.PlayerRespawnEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             player.server.execute(() -> {
                 SyncCategoryLevelsPacket.sendToPlayer(player);
@@ -597,12 +602,11 @@ public class ModEvents {
         }
     }
     @SubscribeEvent
-    public static void onDimensionChange(PlayerEvent.PlayerChangedDimensionEvent event) {
+    public static void onDimensionChange1(PlayerEvent.PlayerChangedDimensionEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             SyncCategoryLevelsPacket.sendToPlayer(player);
         }
     }
-
 
 
 }

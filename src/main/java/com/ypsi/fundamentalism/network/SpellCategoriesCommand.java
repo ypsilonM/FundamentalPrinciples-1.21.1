@@ -48,7 +48,8 @@ public class SpellCategoriesCommand {
         String[] categories = {
                 "createEntity", "usesShoot", "usesSummon", "usesTargeting",
                 "hasRecasts", "usesTeleport", "addEffects",
-                "createsAoeEntities", "usesMobility", "usesRaycast"
+                "createsAoeEntities", "usesMobility", "usesRaycast",
+                "usesHealing", "usesPotentiation"
         };
 
         String currentInput = builder.getRemaining().toLowerCase();
@@ -69,7 +70,8 @@ public class SpellCategoriesCommand {
         String[] categories = {
                 "createEntity", "usesShoot", "usesSummon", "usesTargeting",
                 "hasRecasts", "usesTeleport", "addEffects",
-                "createsAoeEntities", "usesMobility", "usesRaycast", "usesHealing"
+                "createsAoeEntities", "usesMobility", "usesRaycast",
+                "usesHealing", "usesPotentiation"
         };
 
         for (String category : categories) {

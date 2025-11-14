@@ -1,7 +1,6 @@
 package com.ypsi.fundamentalism.mixins;
 
-import com.ypsi.fundamentalism.config.SpellCategoriesConfig;
-import com.ypsi.fundamentalism.spellCategories.SpellCategoryLevels;
+import com.ypsi.fundamentalism.config.SpellCategoriesGenerator;
 import com.ypsi.fundamentalism.spellCategories.SpellCategoryProgression;
 import io.redspace.ironsspellbooks.IronsSpellbooks;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
@@ -74,7 +73,7 @@ public class SpellWheelOverlayMixin {
     }
 
     private List<String> getSpellCategories(AbstractSpell spell) {
-        Set<String> categories = SpellCategoriesConfig.getInstance().getCategoriesForSpell(spell.getSpellId());
+        Set<String> categories = SpellCategoriesGenerator.getCategoriesForSpell(spell.getSpellId());
         return new ArrayList<>(categories);
     }
 }

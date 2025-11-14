@@ -25,7 +25,6 @@ public class GuiMixin {
     @Unique
     private static final ResourceLocation REINFORCED_HEART_OUTLINE_WHITE =
             ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "textures/gui/reinforced_heart_white.png");
-
     @Unique
     private static long lastHealth = 0;
     @Unique

@@ -2,7 +2,7 @@ package com.ypsi.fundamentalism;
 import com.ypsi.fundamentalism.attributes.YpsAttributes;
 import com.ypsi.fundamentalism.block.YpsBlocks;
 import com.ypsi.fundamentalism.component.YpsDataComponents;
-import com.ypsi.fundamentalism.config.SpellCategoriesConfig;
+import com.ypsi.fundamentalism.config.SpellCategoriesGenerator;
 import com.ypsi.fundamentalism.effect.ModEffects;
 import com.ypsi.fundamentalism.entity.ModEntities;
 import com.ypsi.fundamentalism.entity.mobs.hemomancer.HemomancerRenderer;
@@ -22,6 +22,7 @@ import com.ypsi.fundamentalism.keybind.ModKeyBinds;
 import com.ypsi.fundamentalism.network.ExhaustionCommand;
 import com.ypsi.fundamentalism.network.ModNetwork;
 import com.ypsi.fundamentalism.network.SpellCategoriesCommand;
+import com.ypsi.fundamentalism.network.packets.SyncCategoryLevelsPacket;
 import com.ypsi.fundamentalism.particle.ConstellationParticle;
 import com.ypsi.fundamentalism.particle.ModParticles;
 import com.ypsi.fundamentalism.particle.ReinforceParticles;
@@ -33,6 +34,9 @@ import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.resources.PlayerSkin;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
@@ -67,9 +71,6 @@ public class FundamentalPrinciples {
         modEventBus.addListener(this::commonSetup);
         NeoForge.EVENT_BUS.register(this);
 
-        SpellCategoriesConfig.initialize(
-                net.neoforged.fml.loading.FMLPaths.CONFIGDIR.get().toFile()
-        );
 
         ModCreativeModTabs.register(modEventBus);
         ModItems.register(modEventBus);
@@ -100,6 +101,21 @@ public class FundamentalPrinciples {
     public void registerCommands(RegisterCommandsEvent event) {
         ExhaustionCommand.register(event.getDispatcher());
         SpellCategoriesCommand.register(event.getDispatcher());
+
+//        event.getDispatcher().register(Commands.literal("debugspells")
+//                .executes(context -> {
+//                    // 1. Generar categorías
+//                    SpellCategoriesGenerator.generateCategoriesFromRegistry();
+//                    // 3. ✅ SINCRONIZAR con el cliente
+//                    if (context.getSource().getPlayer() instanceof ServerPlayer player) {
+//                        SyncCategoryLevelsPacket.sendToPlayer(player);
+//                    }
+//                    context.getSource().sendSuccess(() ->
+//                            Component.literal("✅ Spell categories generated and reloaded! Re-join world or use spells."), false);
+//                    return 1;
+//                })
+//        );
+
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
@@ -122,6 +138,7 @@ public class FundamentalPrinciples {
 
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) { }
+
 
     @EventBusSubscriber(modid = MOD_ID, value = Dist.CLIENT)
     public static class ClientModEvents {

@@ -17,11 +17,6 @@ public class Visitors {
             super(Opcodes.ASM9);
         }
 
-//        @Override
-//        public FieldVisitor visitField(int access, String name, String descriptor, String signature, Object value) {
-//            analyzeType(Type.getType(descriptor).getInternalName());
-//            return null;
-//        }
         public void analyzeType(String internalClassName) {
 
             if (internalClassName == null || analyzedClasses.contains(internalClassName) ) return;
@@ -89,8 +84,6 @@ public class Visitors {
                 if (category != null && matchesOwner(owner, name)) {
                     detectedCategories.add(category);
                 }
-//                analyzeType(owner);
-//                analyzeType(Type.getReturnType(descriptor).getInternalName());
             }
 
             @Override
@@ -98,9 +91,6 @@ public class Visitors {
                 if (opcode == Opcodes.NEW || opcode == Opcodes.INSTANCEOF) {
                     analyzeType(type);
                 }
-//                if(opcode == Opcodes.NEW && isEntityClass(type)) {
-//                    detectedCategories.add("createsEntity");
-//                }
                 if (opcode == Opcodes.INSTANCEOF && type.contains("IMagicSummon")) {
                     detectedCategories.add("usesSummon");
                 }
@@ -111,12 +101,6 @@ public class Visitors {
                     detectedCategories.add("usesHealing");
                 }
             }
-//
-//            @Override
-//            public void visitFieldInsn(int opcode, String owner, String name, String descriptor) {
-//                analyzeType(Type.getType(descriptor).getInternalName());
-//            }
-
             private boolean matchesOwner(String owner, String methodName) {
                 return switch (methodName) {
                     case "initSummon" -> owner.contains("SummonManager");
@@ -145,9 +129,6 @@ public class Visitors {
                         if ("addEffect".equals(name)) {
                             childDetectedCategories.add("usesAddEffect");
                         }
-//                        if (("setAoeDamage".equals(name) || "createAoe".equals(name)) && owner.contains("Aoe")) {
-//                            childDetectedCategories.add("createsAoeEntity");
-//                        }
                         if ("heal".equals(name)) {
                             childDetectedCategories.add("usesHealing");
                         }
@@ -162,9 +143,6 @@ public class Visitors {
                             if (isAoeEntity(type)) {
                                 childDetectedCategories.add("createsAoeEntity");
                             }
-//                            if (isEntityClass(type)) {
-//                                childDetectedCategories.add("createsEntity");
-//                            }
                             if (type.contains("SpellHealEvent")) {
                                 childDetectedCategories.add("usesHealing");
                             }
@@ -216,22 +194,7 @@ public class Visitors {
             }
             return false;
         }
-//        public boolean usesHealing() { return detectedCategories.contains("usesHealing"); }
-//        public boolean createsEntity() { return detectedCategories.contains("createsEntity"); }
-//        public boolean createsProjectile() { return detectedCategories.contains("createsProjectile"); }
-//        public boolean usesShootMethod() { return detectedCategories.contains("usesShoot"); }
-//        public boolean usesSummon() { return detectedCategories.contains("usesSummon"); }
-//        public boolean usesTargeting() { return detectedCategories.contains("usesTargeting"); }
-//        public boolean hasRecastCount() { return detectedCategories.contains("hasRecasts"); }
-//        public boolean usesTeleport() { return detectedCategories.contains("usesTeleport"); }
-//        public boolean usesAddEffect() { return detectedCategories.contains("usesAddEffect"); }
-//        public boolean createsAoeEntity() { return detectedCategories.contains("createsAoeEntity"); }
-//        public boolean usesImpulseCastData() { return detectedCategories.contains("usesImpulseCastData"); }
-//        public boolean usesRaycast() { return detectedCategories.contains("usesRaycast"); }
-
         public Set<String> getDetectedCategories() { return detectedCategories; }
         public Set<String> getEntityClassesToAnalyze() { return entityClassesToAnalyze; }
-
     }
-
 }

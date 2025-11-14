@@ -77,9 +77,14 @@ public class ClientEvents {
             ResourceLocation EMPTY_BOTTLE_TEXTURE = ResourceLocation.fromNamespaceAndPath(
                     FundamentalPrinciples.MOD_ID, "textures/gui/empty_bottle.png"
             );
-            ResourceLocation LIQUID_TEXTURE = ResourceLocation.fromNamespaceAndPath(
-                    FundamentalPrinciples.MOD_ID, "textures/gui/liquid.png"
-            );
+
+            ResourceLocation LIQUID_TEXTURE = switch (exhaustionLvl) {
+              case 4 -> ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "textures/gui/exhaustion/lvl4.png");
+              case 3 -> ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "textures/gui/exhaustion/lvl3.png");
+              case 2 -> ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "textures/gui/exhaustion/lvl2.png");
+              case 1 -> ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "textures/gui/exhaustion/lvl1.png");
+              default -> ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "textures/gui/exhaustion/lvl0.png");
+            };
 
             int size = 16;
 
@@ -101,49 +106,48 @@ public class ClientEvents {
             Minecraft minecraft = Minecraft.getInstance();
             Font font = minecraft.font;
 
-            String levelText = String.valueOf(exhaustionLvl);
-            int levelX = bottleX;
-            int levelY = bottleY - size;
-
             String exhaustionText = String.valueOf(exhaustion);
             int exhaustionX = bottleX + size - 4;
             int exhaustionY = bottleY + 2;
 
             PoseStack poseStack = gui.pose();
-            poseStack.pushPose();
-            poseStack.scale(0.8f, 0.8f, 0.8f);
-            float inverseScale = 1 / 0.8f;
-            int scaledLevelX = (int) (levelX * inverseScale);
-            int scaledLevelY = (int) (levelY * inverseScale);
-
-            int exhaustionColor = getExhaustionTextColor(exhaustion, maxEx);
-
-            gui.drawString(font, levelText, scaledLevelX + 1, scaledLevelY + 1, 0x000000, false);
-            gui.drawString(font, levelText, scaledLevelX, scaledLevelY, exhaustionColor, false);
-            poseStack.popPose();
 
             poseStack.pushPose();
             poseStack.scale(0.8f, 0.8f, 0.8f);
-            int scaledExhaustionX = (int) (exhaustionX * inverseScale);
-            int scaledExhaustionY = (int) (exhaustionY * inverseScale);
 
-            gui.drawString(font, exhaustionText, scaledExhaustionX + 1, scaledExhaustionY + 1, 0x000000, false);
+            int scaledExhaustionX = (int) (exhaustionX / 0.8f);
+            int scaledExhaustionY = (int) (exhaustionY / 0.8f);
+
+            int exhaustionColor = getExhaustionTextColor(exhaustionLvl);
+            int shadowColor = getExhaustionShadowColor(exhaustionLvl);
+
+            gui.drawString(font, exhaustionText, scaledExhaustionX + 1, scaledExhaustionY + 1, shadowColor, false);
             gui.drawString(font, exhaustionText, scaledExhaustionX, scaledExhaustionY, exhaustionColor, false);
             poseStack.popPose();
         }
-
-        private static int getLiquidTextureV(float progress) {
-            if (progress < 0.25f) return 0;     // Green
-            if (progress < 0.5f) return 16;     // Yellow
-            if (progress < 0.75f) return 32;    // Orange
-            return 48;                          // Red
+        private static int getExhaustionTextColor(int exhaustionLevel) {
+            return switch (exhaustionLevel){
+                case 4 -> 0xFF3366; // Rojo vibrante
+                case 3 -> 0xCC33CC; // Púrpura brillante
+                case 2 -> 0x3366FF; // Azul brillante
+                case 1 -> 0x3399FF; // Azul cielo
+                default -> 0x33CCCC; // Turquesa
+            };
         }
-        private static int getExhaustionTextColor(int exhaustion, int maxEx) {
-            double percentage = ((double) exhaustion /maxEx);
-            if(percentage < 0.25) return 0x3BBDF5;
-            if(percentage < 0.50) return 0x338CF2;
-            if(percentage < 0.75) return 0x225DF2;
-            return 0x4636F5;
+        private static int getExhaustionShadowColor(int exhaustionLevel) {
+            return switch (exhaustionLevel){
+                case 4 -> 0x660022; // Sombra rojo más oscuro
+                case 3 -> 0x660066; // Sombra púrpura más oscuro
+                case 2 -> 0x001188; // Sombra azul más oscuro
+                case 1 -> 0x004488; // Sombra azul medio más oscuro
+                default -> 0x004444; // Sombra verde azulado más oscuro
+            };
+        }
+        private static int getLiquidTextureV(float progress) {
+            if (progress < 0.25f) return 0;
+            if (progress < 0.5f) return 16;
+            if (progress < 0.75f) return 32;
+            return 48;
         }
 
         @SubscribeEvent
