@@ -22,22 +22,13 @@ import com.ypsi.fundamentalism.keybind.ModKeyBinds;
 import com.ypsi.fundamentalism.network.ExhaustionCommand;
 import com.ypsi.fundamentalism.network.ModNetwork;
 import com.ypsi.fundamentalism.network.SpellCategoriesCommand;
-import com.ypsi.fundamentalism.network.packets.SyncCategoryLevelsPacket;
 import com.ypsi.fundamentalism.particle.ConstellationParticle;
 import com.ypsi.fundamentalism.particle.ModParticles;
 import com.ypsi.fundamentalism.particle.ReinforceParticles;
-import com.ypsi.fundamentalism.render.ReinforcementLayer;
+import com.ypsi.fundamentalism.particle.SolAppearanceParticle;
 import com.ypsi.fundamentalism.spells.ModSpells;
 import com.ypsi.fundamentalism.spells.YpsSchoolRegistry;
-import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.model.PlayerModel;
-import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.LivingEntityRenderer;
-import net.minecraft.client.resources.PlayerSkin;
-import net.minecraft.commands.Commands;
-import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
@@ -102,20 +93,6 @@ public class FundamentalPrinciples {
         ExhaustionCommand.register(event.getDispatcher());
         SpellCategoriesCommand.register(event.getDispatcher());
 
-//        event.getDispatcher().register(Commands.literal("debugspells")
-//                .executes(context -> {
-//                    // 1. Generar categorías
-//                    SpellCategoriesGenerator.generateCategoriesFromRegistry();
-//                    // 3. ✅ SINCRONIZAR con el cliente
-//                    if (context.getSource().getPlayer() instanceof ServerPlayer player) {
-//                        SyncCategoryLevelsPacket.sendToPlayer(player);
-//                    }
-//                    context.getSource().sendSuccess(() ->
-//                            Component.literal("✅ Spell categories generated and reloaded! Re-join world or use spells."), false);
-//                    return 1;
-//                })
-//        );
-
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
@@ -160,9 +137,10 @@ public class FundamentalPrinciples {
             event.registerEntityRenderer(ModEntities.PROIECTUM_PROJECTILE.get(), ProiectumRenderer::new);
         }
         @SubscribeEvent
-        public static void registerParticleFactories(RegisterParticleProvidersEvent event){
+        public static void registerParticleFactories(RegisterParticleProvidersEvent event) {
             event.registerSpriteSet(ModParticles.REINFORCEMENT_PARTICLE.get(), ReinforceParticles.Provider::new);
             event.registerSpriteSet(ModParticles.CONSTELLATION_PARTICLE.get(), ConstellationParticle.Provider::new);
+            //event.registerSpriteSet(ModParticles.SOL_PARTICLE.get(), SolAppearanceParticle.Provider::new);
         }
 
 

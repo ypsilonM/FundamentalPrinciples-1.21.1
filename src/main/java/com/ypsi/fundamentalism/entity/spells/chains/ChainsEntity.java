@@ -52,6 +52,10 @@ public class ChainsEntity extends LivingEntity implements GeoEntity, PreventDism
     private int duration;
     private boolean playSound;
     private LivingEntity target;
+
+    private Vec3 lastTargetPos;
+    private int noPassengerTicks = 0;
+
     private boolean played;
     private final RawAnimation ANIMATION;
     private final AnimationController controller;
@@ -126,19 +130,50 @@ public class ChainsEntity extends LivingEntity implements GeoEntity, PreventDism
         super.tick();
         if (this.playSound) {
             this.refreshDimensions();
-            this.playSound((SoundEvent) SoundRegistry.ICE_SPIKE_EMERGE .get(), 2.0F, 1.0F);
+            this.playSound((SoundEvent) SoundRegistry.ICE_SPIKE_EMERGE.get(), 2.0F, 1.0F);
             this.playSound = false;
         }
 
         if (!this.level().isClientSide) {
-            if (this.tickCount > this.duration || this.target != null && this.target.isDeadOrDying() || !this.isVehicle()) {
+            // Verificación más tolerante para teletransportes
+            boolean shouldRemove = false;
+
+            if (this.tickCount > this.duration) {
+                shouldRemove = true; // Tiempo terminado
+            } else if (this.target != null && this.target.isDeadOrDying()) {
+                shouldRemove = true; // Target murió
+            } else if (!this.isVehicle()) {
+                // Si no hay pasajero, contar ticks antes de remover
+                noPassengerTicks++;
+                if (noPassengerTicks > 20) { // 1 segundo sin pasajero
+                    shouldRemove = true;
+                }
+            } else {
+                noPassengerTicks = 0; // Resetear contador si hay pasajero
+            }
+
+            if (shouldRemove) {
                 this.removeRoot();
             }
         } else if (this.tickCount < 20) {
             this.clientDiggingParticles(this);
         }
-
     }
+
+
+    public void teleportWithTarget() {
+        if (this.target != null && this.target.isAlive()) {
+            this.setPos(this.target.getX(), this.target.getY(), this.target.getZ());
+            this.setDeltaMovement(0, 0, 0);
+
+            // Si el target no está montado, montarlo
+            if (this.target.getVehicle() != this && this.target.isAlive()) {
+                this.target.stopRiding();
+                this.target.startRiding(this, true);
+            }
+        }
+    }
+
 
     protected void clientDiggingParticles(LivingEntity livingEntity) {
         RandomSource randomsource = livingEntity.getRandom();
@@ -157,6 +192,9 @@ public class ChainsEntity extends LivingEntity implements GeoEntity, PreventDism
 
     public void setDuration(int duration) {
         this.duration = duration;
+    }
+    public int getDuration() {
+        return this.duration;
     }
 
     @Nullable
@@ -234,18 +272,7 @@ public class ChainsEntity extends LivingEntity implements GeoEntity, PreventDism
     }
 
     public void positionRider(Entity passenger, Entity.MoveFunction p_19958_) {
-        int x = (int)(this.getX() - passenger.getX());
-        int y = (int)(this.getY() - passenger.getY());
-        int z = (int)(this.getZ() - passenger.getZ());
-        x *= x;
-        y *= y;
-        z *= z;
-        if (x + y + z > 25) {
-            this.removeRoot();
-        } else {
-            passenger.setPos(this.getX(), this.getY(), this.getZ());
-        }
-
+        passenger.setPos(this.getX(), this.getY(), this.getZ());
     }
 
     protected boolean isImmobile() {

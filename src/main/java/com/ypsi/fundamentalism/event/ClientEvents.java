@@ -101,6 +101,7 @@ public class ClientEvents {
                         size, size);
             }
             renderExhaustionCounter(gui, x, y, exhaustion, exhaustionLvl ,maxEx , size);
+            renderExhaustionLevel(gui, x, y, exhaustionLvl, size);
         }
         private static void renderExhaustionCounter(GuiGraphics gui, int bottleX, int bottleY, int exhaustion, int exhaustionLvl, int maxEx,int size) {
             Minecraft minecraft = Minecraft.getInstance();
@@ -125,6 +126,31 @@ public class ClientEvents {
             gui.drawString(font, exhaustionText, scaledExhaustionX, scaledExhaustionY, exhaustionColor, false);
             poseStack.popPose();
         }
+        private static void renderExhaustionLevel(GuiGraphics gui, int bottleX, int bottleY, int exhaustionLvl, int size) {
+            Minecraft minecraft = Minecraft.getInstance();
+            Font font = minecraft.font;
+
+            String levelText = String.valueOf(exhaustionLvl);
+            int levelX = bottleX - 2;
+            int levelY = bottleY - size - 2;
+
+            PoseStack poseStack = gui.pose();
+
+            poseStack.pushPose();
+            poseStack.scale(0.8f, 0.8f, 0.8f);
+
+            int scaledLevelX = (int) (levelX / 0.8f);
+            int scaledLevelY = (int) (levelY / 0.8f);
+
+            int levelColor = getExhaustionTextColor(exhaustionLvl);
+            int shadowColor = getExhaustionShadowColor(exhaustionLvl);
+
+            gui.drawString(font, levelText, scaledLevelX + 1, scaledLevelY + 1, shadowColor, false);
+            gui.drawString(font, levelText, scaledLevelX, scaledLevelY, levelColor, false);
+
+            poseStack.popPose();
+        }
+
         private static int getExhaustionTextColor(int exhaustionLevel) {
             return switch (exhaustionLevel){
                 case 4 -> 0xFF3366; // Rojo vibrante

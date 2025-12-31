@@ -2,8 +2,6 @@ package com.ypsi.fundamentalism.item;
 
 import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.entity.ModEntities;
-import com.ypsi.fundamentalism.item.custom.ChiselItem;
-import com.ypsi.fundamentalism.item.custom.FuelItem;
 import com.ypsi.fundamentalism.item.custom.TonicItem;
 import com.ypsi.fundamentalism.item.custom.food.ManaFruit;
 import net.minecraft.world.item.Item;
@@ -30,11 +28,12 @@ public class ModItems {
             () -> new Item(new Item.Properties().stacksTo(16)));
     public static final DeferredItem<Item> LUMINAIRE_EXTRACT = ITEMS.register("luminaire_extract",
             () -> new Item(new Item.Properties().stacksTo(1)));
+
     public static final DeferredItem<Item> TONIC = ITEMS.register("tonic",
-            () -> new TonicItem());
+            TonicItem::new);
 
     public static final DeferredItem<Item> MANA_FRUIT = ITEMS.register("mana_fruit",
-            () -> new ManaFruit());
+            ManaFruit::new);
 
     public static final DeferredItem<Item> HEMOMANCER_SPAWN_EGG = ITEMS.register("hemomancer_spawn_egg",
             () -> new DeferredSpawnEggItem(ModEntities.HEMOMANCER, 0x120303, 0x704141,
@@ -45,6 +44,10 @@ public class ModItems {
     public static final DeferredItem<Item> VENEMERUS_SPAWN_EGG = ITEMS.register("venemerus_spawn_egg",
             () -> new DeferredSpawnEggItem(ModEntities.VENEMERUS, 0x03941B, 0x74992E,
                     new Item.Properties()));
+
+    public static final DeferredItem<Item> FUNDAMENTALISM_SCROLL = ITEMS.register("scroll_fundamentalism",
+            () -> new Item(new Item.Properties().stacksTo(1)));
+
 
     private static <T extends Item> DeferredItem<T> registerItem(String name, Supplier<T> item){
         DeferredItem<T> toReturn = ITEMS.register(name, item);

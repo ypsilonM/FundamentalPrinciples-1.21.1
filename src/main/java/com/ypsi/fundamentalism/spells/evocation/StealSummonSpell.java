@@ -39,13 +39,6 @@ import java.util.Optional;
 public class StealSummonSpell extends AbstractSpell {
     private final ResourceLocation spellId = ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "summon_steal");
 
-//    @Override
-//    public List<MutableComponent> getUniqueInfo(int spellLevel, LivingEntity caster) {
-//        return List.of(
-//                Component.translatable("ui.irons_spellbooks.summon_count", getSummonCount(spellLevel, caster))
-//        );
-//    }
-
     private final DefaultConfig defaultConfig = new DefaultConfig()
             .setMinRarity(SpellRarity.EPIC)
             .setSchoolResource(SchoolRegistry.EVOCATION_RESOURCE)
@@ -97,7 +90,6 @@ public class StealSummonSpell extends AbstractSpell {
 //            super.onRecastFinished(serverPlayer, recastInstance, recastResult, castDataSerializable);
 //        }
 //    }
-
 //    @Override
 //    public ICastDataSerializable getEmptyCastData() {
 //        return new SummonedEntitiesCastData();
@@ -106,37 +98,33 @@ public class StealSummonSpell extends AbstractSpell {
 //    public int getSummonCount(int spellLevel, LivingEntity caster) {
 //        return spellLevel + 2;
 //    }
+
     @Override
     public boolean checkPreCastConditions(Level level, int spellLevel, LivingEntity entity, MagicData playerMagicData) {
         return Utils.preCastTargetHelper(level, entity, playerMagicData, this, 64, .35f);
-    }
-
-    @Nullable
-    private LivingEntity findTarget(LivingEntity caster) {
-        var target = Utils.raycastForEntity(caster.level(), caster, 32, true, 0.35f);
-        if (target instanceof EntityHitResult entityHit && entityHit.getEntity() instanceof LivingEntity livingTarget && livingTarget instanceof IMagicSummon) {
-            return livingTarget;
-        } else {
-            return null;
-        }
     }
 
 
     @Override
     public void onCast(Level world, int spellLevel, LivingEntity entity, CastSource castSource, MagicData playerMagicData) {
         if (playerMagicData.getAdditionalCastData() instanceof TargetEntityCastData targetingData) {
-            var targetEntity = targetingData.getTarget((ServerLevel) world);
-            if (targetEntity != null && entity instanceof Player player && player instanceof ServerPlayer) {
-                targetEntity.isAlliedTo(entity);
 
-                if(!SummonManager.getSummons(entity).contains(targetEntity)) {
-                    SummonManager.setOwner(targetEntity, entity);
+            var targetEntity = targetingData.getTarget((ServerLevel) world);
+            if (targetEntity != null) {
+
+                if(targetEntity instanceof IMagicSummon summon) {
+
+                    if (!SummonManager.getSummons(entity).contains(targetEntity)) {
+                        SummonManager.setOwner(targetEntity, entity);
+                    }
+                    if (targetEntity instanceof Mob mob) {
+                        mob.setTarget(null);
+                    }
+
+                    ClientMagicData.getActiveSummons().add(targetEntity.getUUID());
                 }
-                if (targetEntity instanceof Mob mob) {
-                    mob.setTarget(null);
-                }
-                ClientMagicData.getActiveSummons().add(targetEntity.getUUID());
             }
+
         }
 
         super.onCast(world, spellLevel, entity, castSource, playerMagicData);

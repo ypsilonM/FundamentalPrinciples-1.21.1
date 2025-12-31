@@ -60,7 +60,7 @@ public class LapsusSpell extends AbstractSpell {
         this.baseSpellPower = 15;
         this.spellPowerPerLevel = 0;
         this.castTime = 0;
-        this.baseManaCost = 100;
+        this.baseManaCost = 50;
     }
 
     @Override

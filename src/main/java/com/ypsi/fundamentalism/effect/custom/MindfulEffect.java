@@ -5,8 +5,12 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
+import net.neoforged.neoforge.common.EffectCure;
+import net.neoforged.neoforge.common.extensions.IMobEffectExtension;
 
-public class MindfulEffect extends MobEffect {
+import java.util.Set;
+
+public class MindfulEffect extends MobEffect implements IMobEffectExtension {
 
     public MindfulEffect(MobEffectCategory category, int color) {
         super(category, color);
@@ -25,5 +29,10 @@ public class MindfulEffect extends MobEffect {
     @Override
     public ParticleOptions createParticleOptions(MobEffectInstance effect) {
         return super.createParticleOptions(effect);
+    }
+
+    @Override
+    public void fillEffectCures(Set<EffectCure> cures, MobEffectInstance effectInstance) {
+
     }
 }

@@ -9,7 +9,13 @@
     "SpellWheelOverlayMixin"
   ],
   "mixins": [
-    "PostCastSpellMixin"
+    "SpellPowerSpellsMixin",
+    "PlayerRecastsMixin",
+    "SpellBookMixin",
+    "UniqueBookMixin",
+    "SpellBookTooltipMixin",
+    "InscriptionMixin",
+    "TargetRaycastMixin"
   ],
   "injectors": {
     "defaultRequire": 1

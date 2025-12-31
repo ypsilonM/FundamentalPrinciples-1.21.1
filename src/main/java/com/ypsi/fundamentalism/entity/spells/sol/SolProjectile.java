@@ -1,9 +1,7 @@
 package com.ypsi.fundamentalism.entity.spells.sol;
 
 import com.ypsi.fundamentalism.entity.ModEntities;
-import com.ypsi.fundamentalism.entity.spells.pull.PullProjectile;
 import com.ypsi.fundamentalism.spells.ModSpells;
-import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import io.redspace.ironsspellbooks.api.util.CameraShakeData;
 import io.redspace.ironsspellbooks.api.util.CameraShakeManager;
@@ -12,7 +10,6 @@ import io.redspace.ironsspellbooks.config.ServerConfigs;
 import io.redspace.ironsspellbooks.damage.DamageSources;
 import io.redspace.ironsspellbooks.entity.spells.AbstractMagicProjectile;
 import io.redspace.ironsspellbooks.network.particles.FieryExplosionParticlesPacket;
-import io.redspace.ironsspellbooks.registries.EntityRegistry;
 import io.redspace.ironsspellbooks.util.ParticleHelper;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
@@ -30,6 +27,7 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.ExplosionDamageCalculator;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForge;
@@ -40,7 +38,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-
 public class SolProjectile extends AbstractMagicProjectile {
     private static final EntityDataAccessor<Float> DATA_RADIUS = SynchedEntityData.defineId(SolProjectile.class, EntityDataSerializers.FLOAT);
     public SolProjectile(EntityType<? extends Projectile> pEntityType, Level pLevel) {
@@ -49,27 +46,43 @@ public class SolProjectile extends AbstractMagicProjectile {
     }
 
     public SolProjectile(Level pLevel, LivingEntity pShooter) {
-        this((EntityType) ModEntities.SOL_PROJECTILE.get(), pLevel);
+        this(ModEntities.SOL_PROJECTILE.get(), pLevel);
         this.setOwner(pShooter);
     }
 
     public void trailParticles() {
-        Vec3 vec3 = this.getDeltaMovement();
-        double d0 = this.getX() - vec3.x;
-        double d1 = this.getY() - vec3.y;
-        double d2 = this.getZ() - vec3.z;
-        int count = Mth.clamp((int)(vec3.lengthSqr() * 4.0), 1, 4);
+        Vec3 center = this.getBoundingBox().getCenter();
+
+        AABB aabb = this.getBoundingBox();
+        double width = aabb.getXsize();
+        double height = aabb.getYsize();
+        double depth = aabb.getZsize();
+
+        double speed = this.getDeltaMovement().length();
+        int count = Mth.clamp((int)(speed * width * 2.0), 1, 32);
 
         for(int i = 0; i < count; ++i) {
-            Vec3 random = Utils.getRandomVec3(0.25);
-            float f = (float)i / (float)count;
-            double x = Mth.lerp((double)f, d0, this.getX());
-            double y = Mth.lerp((double)f, d1, this.getY());
-            double z = Mth.lerp((double)f, d2, this.getZ());
-            this.level().addParticle(ParticleTypes.LARGE_SMOKE, x - random.x, y + 0.5 - random.y, z - random.z, random.x * 0.5, random.y * 0.5, random.z * 0.5);
-            this.level().addParticle(ParticleHelper.EMBERS, x - random.x, y + 0.5 - random.y, z - random.z, random.x * 0.5, random.y * 0.5, random.z * 0.5);
-        }
+            double offsetX = (this.random.nextDouble() - 0.5) * width * 0.5;
+            double offsetY = (this.random.nextDouble() - 0.5) * height * 0.5;
+            double offsetZ = (this.random.nextDouble() - 0.5) * depth * 0.5;
 
+            double motionScale = 0.1 + (width * 0.05);
+            double motionX = (this.random.nextDouble() - 0.5) * motionScale;
+            double motionY = (this.random.nextDouble() - 0.5) * motionScale;
+            double motionZ = (this.random.nextDouble() - 0.5) * motionScale;
+
+            this.level().addParticle(ParticleTypes.LARGE_SMOKE,
+                    center.x + offsetX,
+                    center.y + offsetY,
+                    center.z + offsetZ,
+                    motionX, motionY, motionZ);
+
+            this.level().addParticle(ParticleHelper.EMBERS,
+                    center.x + offsetX,
+                    center.y + offsetY,
+                    center.z + offsetZ,
+                    motionX * 0.8, motionY * 0.8, motionZ * 0.8);
+        }
     }
     public void refreshDimensions() {
         double d0 = this.getX();
@@ -109,16 +122,16 @@ public class SolProjectile extends AbstractMagicProjectile {
                 }
             }
 
-            if ((Boolean) ServerConfigs.SPELL_GREIFING.get()) {
-                Explosion explosion = new Explosion(this.level(), (Entity)null, ((AbstractSpell) ModSpells.SOL_SPELL.get()).getDamageSource(this, this.getOwner()), (ExplosionDamageCalculator)null, this.getX(), this.getY(), this.getZ(), this.getExplosionRadius()*3, true, Explosion.BlockInteraction.DESTROY, ParticleTypes.EXPLOSION, ParticleTypes.EXPLOSION_EMITTER, SoundEvents.GENERIC_EXPLODE);
-                if (!((ExplosionEvent.Start) NeoForge.EVENT_BUS.post(new ExplosionEvent.Start(this.level(), explosion))).isCanceled()) {
+            if (ServerConfigs.SPELL_GREIFING.get()) {
+                Explosion explosion = new Explosion(this.level(), null, (ModSpells.SOL_SPELL.get()).getDamageSource(this, this.getOwner()), null, this.getX(), this.getY(), this.getZ(), this.getExplosionRadius()*3, true, Explosion.BlockInteraction.DESTROY, ParticleTypes.EXPLOSION, ParticleTypes.EXPLOSION_EMITTER, SoundEvents.GENERIC_EXPLODE);
+                if (!( NeoForge.EVENT_BUS.post(new ExplosionEvent.Start(this.level(), explosion))).isCanceled()) {
                     explosion.explode();
                     explosion.finalizeExplosion(false);
                 }
             }
 
-            PacketDistributor.sendToPlayersTrackingEntity(this, new FieryExplosionParticlesPacket(new Vec3(this.getX(), this.getY() + 0.15000000596046448, this.getZ()), this.getExplosionRadius()), new CustomPacketPayload[0]);
-            this.playSound((SoundEvent)SoundEvents.GENERIC_EXPLODE.value(), 4.0F, (1.0F + (this.level().random.nextFloat() - this.level().random.nextFloat()) * 0.2F) * 0.7F);
+            PacketDistributor.sendToPlayersTrackingEntity(this, new FieryExplosionParticlesPacket(new Vec3(this.getX(), this.getY() + 0.15000000596046448, this.getZ()), this.getExplosionRadius()));
+            this.playSound(SoundEvents.GENERIC_EXPLODE.value(), 4.0F, (1.0F + (this.level().random.nextFloat() - this.level().random.nextFloat()) * 0.2F) * 0.7F);
             this.discard();
         }
     }
@@ -129,6 +142,7 @@ public class SolProjectile extends AbstractMagicProjectile {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder pBuilder) {
+        super.defineSynchedData(pBuilder);
         pBuilder.define(DATA_RADIUS, 5F);
     }
 
@@ -180,7 +194,7 @@ public class SolProjectile extends AbstractMagicProjectile {
     @Override
     public void tick() {
         if(tickCount%20==0 || tickCount==1) {
-            CameraShakeManager.addCameraShake(new CameraShakeData(20, this.position(), 120));
+            CameraShakeManager.addCameraShake(new CameraShakeData(this.level(),20, this.position(), 120));
         }
         super.tick();
     }

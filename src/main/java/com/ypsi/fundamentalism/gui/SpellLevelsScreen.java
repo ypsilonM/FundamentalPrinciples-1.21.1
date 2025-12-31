@@ -1,29 +1,30 @@
 package com.ypsi.fundamentalism.gui;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.ypsi.fundamentalism.FundamentalPrinciples;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.ypsi.fundamentalism.keybind.ModKeyBinds;
 import com.ypsi.fundamentalism.network.packets.data.ClientCategoryLevelsData;
 import com.ypsi.fundamentalism.spellCategories.SpellCategoryProgression;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class SpellLevelsScreen extends Screen {
-    private static final int WINDOW_WIDTH = 328;
+    private static final int WINDOW_WIDTH = 500;
     private static final int WINDOW_HEIGHT = 210;
     private int leftPos, topPos;
-    private double scrollOffset;
-    private boolean isDragging = false;
-    private double lastMouseX;
+    private float rotation = 0.0f;
+
+    private String selectedCategory = null;
+    private static final int LARGE_ICON_SIZE = 48;
+    private static final int CENTER_ANIMATION_TIME = 30;
+    private int animationTimer = 0;
 
     private final String[] CATEGORIES = {
             "createEntity", "usesShoot", "usesSummon", "usesTargeting",
@@ -32,10 +33,8 @@ public class SpellLevelsScreen extends Screen {
             "usesHealing", "usesPotentiation"
     };
 
-    private static final int CARD_WIDTH = 40;
-    private static final int CARD_HEIGHT = 60;
-    private static final int CARD_SPACING = 10;
-    private static final int VISIBLE_CARDS = 6; // Número de cartas visibles a la vez
+    private static final int ICON_SIZE = 24;
+    private static final int CIRCLE_RADIUS = 70;
 
     public SpellLevelsScreen() {
         super(Component.literal("Fundamentals Experience"));
@@ -46,7 +45,6 @@ public class SpellLevelsScreen extends Screen {
         super.init();
         this.leftPos = (this.width - WINDOW_WIDTH) / 2;
         this.topPos = (this.height - WINDOW_HEIGHT) / 2;
-        this.scrollOffset = 0;
     }
 
     @Override
@@ -56,298 +54,393 @@ public class SpellLevelsScreen extends Screen {
 
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        // Fondo semitransparente
-        guiGraphics.fill(0, 0, this.width, this.height, 0x80101010);
+        //guiGraphics.fill(0, 0, this.width, this.height, 0x80101010);
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        this.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
+        this.renderBlurredBackground(partialTick);
 
-        // Fondo principal de la ventana
         guiGraphics.fill(leftPos, topPos, leftPos + WINDOW_WIDTH, topPos + WINDOW_HEIGHT, 0x882D2D2D);
         guiGraphics.renderOutline(leftPos, topPos, WINDOW_WIDTH, WINDOW_HEIGHT, 0xFF2D2D2D);
 
-        // Título
-        Component styledTitle = this.title.copy().withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.DARK_PURPLE);
+        Component styledTitle = this.title.copy().withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.LIGHT_PURPLE);
         int titleWidth = this.font.width(styledTitle);
         int titleX = leftPos + (WINDOW_WIDTH - titleWidth) / 2;
         guiGraphics.drawString(this.font, styledTitle, titleX, topPos + 6, 0xFFFFFF, false);
 
-        // Área de contenido con recorte para las cartas
-        int contentTop = topPos + 25;
-        int contentHeight = WINDOW_HEIGHT - 35;
-        guiGraphics.enableScissor(leftPos + 8, contentTop, leftPos + WINDOW_WIDTH - 8, contentTop + contentHeight);
+        guiGraphics.enableScissor(leftPos + 8, topPos + 20, leftPos + WINDOW_WIDTH - 8, topPos + WINDOW_HEIGHT - 8);
 
-        renderCardDeck(guiGraphics, mouseX, mouseY, contentTop, contentHeight);
+        renderCircularIcons(guiGraphics, mouseX, mouseY);
 
         guiGraphics.disableScissor();
-
-        // Flechas de navegación (opcional)
-        renderNavigationArrows(guiGraphics, mouseX, mouseY);
 
         super.render(guiGraphics, mouseX, mouseY, partialTick);
     }
 
-    private void renderCardDeck(GuiGraphics guiGraphics, int mouseX, int mouseY, int contentTop, int contentHeight) {
-        int totalCardsWidth = CATEGORIES.length * (CARD_WIDTH + CARD_SPACING) - CARD_SPACING;
-        int maxScroll = Math.max(0, totalCardsWidth - (WINDOW_WIDTH - 30));
+    private void renderCircularIcons(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        int centerX = leftPos + WINDOW_WIDTH / 2;
+        int centerY = topPos + WINDOW_HEIGHT / 2;
 
-        // Limitar el scroll
-        scrollOffset = Math.max(0, Math.min(scrollOffset, maxScroll));
-
-        int startX = leftPos + 15 - (int)scrollOffset;
-        int cardY = contentTop + (contentHeight - CARD_HEIGHT) / 2;
+        if (selectedCategory != null) {
+            renderLargeCenterIcon(guiGraphics, selectedCategory, centerX, centerY);
+        }
 
         for (int i = 0; i < CATEGORIES.length; i++) {
-            int cardX = startX + i * (CARD_WIDTH + CARD_SPACING);
+            if (CATEGORIES[i].equals(selectedCategory)) continue;
 
-            // Solo renderizar cartas que estén dentro del área visible
-            if (cardX + CARD_WIDTH >= leftPos + 8 && cardX <= leftPos + WINDOW_WIDTH - 8) {
-                renderCard(guiGraphics, CATEGORIES[i], cardX, cardY, mouseX, mouseY, i);
-            }
+            double angle = 2 * Math.PI * i / CATEGORIES.length + rotation;
+            int x = centerX + (int) (CIRCLE_RADIUS * Math.cos(angle)) - ICON_SIZE / 2;
+            int y = centerY + (int) (CIRCLE_RADIUS * Math.sin(angle)) - ICON_SIZE / 2;
+
+            renderIcon(guiGraphics, CATEGORIES[i], x, y, mouseX, mouseY, i);
         }
     }
 
-    private void renderCard(GuiGraphics guiGraphics, String category, int x, int y, int mouseX, int mouseY, int index) {
-        int level = ClientCategoryLevelsData.getLevel(category);
-        float progress = ClientCategoryLevelsData.getProgress(category);
+    private void renderLargeCenterIcon(GuiGraphics guiGraphics, String category, int centerX, int centerY) {
+        float totalScale;
 
-        boolean isHovered = isMouseOverCard(mouseX, mouseY, x, y);
-        boolean isSelected = isCardSelected(index);
-
-        // Color de fondo de la carta (dependiendo del nivel)
-        int bgColor = getCardColor(level);
-        int borderColor = isHovered ? 0xFFFFFFAA : (isSelected ? 0xFFFFD700 : 0xFF888888);
-
-        // Cuerpo de la carta
-        guiGraphics.fill(x, y, x + CARD_WIDTH, y + CARD_HEIGHT, bgColor);
-        guiGraphics.renderOutline(x, y, CARD_WIDTH, CARD_HEIGHT, borderColor);
-
-        // Efecto de elevación al hacer hover
-        if (isHovered) {
-            guiGraphics.fill(x + 2, y + 2, x + CARD_WIDTH - 2, y + CARD_HEIGHT - 2, 0x22FFFFFF);
+        if (animationTimer > 0) {
+            float progress = 1.0f - (float)animationTimer / CENTER_ANIMATION_TIME;
+            // Animación de 0.5 a 2.0
+            totalScale = 0.5f + progress * 1.5f; // 0.5 → 2.0
+            animationTimer--;
+        } else {
+            // Cuando termina la animación, mantener en 2.0
+            totalScale = 2.0f;
         }
 
-        // Símbolo de la categoría (centrado)
+        int x = centerX - LARGE_ICON_SIZE / 2;
+        int y = centerY - LARGE_ICON_SIZE / 2;
+
+        // Fondo del icono grande (TAMAÑO ORIGINAL)
+        int bgColor = 0xFF444444;
+        guiGraphics.fill(x, y, x + LARGE_ICON_SIZE, y + LARGE_ICON_SIZE, bgColor);
+
+        // Borde resaltado (TAMAÑO ORIGINAL)
+        int borderColor = 0xFFAA00FF;
+        guiGraphics.renderOutline(x - 1, y - 1, LARGE_ICON_SIZE + 2, LARGE_ICON_SIZE + 2, borderColor);
+        guiGraphics.renderOutline(x, y, LARGE_ICON_SIZE, LARGE_ICON_SIZE, 0xFFCC44FF);
+
+        // Solo el símbolo se escala
+        PoseStack poseStack = guiGraphics.pose();
+        poseStack.pushPose();
+        poseStack.translate(centerX, centerY, 0);
+        poseStack.scale(totalScale, totalScale, 1.0f);
+
         String symbol = SpellCategoryProgression.getCategorySymbol(category);
-        int symbolX = x + (CARD_WIDTH - this.font.width(symbol)) / 2;
-        int symbolY = y + 10;
-        guiGraphics.drawString(this.font, symbol, symbolX, symbolY, 0xEFBF04, false);
+        int symbolX = -this.font.width(symbol) / 2;
+        int symbolY = -4;
 
-        // Nivel (en la parte inferior)
-        String levelText = "Lvl " + level;
-        int levelX = x + (CARD_WIDTH - this.font.width(levelText)) / 2;
-        int levelY = y + CARD_HEIGHT - 20;
-        guiGraphics.drawString(this.font, levelText, levelX, levelY, 0xFFFFFF, false);
+        int textColor = 0xEFBF04;
+        guiGraphics.drawString(this.font, symbol, symbolX, symbolY, textColor, false);
 
-        // Barra de progreso para niveles no máximos
-        if (level < 20 && progress > 0) {
-            renderProgressBar(guiGraphics, x, y, progress);
+        poseStack.popPose();
+
+        // Nombre (sin escala)
+        String displayName = SpellCategoryProgression.getCategoryDisplayName(category).replace("Principle", "").trim();
+        int nameX = centerX - this.font.width(displayName) / 2;
+        int nameY = y + LARGE_ICON_SIZE + 8;
+
+        int nameBgWidth = this.font.width(displayName) + 6;
+        int nameBgX = nameX - 3;
+        guiGraphics.fill(nameBgX, nameY - 2, nameBgX + nameBgWidth, nameY + 10, 0xAA000000);
+        guiGraphics.drawString(this.font, displayName, nameX, nameY, 0xFFFFFF, true);
+
+        int level = ClientCategoryLevelsData.getLevel(category);
+        float progressValue = ClientCategoryLevelsData.getProgress(category);
+        renderSelectedCategoryTooltip(guiGraphics, category, level, progressValue, centerX, centerY);
+    }
+
+    private void renderSelectedCategoryTooltip(GuiGraphics guiGraphics, String category, int level, float progress, int centerX, int centerY) {
+        List<Component> tooltip = new ArrayList<>();
+
+        tooltip.add(Component.literal(SpellCategoryProgression.getCategoryDisplayName(category))
+                .withStyle(ChatFormatting.BOLD, ChatFormatting.GOLD));
+
+        boolean isMaxLevel = level >= 20;
+
+        if (isMaxLevel) {
+            tooltip.add(Component.literal("Level: MAX")
+                    .withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD, ChatFormatting.ITALIC));
+            tooltip.add(Component.literal(""));
+            tooltip.add(Component.literal(""));
+
+        } else {
+            tooltip.add(Component.literal("Level: " + level + "/20")
+                    .withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+            tooltip.add(Component.literal("Progress: " + (int)(progress * 100) + "%")
+                    .withStyle(ChatFormatting.BLUE, ChatFormatting.ITALIC));
+
+            int currentExp = ClientCategoryLevelsData.getExperience(category);
+            int expNeeded = 100 * (level + 1);
+            tooltip.add(Component.literal("XP: " + currentExp + "/" + expNeeded)
+                    .withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+            tooltip.add(Component.literal(""));
+            tooltip.add(Component.literal(""));
         }
 
-        // Indicador de nivel máximo
-        if (level >= 20) {
-            renderMaxLevelIndicator(guiGraphics, x, y);
+        tooltip.add(Component.literal("Stats:")
+                .withStyle(ChatFormatting.YELLOW, ChatFormatting.ITALIC));
+
+        float power = calculatePowerForCategory(category, level);
+        power = Math.round(power * 100.0f)/100.0f;
+        String sign = power > 0 ? "+" : "";
+        ChatFormatting color = power < 0 ? ChatFormatting.RED : ChatFormatting.BLUE;
+        tooltip.add(Component.literal("• " + sign + power + "% Power")
+                .withStyle(color));
+
+        if(category.equals("hasRecasts")) {
+            float recastProb = calculateProbabilityForRecast(level);
+            recastProb = Math.round(recastProb * 100.0f) / 100.0f;
+            tooltip.add(Component.literal("• " + recastProb + "% +1 Recast")
+                    .withStyle(ChatFormatting.DARK_AQUA));
+        }
+        if(category.equals("usesTeleport")){
+            float addProb = calculateProbabilityForAddTp(level);
+            addProb = Math.round(addProb * 100.0f) / 100.0f;
+            tooltip.add(Component.literal("• +" + addProb + "% Chance")
+                    .withStyle(ChatFormatting.LIGHT_PURPLE));
+        }
+        if(category.equals("usesTargeting")){
+            int addRange = getTotalRange(level);
+            tooltip.add(Component.literal("• +" + addRange + " Distance")
+                    .withStyle(ChatFormatting.GREEN));
         }
 
-        // Tooltip al hacer hover
-        if (isHovered) {
-            renderCardTooltip(guiGraphics, category, level, progress, mouseX, mouseY);
+        renderTooltipBackgroundAndText(guiGraphics, tooltip, centerX, centerY, isMaxLevel ? -1 : progress);
+    }
+    private static int getTotalRange(int level){
+        return (int) (level*1.5);
+    }
+    private static float calculateProbabilityForAddTp(int categoryLevel) {
+        return (float)((categoryLevel * 0.025) * 100);
+    }
+    private float calculateProbabilityForRecast(int categoryLevel) {
+        return (float)(categoryLevel * 0.04 * 100);
+    }
+    private float calculatePowerForCategory(String category, int level) {
+        if (category.equals("usesShoot") || category.equals("createsAoeEntities") || category.equals("usesSummon")) {
+            return (float) getSubEntityModificator(level) * 100;
+        } else {
+            return (float) getModificator(level) * 100;
         }
     }
 
-    private int getCardColor(int level) {
-        // Colores basados en el nivel (similar a cartas de poker/trading)
-        if (level >= 20) return 0xFF4A148C; // Púrpura - nivel máximo
-        if (level >= 15) return 0xFF1565C0; // Azul - épico
-        if (level >= 10) return 0xFF2E7D32; // Verde - raro
-        if (level >= 5) return 0xFFF9A825;  // Amarillo - poco común
-        return 0xFF424242; // Gris - común
+    private void renderTooltipBackgroundAndText(GuiGraphics guiGraphics, List<Component> tooltip, int centerX, int centerY, float progress) {
+        int maxWidth = tooltip.stream()
+                .mapToInt(line -> this.font.width(line))
+                .max()
+                .orElse(120);
+        maxWidth = Math.max(maxWidth, 120);
+
+        int tooltipX = centerX + 100;
+        int tooltipY = centerY - 50;
+        int bgPadding = 6;
+
+        int bgX = tooltipX - bgPadding;
+        int bgY = tooltipY - bgPadding;
+        int bgWidth = maxWidth + bgPadding * 2;
+        int bgHeight = tooltip.size() * 10 + bgPadding * 2;
+
+        boolean hasProgressBar = progress >= 0;
+        if (hasProgressBar) {
+            bgHeight += 10;
+        }
+
+        guiGraphics.fill(bgX, bgY, bgX + bgWidth, bgY + bgHeight, 0xDD000000);
+        guiGraphics.renderOutline(bgX, bgY, bgWidth, bgHeight, 0xFFAA00FF);
+
+        if (hasProgressBar) {
+            renderProgressBar(guiGraphics, progress, tooltipX, tooltipY, 4);
+        }
+
+        for (int i = 0; i < tooltip.size(); i++) {
+            guiGraphics.drawString(this.font, tooltip.get(i), tooltipX, tooltipY + i * 10, 0xFFFFFF, false);
+        }
     }
 
-    private void renderProgressBar(GuiGraphics guiGraphics, int x, int y, float progress) {
-        int barWidth = CARD_WIDTH - 8;
-        int barHeight = 3;
-        int barX = x + 4;
-        int barY = y + CARD_HEIGHT - 25;
 
-        // Fondo de la barra
-        guiGraphics.fill(barX, barY, barX + barWidth, barY + barHeight, 0xFF555555);
+    private double getModificator(int level){
+        double basePercentage = -0.10;
+        for(int i=0;i<level;i++){
+            double increment = 0.01;
+            basePercentage+=increment;
+        }
+        return basePercentage;
+    }
+    private double getSubEntityModificator(int level){
+        double basePercentage = -0.05;
+        for(int i=0;i<level;i++){
+            double increment = 0.005;
+            basePercentage+=increment;
+        }
+        return basePercentage;
+    }
 
-        // Progreso
-        int progressWidth = (int)(barWidth * progress);
+
+    private void renderProgressBar(GuiGraphics guiGraphics, float progress, int x, int y, int lineIndex) {
+        int barWidth = 120;
+        int barHeight = 6;
+        int barX = x;
+        int barY = y + lineIndex * 10 + 3;
+        guiGraphics.fill(barX, barY, barX + barWidth, barY + barHeight, 0xFF330033); // Morado muy oscuro
+        int progressWidth = (int) (barWidth * progress);
         if (progressWidth > 0) {
-            guiGraphics.fill(barX, barY, barX + progressWidth, barY + barHeight, 0xFF00FF00);
+            guiGraphics.fill(barX, barY, barX + progressWidth, barY + barHeight, 0xFFAA00FF);
+            drawPurpleGradientBar(guiGraphics, barX, barY, progressWidth, barHeight);
+        }
+        guiGraphics.renderOutline(barX, barY, barWidth, barHeight, 0xFFCC66FF);
+    }
+
+    private void drawPurpleGradientBar(GuiGraphics guiGraphics, int x, int y, int width, int height) {
+        if (width <= 0) return;
+        int segments = Math.min(width, 10);
+        int segmentWidth = width / segments;
+
+        for (int i = 0; i < segments; i++) {
+            int segmentX = x + i * segmentWidth;
+            int segmentEndX = (i == segments - 1) ? x + width : segmentX + segmentWidth;
+            float t = (float) i / (segments - 1);
+            int r = (int)(85 + (170 * t));
+            int g = 0;
+            int b = (int)(128 + (127 * t));
+
+            int color = (0xFF << 24) | (r << 16) | (g << 8) | b;
+            guiGraphics.fill(segmentX, y, segmentEndX, y + height, color);
         }
     }
 
-    private void renderMaxLevelIndicator(GuiGraphics guiGraphics, int x, int y) {
-        // Estrella dorada para nivel máximo
-        String star = "★";
-        int starX = x + CARD_WIDTH - 8;
-        int starY = y + 2;
-        guiGraphics.drawString(this.font, star, starX, starY, 0xFFFFD700, false);
-    }
-
-    private boolean isMouseOverCard(int mouseX, int mouseY, int cardX, int cardY) {
-        return mouseX >= cardX && mouseX <= cardX + CARD_WIDTH &&
-                mouseY >= cardY && mouseY <= cardY + CARD_HEIGHT;
-    }
-
-    private boolean isCardSelected(int index) {
-        // Aquí puedes implementar lógica para cartas seleccionadas
-        // Por ejemplo, basado en el scroll o selección del jugador
-        return false;
-    }
-
-    private void renderCardTooltip(GuiGraphics guiGraphics, String category, int level, float progress, int mouseX, int mouseY) {
+    private void renderTooltip(GuiGraphics guiGraphics, String category, int level, float progress, int mouseX, int mouseY) {
         List<Component> tooltip = new ArrayList<>();
         tooltip.add(Component.literal(SpellCategoryProgression.getCategoryDisplayName(category))
                 .withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.GOLD));
         tooltip.add(Component.literal("Level: " + level + "/20")
-                .withStyle(ChatFormatting.GRAY));
+                .withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
 
         if (level < 20) {
             int currentExp = ClientCategoryLevelsData.getExperience(category);
             int expNeeded = 100 * (level + 1);
             tooltip.add(Component.literal("Progress: " + (int)(progress * 100) + "%")
-                    .withStyle(ChatFormatting.GREEN));
+                    .withStyle(ChatFormatting.BLUE).withStyle(ChatFormatting.ITALIC));
             tooltip.add(Component.literal("XP: " + currentExp + "/" + expNeeded)
-                    .withStyle(ChatFormatting.GRAY));
+                    .withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
         } else {
             tooltip.add(Component.literal("MAX LEVEL")
                     .withStyle(ChatFormatting.GOLD).withStyle(ChatFormatting.BOLD));
         }
-
-        // Calcular aproximadamente el ancho del tooltip (la línea más larga)
-        int estimatedWidth = 0;
-        for (Component line : tooltip) {
-            estimatedWidth = Math.max(estimatedWidth, this.font.width(line));
-        }
-        estimatedWidth += 15; // Margen
-
-        // Determinar si mostrar a la izquierda o derecha
-        int tooltipX = mouseX;
-        if (mouseX > this.width / 2) {
-            tooltipX = mouseX - estimatedWidth - 5; // Siempre a la izquierda cuando está en la mitad derecha
-        } else {
-            tooltipX += 5; // A la derecha cuando está en la mitad izquierda
-        }
-
-        guiGraphics.renderTooltip(this.font, tooltip, Optional.empty(), tooltipX, mouseY);
+        guiGraphics.renderTooltip(this.font, tooltip, Optional.empty(), mouseX, mouseY);
     }
 
-    private void renderNavigationArrows(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        // Flecha izquierda
-        int arrowY = topPos + WINDOW_HEIGHT / 2;
-        boolean leftHovered = isMouseOverArrow(mouseX, mouseY, leftPos + 5, arrowY, true);
-        int leftColor = leftHovered ? 0xFFFFFFAA : 0xFF888888;
+    private void renderIcon(GuiGraphics guiGraphics, String category, int x, int y, int mouseX, int mouseY, int index) {
+        int level = ClientCategoryLevelsData.getLevel(category);
+        float progress = ClientCategoryLevelsData.getProgress(category);
 
-        // Flecha derecha
-        boolean rightHovered = isMouseOverArrow(mouseX, mouseY, leftPos + WINDOW_WIDTH - 15, arrowY, false);
-        int rightColor = rightHovered ? 0xFFFFFFAA : 0xFF888888;
+        int bgColor = 0xFF333333;
+        guiGraphics.fill(x, y, x + ICON_SIZE, y + ICON_SIZE, bgColor);
+        int borderColor = 0xFF888888;
 
-        // Dibujar flechas (símbolos simples)
-        guiGraphics.drawString(this.font, "◀", leftPos + 8, arrowY - 4, leftColor, false);
-        guiGraphics.drawString(this.font, "▶", leftPos + WINDOW_WIDTH - 12, arrowY - 4, rightColor, false);
+        guiGraphics.renderOutline(x, y, ICON_SIZE, ICON_SIZE, borderColor);
+
+        String symbol = SpellCategoryProgression.getCategorySymbol(category);
+        int symbolX = x + (ICON_SIZE - this.font.width(symbol)) / 2;
+        int symbolY = y + (ICON_SIZE - 8) / 2;
+
+        int textColor = 0xEFBF04;
+        guiGraphics.drawString(this.font, symbol, symbolX, symbolY, textColor, false);
+
+        // Efecto de hover
+        if (isMouseOverIcon(mouseX, mouseY, x, y)) {
+            guiGraphics.fill(x, y, x + ICON_SIZE, y + ICON_SIZE, 0x44FFFFFF);
+            renderTooltip(guiGraphics, category, level, progress, mouseX, mouseY);
+        }
+
+        // Línea de progreso (opcional, alrededor del icono)
+        if (level < 20 && progress > 0) {
+            renderProgressOutline(guiGraphics, x, y, progress);
+        }
     }
 
-    private boolean isMouseOverArrow(int mouseX, int mouseY, int arrowX, int arrowY, boolean isLeft) {
-        int arrowWidth = 10;
-        int arrowHeight = 12;
-        return mouseX >= arrowX && mouseX <= arrowX + arrowWidth &&
-                mouseY >= arrowY && mouseY <= arrowY + arrowHeight;
+    private void renderProgressOutline(GuiGraphics guiGraphics, int x, int y, float progress) {
+        int outlineThickness = 1;
+        int totalPerimeter = (ICON_SIZE - 2) * 4;
+        int remainingPixels = (int)(totalPerimeter * progress);
+
+        int color = 0xFFCC7722;
+
+        if (remainingPixels > 0) {
+            int topPixels = Math.min(remainingPixels, ICON_SIZE - 2);
+            guiGraphics.fill(x + 1, y + 1, x + 1 + topPixels, y + 1 + outlineThickness, color);
+            remainingPixels -= topPixels;
+        }
+
+        if (remainingPixels > 0) {
+            int rightPixels = Math.min(remainingPixels, ICON_SIZE - 2);
+            guiGraphics.fill(x + ICON_SIZE - 1 - outlineThickness, y + 1,
+                    x + ICON_SIZE - 1, y + 1 + rightPixels, color);
+            remainingPixels -= rightPixels;
+        }
+
+        if (remainingPixels > 0) {
+            int bottomPixels = Math.min(remainingPixels, ICON_SIZE - 2);
+            guiGraphics.fill(x + ICON_SIZE - 1 - bottomPixels, y + ICON_SIZE - 1 - outlineThickness,
+                    x + ICON_SIZE - 1, y + ICON_SIZE - 1, color);
+            remainingPixels -= bottomPixels;
+        }
+
+        if (remainingPixels > 0) {
+            int leftPixels = Math.min(remainingPixels, ICON_SIZE - 2);
+            guiGraphics.fill(x + 1, y + ICON_SIZE - 1 - leftPixels,
+                    x + 1 + outlineThickness, y + ICON_SIZE - 1, color);
+        }
+    }
+
+    private boolean isMouseOverIcon(int mouseX, int mouseY, int iconX, int iconY) {
+        return mouseX >= iconX && mouseX <= iconX + ICON_SIZE &&
+                mouseY >= iconY && mouseY <= iconY + ICON_SIZE;
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (button == 0) {
-            // Verificar clic en flechas de navegación
-            int arrowY = topPos + WINDOW_HEIGHT / 2;
+        int centerX = leftPos + WINDOW_WIDTH / 2;
+        int centerY = topPos + WINDOW_HEIGHT / 2;
 
-            if (isMouseOverArrow((int)mouseX, (int)mouseY, leftPos + 5, arrowY, true)) {
-                scrollOffset = Math.max(0, scrollOffset - (CARD_WIDTH + CARD_SPACING));
-                return true;
-            }
+        for (int i = 0; i < CATEGORIES.length; i++) {
+            double angle = 2 * Math.PI * i / CATEGORIES.length + rotation;
+            int x = centerX + (int) (CIRCLE_RADIUS * Math.cos(angle)) - ICON_SIZE / 2;
+            int y = centerY + (int) (CIRCLE_RADIUS * Math.sin(angle)) - ICON_SIZE / 2;
 
-            if (isMouseOverArrow((int)mouseX, (int)mouseY, leftPos + WINDOW_WIDTH - 15, arrowY, false)) {
-                int totalCardsWidth = CATEGORIES.length * (CARD_WIDTH + CARD_SPACING) - CARD_SPACING;
-                int maxScroll = Math.max(0, totalCardsWidth - (WINDOW_WIDTH - 30));
-                scrollOffset = Math.min(maxScroll, scrollOffset + (CARD_WIDTH + CARD_SPACING));
-                return true;
-            }
-
-            // Verificar clic en cartas
-            int contentTop = topPos + 25;
-            int contentHeight = WINDOW_HEIGHT - 35;
-            int startX = leftPos + 15 - (int)scrollOffset;
-            int cardY = contentTop + (contentHeight - CARD_HEIGHT) / 2;
-
-            for (int i = 0; i < CATEGORIES.length; i++) {
-                int cardX = startX + i * (CARD_WIDTH + CARD_SPACING);
-                if (isMouseOverCard((int)mouseX, (int)mouseY, cardX, cardY)) {
-                    // Aquí puedes agregar interacción con la carta
-                    handleCardClick(CATEGORIES[i], i);
-                    return true;
+            if (isMouseOverIcon((int)mouseX, (int)mouseY, x, y)) {
+                if (this.minecraft != null && this.minecraft.player != null) {
+                    this.minecraft.player.playSound(
+                            SoundEvents.UI_BUTTON_CLICK.value(),
+                            0.5f,  // volumen
+                            1.0f   // pitch
+                    );
                 }
+                // Seleccionar o deseleccionar categoría
+                if (CATEGORIES[i].equals(selectedCategory)) {
+                    selectedCategory = null; // Deseleccionar
+                } else {
+                    selectedCategory = CATEGORIES[i];
+                    animationTimer = CENTER_ANIMATION_TIME; // Iniciar animación
+                }
+                return true;
             }
         }
 
-        // Iniciar arrastre
-        if (button == 0) {
-            isDragging = true;
-            lastMouseX = mouseX;
-        }
-
+        selectedCategory = null;
         return super.mouseClicked(mouseX, mouseY, button);
     }
-
-    @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        if (button == 0) {
-            isDragging = false;
-        }
-        return super.mouseReleased(mouseX, mouseY, button);
-    }
-
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        if (isDragging && button == 0) {
-            double deltaX = mouseX - lastMouseX;
-            scrollOffset = Math.max(0, Math.min(
-                    scrollOffset - deltaX * 1.5,
-                    getMaxScrollOffset()
-            ));
-            lastMouseX = mouseX;
-            return true;
-        }
         return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-        // Scroll horizontal con la rueda del mouse
-        scrollOffset = Math.max(0, Math.min(
-                scrollOffset - scrollY * (CARD_WIDTH + CARD_SPACING),
-                getMaxScrollOffset()
-        ));
+        rotation += scrollY * 0.1f;
         return true;
-    }
-
-    private int getMaxScrollOffset() {
-        int totalCardsWidth = CATEGORIES.length * (CARD_WIDTH + CARD_SPACING) - CARD_SPACING;
-        return Math.max(0, totalCardsWidth - (WINDOW_WIDTH - 30));
-    }
-
-    private void handleCardClick(String category, int index) {
-        // Aquí puedes implementar lo que pasa al hacer clic en una carta
-        // Por ejemplo: mostrar detalles, seleccionar, etc.
-        Minecraft.getInstance().player.displayClientMessage(
-                Component.literal("Selected: " + SpellCategoryProgression.getCategoryDisplayName(category))
-                        .withStyle(ChatFormatting.YELLOW),
-                true
-        );
     }
 
     @Override
@@ -362,17 +455,8 @@ public class SpellLevelsScreen extends Screen {
             this.onClose();
             return true;
         }
-
-        // Navegación con teclado
-        if (keyCode == InputConstants.KEY_LEFT) {
-            scrollOffset = Math.max(0, scrollOffset - (CARD_WIDTH + CARD_SPACING));
-            return true;
-        }
-        if (keyCode == InputConstants.KEY_RIGHT) {
-            scrollOffset = Math.min(getMaxScrollOffset(), scrollOffset + (CARD_WIDTH + CARD_SPACING));
-            return true;
-        }
-
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 }
+
+

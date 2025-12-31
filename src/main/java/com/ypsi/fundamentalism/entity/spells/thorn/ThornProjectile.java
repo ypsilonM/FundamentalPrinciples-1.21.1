@@ -32,6 +32,7 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.common.Mod;
 
+import javax.swing.*;
 import java.util.Optional;
 
 public class ThornProjectile extends AbstractMagicProjectile {
@@ -85,7 +86,7 @@ public class ThornProjectile extends AbstractMagicProjectile {
                 MagicManager.spawnParticles(level, ParticleHelper.BLOOD, livingEntity.getX(), livingEntity.getY() + .25f, livingEntity.getZ(), 100, .03, .4, .03, .4, true);
                 MagicManager.spawnParticles(level, ParticleHelper.BLOOD, livingEntity.getX(), livingEntity.getY() + .25f, livingEntity.getZ(), 100, .03, .4, .03, .4, false);
                 MagicManager.spawnParticles(level, new BlastwaveParticleOptions(SchoolRegistry.BLOOD.get().getTargetingColor(), explosionRadius), livingEntity.getX(), livingEntity.getBoundingBox().getCenter().y, livingEntity.getZ(), 1, 0, 0, 0, 0, true);
-                CameraShakeManager.addCameraShake(new CameraShakeData(10, livingEntity.position(), 20));
+                CameraShakeManager.addCameraShake(new CameraShakeData(level,10, livingEntity.position(), 20));
                 level.playSound(null, livingEntity.blockPosition(), SoundRegistry.BLOOD_EXPLOSION.get(), SoundSource.PLAYERS, 3, Utils.random.nextIntBetweenInclusive(8, 12) * .1f);
 
                 livingEntity.removeEffect(ModEffects.MARKED_EFFECT);
@@ -125,4 +126,5 @@ public class ThornProjectile extends AbstractMagicProjectile {
             level().addParticle(ParticleTypes.CRIMSON_SPORE, x, y, z, jitter.x, jitter.y, jitter.z);
         }
     }
+
 }

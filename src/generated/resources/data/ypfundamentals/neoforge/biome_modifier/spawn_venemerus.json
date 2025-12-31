@@ -8,7 +8,7 @@
   ],
   "spawners": {
     "type": "ypfundamentals:venemerus",
-    "maxCount": 4,
+    "maxCount": 3,
     "minCount": 2,
     "weight": 10
   }

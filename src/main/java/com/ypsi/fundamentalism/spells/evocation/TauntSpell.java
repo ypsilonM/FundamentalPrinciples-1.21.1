@@ -48,7 +48,7 @@ public class TauntSpell extends AbstractSpell {
 
     @Override
     public boolean checkPreCastConditions(Level level, int spellLevel, LivingEntity entity, MagicData playerMagicData) {
-        return Utils.preCastTargetHelper(level, entity, playerMagicData, this, 64, .35f);
+        return Utils.preCastTargetHelper(level, entity, playerMagicData, this, 24, .35f);
     }
     @Override
     public CastType getCastType() {
@@ -72,24 +72,12 @@ public class TauntSpell extends AbstractSpell {
             Entity targetEntity = spellTargetingData.getTarget((ServerLevel) world);
             if (targetEntity instanceof Mob mob) {
                 mob.setTarget(entity);
+                angryParticles(mob, world);
             }else if (targetEntity instanceof ServerPlayer player){
                 LookAtEntityPacket.sendToPlayer(player, entity);
-
-                // Efectos de feedback
                 world.playSound(null, player.getX(), player.getY(), player.getZ(),
                         SoundEvents.RAVAGER_ROAR, SoundSource.PLAYERS, 1.0F, 0.8F);
-
-                // Partículas alrededor del jugador
-                for (int i = 0; i < 360; i += 45) {
-                    double rad = Math.toRadians(i);
-                    double x = player.getX() + Math.cos(rad) * 1.5;
-                    double z = player.getZ() + Math.sin(rad) * 1.5;
-                    ((ServerLevel) world).sendParticles(
-                            ParticleTypes.ANGRY_VILLAGER,
-                            x, player.getY() + 1.5, z,
-                            1, 0, 0, 0, 0
-                    );
-                }
+                angryParticles(player, world);
             }
         }
         super.onCast(world, spellLevel, entity, castSource, playerMagicData);
@@ -100,6 +88,18 @@ public class TauntSpell extends AbstractSpell {
         return new Vector3f(1.0f, 1.0f, 1.0f);
     }
 
+    public static void angryParticles(LivingEntity livingEntity, Level world){
+        for (int i = 0; i < 360; i += 45) {
+            double rad = Math.toRadians(i);
+            double x = livingEntity.getX() + Math.cos(rad) * 1.5;
+            double z = livingEntity.getZ() + Math.sin(rad) * 1.5;
+            ((ServerLevel) world).sendParticles(
+                    ParticleTypes.ANGRY_VILLAGER,
+                    x, livingEntity.getY() + 1.5, z,
+                    1, 0, 0, 0, 0
+            );
+        }
+    }
 //    @Override
 //    public Optional<SoundEvent> getCastFinishSound() {
 //        return SoundEvents.RAVAGER_ROAR

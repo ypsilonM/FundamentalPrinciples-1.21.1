@@ -8,6 +8,6 @@ public class SpellAnimatorClass {
     public static ResourceLocation ANIMATIONS =
             ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "animation");
 
-    public static final AnimationHolder FLAME_ANIMATION =
-            new AnimationHolder("grant_me_strength", true);
+//    public static final AnimationHolder FLAME_ANIMATION =
+//            new AnimationHolder("grant_me_strength", true);
 }

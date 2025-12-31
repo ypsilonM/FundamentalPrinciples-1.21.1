@@ -113,6 +113,7 @@ public class PullProjectile extends AbstractMagicProjectile implements AntiMagic
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder pBuilder) {
+        super.defineSynchedData(pBuilder);
         pBuilder.define(DATA_RADIUS, 5F);
     }
 

@@ -36,7 +36,7 @@ public class ModBiomeModifiers {
         ));
         context.register(SPAWN_VENE, new BiomeModifiers.AddSpawnsBiomeModifier(
                 HolderSet.direct(biomes.getOrThrow(Biomes.SWAMP), biomes.getOrThrow(Biomes.DRIPSTONE_CAVES), biomes.getOrThrow(Biomes.JUNGLE), biomes.getOrThrow(Biomes.SPARSE_JUNGLE)),
-                List.of(new MobSpawnSettings.SpawnerData(ModEntities.VENEMERUS.get(), 10, 2, 4))
+                List.of(new MobSpawnSettings.SpawnerData(ModEntities.VENEMERUS.get(), 10, 2, 3))
         ));
 
     }

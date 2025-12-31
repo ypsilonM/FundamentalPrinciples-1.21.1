@@ -1,6 +1,7 @@
 package com.ypsi.fundamentalism.datagen;
 
 import com.ypsi.fundamentalism.FundamentalPrinciples;
+import com.ypsi.fundamentalism.advancements.ModAdvancementProvider;
 import com.ypsi.fundamentalism.entity.ModEntityTagProvider;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
@@ -26,6 +27,9 @@ public class DataGenerators {
         PackOutput packOutput = generator.getPackOutput();
         ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
+
+        generator.addProvider(event.includeServer(),
+                ModAdvancementProvider.create(packOutput, lookupProvider, existingFileHelper));
 
         generator.addProvider(event.includeServer(), new LootTableProvider(packOutput, Collections.emptySet(),
                 List.of(

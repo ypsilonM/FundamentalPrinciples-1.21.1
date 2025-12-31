@@ -1,15 +1,10 @@
 package com.ypsi.fundamentalism.entity;
 
-import com.mojang.datafixers.types.templates.Tag;
 import com.ypsi.fundamentalism.FundamentalPrinciples;
-import io.redspace.ironsspellbooks.util.ModTags;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.EntityTypeTagsProvider;
-import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.tags.EntityTypeTags;
-import net.minecraft.tags.TagBuilder;
-import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 
 import javax.annotation.Nullable;

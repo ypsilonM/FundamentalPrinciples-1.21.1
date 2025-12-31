@@ -23,12 +23,11 @@ public class SpellAttributeUtils {
                         "fundamentalism",
                         "spell_bonus/" + spellId.replace(":", "/")
                 );
-
                 attributeInstance.removeModifier(modifierId);
 
                 if (levelModifier != 0) {
                     AttributeModifier modifier = new AttributeModifier(
-                            modifierId, // ResourceLocation como ID
+                            modifierId,
                             levelModifier,
                             AttributeModifier.Operation.ADD_VALUE
                     );

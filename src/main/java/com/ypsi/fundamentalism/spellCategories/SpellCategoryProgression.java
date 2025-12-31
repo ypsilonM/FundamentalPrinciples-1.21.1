@@ -6,6 +6,7 @@ import com.ypsi.fundamentalism.network.packets.data.ClientCategoryLevelsData;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
 
 public class SpellCategoryProgression {
@@ -42,8 +43,7 @@ public class SpellCategoryProgression {
     }
 
     public static void addCategoryExperience(Player player, String category, int amount) {
-        if (player.level().isClientSide) return;
-
+        //if (player.level().isClientSide) return;
         SpellCategoryLevels levels = getCategoryLevels(player);
         int oldLevel = levels.getLevel(category);
         levels.addExperience(category, amount);
@@ -66,13 +66,15 @@ public class SpellCategoryProgression {
     }
 
     private static void onLevelUp(Player player, String category, int newLevel) {
-        if (!player.level().isClientSide) {
             player.displayClientMessage(
-                    Component.literal(getCategoryDisplayName(category) + " level " + newLevel + "!")
+                    Component.literal(getCategoryDisplayName(category) + " " + newLevel + " ↑ ")
                             .withStyle(ChatFormatting.GREEN),
                     true
             );
-        }
+//            player.playSound(
+//                    SoundEvents.PLAYER_LEVELUP,
+//                    1, 0.1F
+//            );
     }
 
     public static String getCategoryDisplayName(String category) {

@@ -120,7 +120,6 @@ public class PyrokinesisSpell extends AbstractSpell {
 
     @Override
     public void onServerCastComplete(Level level, int spellLevel, LivingEntity entity, MagicData playerMagicData, boolean cancelled) {
-
         super.onServerCastComplete(level, spellLevel, entity, playerMagicData, cancelled);
     }
 

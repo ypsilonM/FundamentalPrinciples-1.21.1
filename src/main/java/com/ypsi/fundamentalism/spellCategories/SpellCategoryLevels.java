@@ -18,6 +18,16 @@ public class SpellCategoryLevels {
             ).apply(spellCategoryLevelsInstance, SpellCategoryLevels::new)
     );
 
+    @FunctionalInterface
+    public interface LevelChangeListener {
+        void onLevelChanged(String category, int oldLevel, int newLevel);
+    }
+    private LevelChangeListener listener;
+
+    public void setLevelChangeListener(LevelChangeListener listener) {
+        this.listener = listener;
+    }
+
     public SpellCategoryLevels() {
         this(new HashMap<>(), new HashMap<>());
         initializeCategories();
@@ -60,7 +70,15 @@ public class SpellCategoryLevels {
     }
 
     public void setLevel(String category, int level) {
-        categoryLevels.put(category, Mth.clamp(level, 0, 20));
+        int oldLevel = getLevel(category);
+        level = Mth.clamp(level, 0, 20);
+
+        if (oldLevel != level) {
+            categoryLevels.put(category, level);
+            if (listener != null) {
+                listener.onLevelChanged(category, oldLevel, level);
+            }
+        }
     }
 
     public void setExperience(String category, int experience) {
@@ -97,4 +115,6 @@ public class SpellCategoryLevels {
 
         return (float) currentExp / expForNextLevel;
     }
+
+
 }

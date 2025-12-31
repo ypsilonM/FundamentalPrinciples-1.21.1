@@ -32,6 +32,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -74,7 +75,6 @@ public class TierWheelOverlay implements LayeredDraw.Layer {
     public void close() {
         active = false;
         if (wheelSelection >= 0 && selectedSpell != null) {
-//            ClientMagicData.getSpellSelectionManager().makeSelection(wheelSelection);
             Player player = Minecraft.getInstance().player;
             if(player!=null) {
                 String spellId = selectedSpell.getSpell().getSpellId();
@@ -90,21 +90,16 @@ public class TierWheelOverlay implements LayeredDraw.Layer {
                         Component.literal("Spell Level: " + levelSelected).withStyle(ChatFormatting.GOLD),
                         true
                 );
+                player.playSound(
+                        SoundEvents.BOOK_PAGE_TURN,
+                        1,
+                        1.2F
+                );
             }
-//
-//
-//                var spellSelection = new SpellSelectionManager(player);
-//                SpellData newSelected = new SpellData(selectedSpell.getSpell(), wheelSelection + 1);
-
         }
         Minecraft.getInstance().mouseHandler.grabMouse();
     }
-    //                    int index = spellSelection.getSelectionIndex();
-//                    SpellSelectionManager.SelectionOption selectOp = ClientMagicData.getSpellSelectionManager().getSelection();
-//                    spellSelection.getAllSpells().set(
-//                            index,
-//                            new SpellSelectionManager.SelectionOption(newSelected, selectOp.slot, selectOp.slotIndex, selectOp.globalIndex));
-//
+
     public void render(GuiGraphics guiHelper, DeltaTracker deltaTracker) {
         if (Minecraft.getInstance().options.hideGui || Minecraft.getInstance().player.isSpectator()) {
             return;
@@ -121,8 +116,7 @@ public class TierWheelOverlay implements LayeredDraw.Layer {
             close();
             return;
         }
-        //Current Spell
-//        var swsm = ClientMagicData.getSpellSelectionManager();
+
         var swsm = new SpellSelectionManager(player);
         selectedSpell = swsm.getSpellData(swsm.getSelectionIndex());
         int totalLevels = selectedSpell.getLevel();

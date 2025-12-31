@@ -1,6 +1,5 @@
 package com.ypsi.fundamentalism.mixins;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.effect.ModEffects;
 import net.minecraft.client.Minecraft;
@@ -8,9 +7,6 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
-import net.neoforged.neoforge.event.entity.living.LivingHealEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;

@@ -21,9 +21,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import java.util.List;
 
-import static com.ypsi.fundamentalism.spells.SpellAnimatorClass.ANIMATIONS;
-import static com.ypsi.fundamentalism.spells.SpellAnimatorClass.FLAME_ANIMATION;
-
 @AutoSpellConfig
 public class FlameStrengthSpell extends AbstractSpell {
     private final ResourceLocation spellId = ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "grantstrength");

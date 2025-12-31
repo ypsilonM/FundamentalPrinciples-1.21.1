@@ -24,8 +24,6 @@ import net.minecraft.world.item.component.CustomModelData;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
-import static com.ypsi.fundamentalism.event.ModEvents.getMaxExPerLevel;
-
 public class TonicItem extends Item {
     private static final int MAX_CHARGES = 10;
     private static final int DRINK_DURATION = 32;

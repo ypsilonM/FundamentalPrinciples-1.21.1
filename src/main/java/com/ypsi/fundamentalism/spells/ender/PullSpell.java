@@ -21,6 +21,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3f;
 
 import java.util.List;
 import java.util.Optional;
@@ -88,6 +89,8 @@ public class PullSpell extends AbstractSpell {
     private float getDamage(int spellLevel, LivingEntity entity) {
         return getSpellPower(spellLevel, entity);
     }
+
+
 
     private float getRadius(int spellLevel, LivingEntity entity) {
         return (float) ((Math.sqrt(spellLevel)) + (.125f * getSpellPower(spellLevel, entity)));

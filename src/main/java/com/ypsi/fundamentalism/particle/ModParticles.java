@@ -18,6 +18,9 @@ public class ModParticles {
     public static final Supplier<SimpleParticleType> CONSTELLATION_PARTICLE  =
             PARTICLE_TYPES.register("constellation_particle", () -> new SimpleParticleType(true));
 
+    //public static final Supplier<SimpleParticleType> SOL_PARTICLE =
+            //PARTICLE_TYPES.register("sol_particle", () -> new SimpleParticleType(true));
+
 
 
     public static void register(IEventBus eventBus){

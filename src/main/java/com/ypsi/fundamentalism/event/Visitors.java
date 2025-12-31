@@ -36,14 +36,14 @@ public class Visitors {
 
         public void analyzeChildEntity(String internalClassName) {
             try {
-                System.out.println("🔍 AN. CHILDREN C: " + internalClassName);
+                //System.out.println(" Analyzing Children C: " + internalClassName);
 
                 ClassReader classReader = new ClassReader(internalClassName);
                 ChildEntityAnalyzer childVisitor = new ChildEntityAnalyzer();
                 classReader.accept(childVisitor, 0);
 
                 Set<String> childCats = childVisitor.getDetectedCategories();
-                System.out.println("📦 RESULT: " + internalClassName + " -> " + childCats);
+                //System.out.println(" RESULT: " + internalClassName + " -> " + childCats);
 
                 detectedCategories.addAll(childCats);
 
@@ -77,7 +77,9 @@ public class Visitors {
                         Map.entry("addFreshEntity", "createsEntity"),
                         Map.entry("raycastForEntity", "usesRaycast"),
                         Map.entry("getTargetBlock", "usesRaycast"),
-                        Map.entry("doPostAttackEffects","usesPotentiation")
+                        Map.entry("doPostAttackEffects","usesPotentiation"),
+
+                        Map.entry("setDeltaMovement","usesImpulseCastData")
                 );
 
                 String category = categoryMapping.get(name);
@@ -134,6 +136,9 @@ public class Visitors {
                         }
                         if ("addFreshEntity".equals(name)) {
                             childDetectedCategories.add("createsEntity");
+                        }
+                        if ("doPostAttackEffectsWithItemSource".equals(name)) {
+                            childDetectedCategories.add("usesPotentiation");
                         }
                     }
 

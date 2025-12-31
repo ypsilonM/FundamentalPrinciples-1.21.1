@@ -4,6 +4,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.ypsi.fundamentalism.effect.ModEffects;
 import io.redspace.ironsspellbooks.api.registry.AttributeRegistry;
+import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
+import io.redspace.ironsspellbooks.api.spells.SchoolType;
+import io.redspace.ironsspellbooks.api.util.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.EntityModelSet;
@@ -19,7 +22,14 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import org.joml.Vector3f;
+
+import java.awt.*;
 import java.lang.reflect.Field;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @OnlyIn(Dist.CLIENT)
 public class ReinforcementLayer extends RenderLayer<Player, PlayerModel<Player>> {
@@ -46,7 +56,8 @@ public class ReinforcementLayer extends RenderLayer<Player, PlayerModel<Player>>
         if (hasEffect) {
             if (minecraft.level == null) return;
 
-            int color = rgbToArgb(getElementalColor(player), 0.3f);
+            int color1 = increaseSaturation(Utils.packRGB(getElementalColor(player)), 1f);
+            int color = rgbToArgb(color1, 0.3f);
             PlayerModel<Player> currentModel = determineModel(player);
 
             this.getParentModel().copyPropertiesTo(currentModel);
@@ -138,41 +149,44 @@ public class ReinforcementLayer extends RenderLayer<Player, PlayerModel<Player>>
         int alphaByte = (int)(alpha * 255) << 24;
         return alphaByte | (rgb & 0xFFFFFF);
     }
-    public static int getElementalColor(Player player){
-        double[] values = {
-                player.getAttributeValue(AttributeRegistry.FIRE_SPELL_POWER),
-                player.getAttributeValue(AttributeRegistry.LIGHTNING_SPELL_POWER),
-                player.getAttributeValue(AttributeRegistry.ICE_SPELL_POWER),
-                player.getAttributeValue(AttributeRegistry.NATURE_SPELL_POWER),
-                player.getAttributeValue(AttributeRegistry.HOLY_SPELL_POWER),
-                player.getAttributeValue(AttributeRegistry.ENDER_SPELL_POWER),
-                player.getAttributeValue(AttributeRegistry.BLOOD_SPELL_POWER),
-                player.getAttributeValue(AttributeRegistry.EVOCATION_SPELL_POWER),
-                player.getAttributeValue(AttributeRegistry.ELDRITCH_SPELL_POWER)
-        };
-        int[] colors = {
-                0xff7b08, // Fuego
-                0x0f2bff, // Rayo
-                0x12e7ff, // Hielo
-                0x42ff3b, // Naturaleza
-                0xffd900, // Sagrado
-                0x9816fa, // Ender
-                0xff1212, // Sangre
-                0xbddbb2, // Evocación
-                0x09000f  // Eldritch
-        };
-        int maxIndex = 0;
-        double maxValue = values[0];
-        boolean hasTie = false;
-        for (int i = 1; i < values.length; i++) {
-            if (values[i] > maxValue) {
-                maxValue = values[i];
-                maxIndex = i;
-                hasTie = false;
-            } else if (values[i] == maxValue) {
-                hasTie = true;
-            }
+    public static int increaseSaturation(int rgb, float saturationFactor) {
+        int r = (rgb >> 16) & 0xFF;
+        int g = (rgb >> 8) & 0xFF;
+        int b = rgb & 0xFF;
+
+        float[] hsb = Color.RGBtoHSB(r, g, b, null);
+        // hsb[1] es la saturación
+        hsb[1] = Math.min(1.0f, hsb[1] * (1 + saturationFactor));
+
+        return Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]) & 0xFFFFFF;
+    }
+    public static Vector3f getElementalColor(Player player){
+        final double EPSILON = 0.001;  // 0.1%
+
+        Map<SchoolType, Double> schoolPowers = new LinkedHashMap<>();
+        for(SchoolType school : SchoolRegistry.REGISTRY){
+            double power = school.getPowerFor(player);
+            double rounded = Math.round(power * 1000.0) / 1000.0;
+            schoolPowers.put(school, rounded);
         }
-        return hasTie ? 0x65f0eb : colors[maxIndex];
+        double maxValue = schoolPowers.values().stream()
+                .mapToDouble(Double::doubleValue)
+                .max()
+                .orElse(0.0);
+        if(maxValue <= 0){
+            return Utils.deconstructRGB(0x8FEDF2);
+        }
+        long count = schoolPowers.values().stream()
+                .filter(power -> Math.abs(power - maxValue) < EPSILON)
+                .count();
+        if(count != 1){
+            return Utils.deconstructRGB(0x8FEDF2);
+        }
+        return schoolPowers.entrySet().stream()
+                .filter(entry -> Math.abs(entry.getValue() - maxValue) < EPSILON)
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .map(SchoolType::getTargetingColor)
+                .orElse(Utils.deconstructRGB(0x8FEDF2));
     }
 }

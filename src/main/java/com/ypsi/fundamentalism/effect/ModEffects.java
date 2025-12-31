@@ -20,6 +20,9 @@ public class ModEffects {
     public static final Holder<MobEffect> MARKED_EFFECT = MOB_EFFECTS.register("marked",
             () -> new MarkedEffect(MobEffectCategory.HARMFUL, 0xA52A2A));
 
+    public static final Holder<MobEffect> BURNOUT_EFFECT = MOB_EFFECTS.register("burnout",
+            () -> new BurnoutEffect(MobEffectCategory.HARMFUL, 0xeb0c2d));
+
     public static final Holder<MobEffect> MINDFUL_EFFECT = MOB_EFFECTS.register("mindful",
             () -> new MindfulEffect(MobEffectCategory.BENEFICIAL, 0x0722a9)
                     .addAttributeModifier(AttributeRegistry.MANA_REGEN,
