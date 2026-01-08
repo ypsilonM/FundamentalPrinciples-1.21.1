@@ -1,23 +1,17 @@
 package com.ypsi.fundamentalism.component.SpellbookLevel;
 
-import com.google.common.collect.Multimap;
 import com.ypsi.fundamentalism.component.YpsDataComponents;
 import io.redspace.ironsspellbooks.api.spells.ISpellContainer;
 import io.redspace.ironsspellbooks.item.SpellBook;
-import net.minecraft.core.Holder;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ItemStack;
-import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.SlotContext;
 
 public class SpellBookComponentHelper {
     private static final int[] XP_REQUIREMENTS = {
             0,      // Nivel    COMMON
             50,    // Nivel     UNCOMMON
             200,    // Nivel    RARE
-            650,    // Nivel    EPIC
-            1650   // Nivel     LEGENDARY
+            350,    // Nivel    EPIC
+            600   // Nivel     LEGENDARY
     };
 
     private static final int MAX_LEVEL = 5;
@@ -70,9 +64,18 @@ public class SpellBookComponentHelper {
             int newLevel = calculateLevelFromXP(newXP);
             if (newLevel > currentLevel) {
                 stack.set(YpsDataComponents.SPELLBOOK_LEVEL.get(), new SpellBookLevel(newLevel));
-
+                
+                var upgradedContainer = ISpellContainer.get(stack).mutableCopy();
+                upgradedContainer.setMaxSpellCount(upgradedContainer.getMaxSpellCount() + getSlotsToAdd(newLevel));
+                ISpellContainer.set(stack, upgradedContainer.toImmutable());
             }
         }
+    }
+    public static int getSlotsToAdd(int newLevel){
+        return switch (newLevel) {
+            case 4,5 -> 2;
+            default -> 1;
+        };
     }
 
     public static void setXP(ItemStack stack, int xp) {

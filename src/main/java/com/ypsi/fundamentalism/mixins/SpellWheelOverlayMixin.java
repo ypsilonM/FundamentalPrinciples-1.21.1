@@ -12,9 +12,14 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextColor;
+import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.lang.reflect.Field;
@@ -30,7 +35,6 @@ public class SpellWheelOverlayMixin {
         try {
             SpellWheelOverlay overlay = (SpellWheelOverlay) (Object) this;
 
-            // Obtener la selección actual
             Field wheelSelectionField = SpellWheelOverlay.class.getDeclaredField("wheelSelection");
             wheelSelectionField.setAccessible(true);
             int wheelSelection = wheelSelectionField.getInt(overlay);
@@ -50,7 +54,6 @@ public class SpellWheelOverlayMixin {
                     var spellLevel = selectedSpell.getSpell().getLevelFor(selectedSpell.getLevel(), minecraft.player);
                     var info = selectedSpell.getSpell().getUniqueInfo(spellLevel, minecraft.player);
 
-                    // Obtener campos necesarios
                     Field ringOuterEdgeMaxField = SpellWheelOverlay.class.getDeclaredField("ringOuterEdgeMax");
                     ringOuterEdgeMaxField.setAccessible(true);
                     float ringOuterEdgeMax = ringOuterEdgeMaxField.getFloat(overlay);
@@ -59,24 +62,23 @@ public class SpellWheelOverlayMixin {
                     int textTitleMargin = 5;
                     int textCenterMargin = 5;
 
-                    // 1. Calcular posición base (donde empieza el título)
                     int spellNameY = (int) (centerY - (ringOuterEdgeMax + textHeight));
 
-                    // 2. Símbolos de categorías (arriba del nombre)
                     String symbolsText = categories.stream()
                             .map(SpellCategoryProgression::getCategorySymbol)
                             .collect(Collectors.joining(" "));
 
-                    Component symbolsComponent = Component.literal(symbolsText)
-                            .withStyle(ChatFormatting.GOLD);
+                    Component symbolsComponent = categories.size()>=4?
+                            Component.literal(symbolsText).withStyle(Style.EMPTY.withColor(TextColor.fromRgb(0xCCFFFF))):
+                            Component.literal(symbolsText).withStyle(ChatFormatting.GOLD);
+
 
                     int symbolsWidth = font.width(symbolsComponent);
-                    int symbolsY = spellNameY - font.lineHeight - 2; // Una línea arriba del título
+                    int symbolsY = spellNameY - font.lineHeight - 2;
 
                     guiGraphics.drawString(font, symbolsComponent,
                             centerX - symbolsWidth / 2, symbolsY, 0xFFFFFF, true);
 
-                    // 3. Probabilidad de teleport (al final de la info)
                     if(categories.contains("usesTeleport")) {
                         var swsm = ClientMagicData.getSpellSelectionManager();
                         int categoryLevel = SpellCategoryProgression.getCategoryLevel(minecraft.player, "usesTeleport");
@@ -93,22 +95,6 @@ public class SpellWheelOverlayMixin {
 
                         guiGraphics.drawString(font, probabilityComponent, centerX + textCenterMargin, probabilityY, 0xFFFFFF, true);
                     }
-//                    else if(categories.contains("hasRecasts")){
-//                        int categoryLevel = SpellCategoryProgression.getCategoryLevel(minecraft.player, "hasRecasts");
-//
-//                        int probability = (int) calculateProbabilityForRecast(categoryLevel);
-//                        String probabilityText = probability + "% +Recast";
-//
-//                        Component probabilityComponent = Component.literal(probabilityText)
-//                                .withStyle(ChatFormatting.DARK_AQUA, ChatFormatting.BOLD);
-//
-//                        int probabilityY = (int) (centerY - (ringOuterEdgeMax + textHeight) +
-//                                font.lineHeight * (info.size() + 1) + textTitleMargin);
-//
-//                        // Dibujar al final de la info
-//                        guiGraphics.drawString(font, probabilityComponent,
-//                                centerX + textCenterMargin, probabilityY, 0xFFFFFF, true);
-//                    }
 
                 }
             }
@@ -116,6 +102,28 @@ public class SpellWheelOverlayMixin {
             IronsSpellbooks.LOGGER.error("Error en SpellWheelOverlayMixin", e);
         }
     }
+
+    @Redirect(
+            method = "render",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lio/redspace/ironsspellbooks/api/spells/AbstractSpell;getDisplayName(Lnet/minecraft/world/entity/player/Player;)Lnet/minecraft/network/chat/MutableComponent;"
+            ),
+            remap = false
+    )
+    private MutableComponent modifySpellDisplayName(AbstractSpell spell, Player player) {
+        MutableComponent originalName = spell.getDisplayName(player);
+        Set<String> categories = SpellCategoriesGenerator.getCategoriesForSpell(spell.getSpellId());
+        if (categories.size() >=4){
+            MutableComponent newTitle = Component.literal("");
+            newTitle.append(originalName.copy()
+                    .withStyle(Style.EMPTY.withUnderlined(false).withColor(TextColor.fromRgb(0xCCFFFF))));
+            return newTitle;
+        }else{
+            return originalName.withStyle(Style.EMPTY.withUnderlined(true));
+        }
+    }
+
 
     private List<String> getSpellCategories(AbstractSpell spell) {
         Set<String> categories = SpellCategoriesGenerator.getCategoriesForSpell(spell.getSpellId());

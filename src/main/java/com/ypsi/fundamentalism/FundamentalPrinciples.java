@@ -28,9 +28,11 @@ import com.ypsi.fundamentalism.particle.ReinforceParticles;
 import com.ypsi.fundamentalism.particle.SolAppearanceParticle;
 import com.ypsi.fundamentalism.spells.ModSpells;
 import com.ypsi.fundamentalism.spells.YpsSchoolRegistry;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import org.slf4j.Logger;
@@ -142,6 +144,7 @@ public class FundamentalPrinciples {
             event.registerSpriteSet(ModParticles.CONSTELLATION_PARTICLE.get(), ConstellationParticle.Provider::new);
             //event.registerSpriteSet(ModParticles.SOL_PARTICLE.get(), SolAppearanceParticle.Provider::new);
         }
+
 
 
     }

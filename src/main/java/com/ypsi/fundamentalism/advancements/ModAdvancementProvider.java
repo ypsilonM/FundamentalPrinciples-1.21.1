@@ -40,7 +40,7 @@ public class ModAdvancementProvider {
                             ModItems.FUNDAMENTALISM_SCROLL.get(),
                             Component.literal("Fundamentalism Path"),
                             Component.literal("The principles are the basis for the magical epitome."),
-                            ResourceLocation.fromNamespaceAndPath("minecraft", "textures/gui/advancements/backgrounds/adventure.png"), // Fondo
+                            ResourceLocation.fromNamespaceAndPath("minecraft", "textures/gui/advancements/backgrounds/adventure.png"),
                             AdvancementType.TASK,
                             true, true, false
                     )
@@ -78,6 +78,19 @@ public class ModAdvancementProvider {
                     .addCriterion("its_so_clear", EffectsChangedTrigger.TriggerInstance.hasEffects(
                             MobEffectsPredicate.Builder.effects().and(ModEffects.MINDFUL_EFFECT)
                     )).save(saver, ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "mindful_advancement"), existingFileHelper);
+
+            AdvancementHolder luminaireExtract = Advancement.Builder.advancement()
+                    .parent(root)
+                    .display(
+                            ModItems.LUMINAIRE_EXTRACT,
+                            Component.literal("Deep Blue"),
+                            Component.literal("Obtain Luminaire Extract"),
+                            null,
+                            AdvancementType.TASK,
+                            true, true, false
+                    )
+                    .addCriterion("get_lum", InventoryChangeTrigger.TriggerInstance.hasItems(ModItems.LUMINAIRE_EXTRACT.get()))
+                    .save(saver, ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "luminaire_advancement"), existingFileHelper);
 
         }
     }

@@ -1,11 +1,13 @@
 package com.ypsi.fundamentalism.datagen;
 
 import com.ypsi.fundamentalism.item.ModItems;
+import com.ypsi.fundamentalism.spellCategories.SpellCategoryProgression;
 import io.redspace.ironsspellbooks.IronsSpellbooks;
 import io.redspace.ironsspellbooks.registries.ItemRegistry;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.neoforge.common.conditions.IConditionBuilder;
@@ -44,12 +46,24 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("has_essence", has(ItemRegistry.ARCANE_ESSENCE.get())).save(recipeOutput);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.BREWING, ModItems.TONIC.get())
-                .pattern("   ")
-                .pattern("GTG")
-                .pattern(" G ")
-                .define('G', Items.TINTED_GLASS)
-                .define('T', ItemRegistry.TIMELESS_SLURRY.get())
-                .unlockedBy("has_tinted_glass", has(Items.TINTED_GLASS)).save(recipeOutput);
+                .pattern(" C ")
+                .pattern("IBI")
+                .pattern("IMI")
+                .define('C', ItemRegistry.CINDER_ESSENCE.get())
+                .define('I', ItemRegistry.ARCANE_INGOT.get())
+                .define('B', Items.GLASS_BOTTLE)
+                .define('M', ItemRegistry.MITHRIL_SCRAP.get())
+                .unlockedBy("has_cinder", has(ItemRegistry.CINDER_ESSENCE.get())).save(recipeOutput);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.BREWING, ModItems.FLASK.get())
+                .pattern(" A ")
+                .pattern("IBI")
+                .pattern("IPI")
+                .define('A', ItemRegistry.ARCANE_ESSENCE.get())
+                .define('I', Items.IRON_INGOT)
+                .define('B', Items.GLASS_BOTTLE)
+                .define('P', Items.BLAZE_POWDER)
+                .unlockedBy("default_powder", has(Items.BLAZE_POWDER)).save(recipeOutput);
 //
 //        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.ORB.get(), 9)
 //                .requires(YpsBlocks.MANA_BLOCK)

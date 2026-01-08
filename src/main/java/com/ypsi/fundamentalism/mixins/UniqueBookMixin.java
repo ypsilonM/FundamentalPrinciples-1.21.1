@@ -7,6 +7,7 @@ import io.redspace.ironsspellbooks.item.UniqueSpellBook;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -16,7 +17,8 @@ import java.util.List;
 @Mixin(UniqueSpellBook.class)
 public abstract class UniqueBookMixin {
 
-    @Shadow public abstract List<SpellData> getSpells();
+    @Unique
+    public abstract List<SpellData> getSpells();
 
     @Inject(method = "initializeSpellContainer", at = @At("HEAD"), cancellable = true, remap = false)
     private void ypsInitializeSpellContainer(ItemStack itemStack, CallbackInfo ci) {

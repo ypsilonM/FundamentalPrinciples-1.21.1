@@ -7,12 +7,15 @@ import com.ypsi.fundamentalism.component.SpellbookLevel.SpellBookComponentHelper
 import com.ypsi.fundamentalism.config.SpellCategoriesGenerator;
 import com.ypsi.fundamentalism.effect.ModEffects;
 import com.ypsi.fundamentalism.item.ModItems;
+import com.ypsi.fundamentalism.item.custom.FlaskItem;
+import com.ypsi.fundamentalism.item.custom.IExhaustionConsumable;
 import com.ypsi.fundamentalism.item.custom.TonicItem;
 import com.ypsi.fundamentalism.network.packets.SyncCategoryLevelsPacket;
 import com.ypsi.fundamentalism.network.packets.SyncExhaustionLevelPacket;
 import com.ypsi.fundamentalism.network.packets.SyncExhaustionPacket;
 import com.ypsi.fundamentalism.network.packets.SyncReinforcementPacket;
 import com.ypsi.fundamentalism.particle.ModParticles;
+import com.ypsi.fundamentalism.spellCategories.SpellCategoryLevels;
 import com.ypsi.fundamentalism.spellCategories.SpellCategoryProgression;
 import io.redspace.ironsspellbooks.api.events.*;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
@@ -26,20 +29,26 @@ import io.redspace.ironsspellbooks.api.util.CameraShakeManager;
 import io.redspace.ironsspellbooks.capabilities.magic.MagicManager;
 import io.redspace.ironsspellbooks.capabilities.magic.TargetEntityCastData;
 import io.redspace.ironsspellbooks.compat.Curios;
+import io.redspace.ironsspellbooks.damage.ISSDamageTypes;
+import io.redspace.ironsspellbooks.damage.SpellDamageSource;
 import io.redspace.ironsspellbooks.item.SpellBook;
 import io.redspace.ironsspellbooks.network.SyncManaPacket;
 import io.redspace.ironsspellbooks.network.casting.OnCastFinishedPacket;
 import io.redspace.ironsspellbooks.network.casting.SyncTargetingDataPacket;
+import io.redspace.ironsspellbooks.spells.TargetAreaCastData;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -78,7 +87,7 @@ public class ModEvents {
         InteractionHand otherHand = (hand == InteractionHand.MAIN_HAND) ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
         ItemStack stackInOtherHand = player.getItemInHand(otherHand);
 
-        if (stackInHand.getItem() instanceof TonicItem tonic && stackInOtherHand.is(ModItems.LUMINAIRE_EXTRACT)) {
+        if (stackInHand.getItem() instanceof IExhaustionConsumable tonic && stackInOtherHand.is(ModItems.LUMINAIRE_EXTRACT)) {
             if (tonic.recharge(stackInHand)) {
                 stackInOtherHand.shrink(1);
                 ItemStack replacementItem = new ItemStack(ModItems.TEST_TUBE.get());
@@ -340,6 +349,10 @@ public class ModEvents {
                 float originalDamage = event.getNewDamage();
                 float currentMana = magicData.getMana();
 
+                if(originalDamage==0){
+                    return;
+                }
+
                 double maxMana = serverPlayer.getAttributeValue(AttributeRegistry.MAX_MANA);
                 double baseSpellPower = serverPlayer.getAttributeBaseValue(AttributeRegistry.SPELL_POWER);
                 double removeSpellBase = baseSpellPower*0.2;
@@ -362,16 +375,15 @@ public class ModEvents {
                 int exhaustionAcc = 0;
                 //0.05
                 if(currentMana>=(maxMana*.05)) {
-
                     if (originalDamage < mitigatedDamage) {
                         modifiedDamage = 0.0f;
                         manaToConsume/=2;
                         magicData.addMana(-manaToConsume);
-                        exhaustionAcc = 1;
+                        exhaustionAcc = 2;
                     } else {
                         modifiedDamage = originalDamage - mitigatedDamage;
                         magicData.addMana(-manaToConsume);
-                        exhaustionAcc = 2;
+                        exhaustionAcc = 5;
                     }
                     serverPlayer.level().playSound(
                             null,
@@ -425,6 +437,13 @@ public class ModEvents {
         String spellId = event.getSpellId();
         Set<String> categories = SpellCategoriesGenerator.getCategoriesForSpell(spellId);
 
+        if(cancelDominanSpells(categories, level, caster, spell)){
+            cancelCast(event, magicData, caster, spell);
+            if (caster instanceof ServerPlayer serverPlayer) {
+                serverPlayer.displayClientMessage(Component.translatable("Complex spell unable to cast.").withStyle(ChatFormatting.DARK_PURPLE), true);
+            }
+            return;
+        }
         if (totalLevel < 6) {//More mana wasted
             double manaMult = switch (currentExLvl) {
                 case 1 -> 0.25;
@@ -456,12 +475,37 @@ public class ModEvents {
         //Other categories Verifications
         teleportCategoryVerification(categories,caster,spell,event,magicData);
     }
+    public static boolean cancelDominanSpells(Set<String> categories, int level, ServerPlayer serverPlayer, AbstractSpell spell){
+        if(categories.size() >= 4){
+            SpellRarity spellRarity = spell.getRarity(level);
+            int minLevel = getLevelRequiredForRARITY(spellRarity);
+            for (String category : categories){
+                int categoryLevel =  SpellCategoryProgression.getCategoryLevel(serverPlayer, category);
+                if (categoryLevel<minLevel){
+                    return true;
+                }
+            }
+            return false;
+        }
+        return false;
+    }
+    public static int getLevelRequiredForRARITY(SpellRarity rarity){
+        return switch (rarity) {
+            case COMMON -> 0;
+            case UNCOMMON -> 5;
+            case RARE -> 8;
+            case EPIC -> 12;
+            case LEGENDARY -> 15;
+        };
+    }
+
     public static void cancelCast(SpellPreCastEvent event , @NotNull MagicData magicData, ServerPlayer caster, AbstractSpell spell){
         if (magicData.getAdditionalCastData() instanceof TargetEntityCastData) {
             if (caster instanceof ServerPlayer serverPlayer) {
                 PacketDistributor.sendToPlayer(serverPlayer, new SyncTargetingDataPacket(spell, List.of()));
             }
         }
+        magicData.resetAdditionalCastData();
         event.setCanceled(true);
         if (caster instanceof ServerPlayer serverPlayer) {
             serverPlayer.displayClientMessage(Component.translatable("").withStyle(ChatFormatting.RED), true);
@@ -538,6 +582,7 @@ public class ModEvents {
         int level = event.getSpellLevel();
         int totalLevel = SpellRegistry.getSpell(event.getSpellId()).getMaxLevel();
         int spellLevelResult;
+        SpellRarity spellRarity = SpellRegistry.getSpell(event.getSpellId()).getRarity(level);
 
         if(totalLevel<6){//More mana wasted
             double manaMult = switch(currentExLvl){
@@ -578,37 +623,37 @@ public class ModEvents {
         double spellPower = player.getAttributeValue(AttributeRegistry.SPELL_POWER);
         boolean notElementalPower = entitySchoolPowerModifier <= 0 || spellPower<=0;
 
-        int formula = 0;
+        int formulaAdd = 0;
+
+        double rarityRatio = switch (spellRarity) {
+            case COMMON -> 1.0;
+            case UNCOMMON -> 1.10;
+            case RARE -> 1.15;
+            case EPIC -> 1.20;
+            case LEGENDARY -> 1.30;
+        };
 
         if(notElementalPower){
-            formula = (int) (continuous?
-                    (level+manaUsed):
-                    ((double) level /2) + (manaUsed)
-            );
+            formulaAdd = 1;
+            ;
         }else{
-            formula = (int) (continuous?
-                    (level+manaUsed)/(4*spellPower*entitySchoolPowerModifier):
-                    ((double) level /2) + (manaUsed/(3*spellPower*entitySchoolPowerModifier))
+            formulaAdd = (int) (continuous?
+                            ((Math.sqrt(manaUsed))  /  (spellPower*entitySchoolPowerModifier))  * rarityRatio: //continuos
+                    (5+Math.pow(manaUsed, 1/1.3))/(spellPower*entitySchoolPowerModifier)        * rarityRatio  //other
             );
         }
-
-        int addition = currentExhaustion+formula;
-        int maxEx = getMaxExPerLevel(currentExLvl, player);
-
-        if(addition>maxEx){
-            if(currentExLvl!=4) {
-                int difference = addition - maxEx;
-                player.setData(YpsAttachments.CURRENT_EXHAUSTION,
-                        Mth.clamp(difference, 0, maxEx));
-                player.setData(YpsAttachments.LEVEL_EXHAUSTION, Mth.clamp(currentExLvl + 1, 0, 4));
-            }else{
-                player.setData(YpsAttachments.CURRENT_EXHAUSTION,
-                        Mth.clamp(addition,0,maxEx));
-            }
-        }else{
-            player.setData(YpsAttachments.CURRENT_EXHAUSTION,
-                    Mth.clamp(addition,0,maxEx));
-        }
+//        if(notElementalPower){
+//            formula = (int) (continuous?
+//                    (level+manaUsed):
+//                    ((double) level /2) + (manaUsed)
+//            );
+//        }else{
+//            formula = (int) (continuous?
+//                    (level+manaUsed) / (4*spellPower*entitySchoolPowerModifier): //continuos
+//                    ((double) level /2) + (manaUsed/(3*spellPower*entitySchoolPowerModifier)) //other
+//            );
+//        }
+        addExhaustion(player, formulaAdd);
 
         //Leveling up
         String spellId = event.getSpellId();
@@ -631,10 +676,36 @@ public class ModEvents {
             });
         });
 
-
         //ServerPlayer to ClientPlayer
         SyncExhaustionPacket.sendToPlayer((ServerPlayer) player, player.getData(YpsAttachments.CURRENT_EXHAUSTION));
         SyncExhaustionLevelPacket.sendToPlayer((ServerPlayer)player, player.getData(YpsAttachments.LEVEL_EXHAUSTION));
+    }
+    private static void addExhaustion(Player player, int amountToAdd) {
+        int currentLevel = player.getData(YpsAttachments.LEVEL_EXHAUSTION);
+        int currentEx = player.getData(YpsAttachments.CURRENT_EXHAUSTION);
+        int remainingToAdd = amountToAdd;
+
+        while (remainingToAdd > 0 && currentLevel <= 4) {
+            int maxExPts = getMaxExPerLevel(currentLevel, player);
+            int remainingSpace = maxExPts - currentEx;
+
+            if (remainingToAdd <= remainingSpace) {
+                currentEx += remainingToAdd;
+                remainingToAdd = 0;
+            } else {
+                currentEx = maxExPts;
+                remainingToAdd -= remainingSpace;
+
+                if (currentLevel < 4) {
+                    currentLevel++;
+                    currentEx = 0;
+                } else {
+                    remainingToAdd = 0;
+                }
+            }
+        }
+        player.setData(YpsAttachments.LEVEL_EXHAUSTION, currentLevel);
+        player.setData(YpsAttachments.CURRENT_EXHAUSTION, currentEx);
     }
 
     private static int calculateXpFromSpell(int level, AbstractSpell spell) {
@@ -844,7 +915,13 @@ public class ModEvents {
         }
     }
 
-
+    @SubscribeEvent
+    public static void uselessShield(LivingShieldBlockEvent event){
+        DamageSource source = event.getDamageSource();
+        if (source instanceof SpellDamageSource spellDamageSource){
+            event.setBlocked(false);
+        }
+    }
 
 
 

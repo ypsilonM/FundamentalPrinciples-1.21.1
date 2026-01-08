@@ -9,14 +9,15 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
 
 import static com.ypsi.fundamentalism.event.ModEvents.getMaxExPerLevel;
 
 public class ManaFruit extends Item {
 
-    public ManaFruit() {
-       super(new Item.Properties().food(ModFoodProperties.MANA_FRUIT));
+    public ManaFruit(Rarity rarity) {
+       super(new Item.Properties().food(ModFoodProperties.MANA_FRUIT).rarity(rarity));
     }
 
     @Override

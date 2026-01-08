@@ -1,5 +1,5 @@
 {
-  "creativetab.ypfundamentals.mana_items": "Fundamental Items",
+  "creativetab.ypfundamentals.mana_items": "Fundamental Principles",
 
   "effect.ypfundamentals.mindful": "Mindful",
   "effect.ypfundamentals.burnout": "Burnout",
@@ -20,6 +20,7 @@
   "item.ypfundamentals.test_tube": "Test Tube",
   "item.ypfundamentals.luminaire_extract": "Luminaire Extract",
   "item.ypfundamentals.tonic": "Tonic",
+  "item.ypfundamentals.flask": "Flask",
 
   "attribute.name.technique.exhaustion": "Exhaustion",
 

@@ -17,6 +17,7 @@ public class SpellbookTooltip {
             ChatFormatting chatFormatting = getChatFormatting(level);
             String rarity = getRarity(level);
 
+            tooltip.add(Component.literal(""));
             tooltip.add(Component.literal(rarity)
                     .withStyle(chatFormatting));
 
@@ -42,7 +43,6 @@ public class SpellbookTooltip {
     }
     private static String getRarity(int level){
         return switch (level){
-            case 1 -> "Common";
             case 2 -> "Uncommon";
             case 3 -> "Rare";
             case 4 -> "Epic";

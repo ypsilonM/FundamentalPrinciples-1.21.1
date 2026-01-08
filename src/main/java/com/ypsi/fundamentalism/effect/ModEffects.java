@@ -48,8 +48,8 @@ public class ModEffects {
 
     public static final Holder<MobEffect> REINFORCEMENT_EFFECT = MOB_EFFECTS.register("reinforcement",
             () -> new ReinforcementEffect(MobEffectCategory.BENEFICIAL, 0x0722a9)
-                    .addAttributeModifier(AttributeRegistry.SPELL_RESIST, //0.3->0.5
-                            ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "reinforcement"), 0.5, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
+                    .addAttributeModifier(AttributeRegistry.SPELL_RESIST, //0.3->0.5  -->  0.5->0.2
+                            ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "reinforcement"), 0.2, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
                     .addAttributeModifier(AttributeRegistry.SPELL_POWER,
                             ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "reinforcement"), -0.2, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
         );

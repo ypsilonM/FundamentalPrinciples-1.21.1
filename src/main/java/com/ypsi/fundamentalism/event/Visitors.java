@@ -78,8 +78,8 @@ public class Visitors {
                         Map.entry("raycastForEntity", "usesRaycast"),
                         Map.entry("getTargetBlock", "usesRaycast"),
                         Map.entry("doPostAttackEffects","usesPotentiation"),
-
-                        Map.entry("setDeltaMovement","usesImpulseCastData")
+                        Map.entry("setDeltaMovement","usesImpulseCastData"),
+                        Map.entry("getWeaponDamage", "usesPotentiation")
                 );
 
                 String category = categoryMapping.get(name);
@@ -106,7 +106,7 @@ public class Visitors {
             private boolean matchesOwner(String owner, String methodName) {
                 return switch (methodName) {
                     case "initSummon" -> owner.contains("SummonManager");
-                    case "preCastTargetHelper", "handleSpellTeleport", "raycastForEntity", "getTargetBlock" -> owner.contains("Utils");
+                    case "preCastTargetHelper", "handleSpellTeleport", "raycastForEntity", "getTargetBlock", "getWeaponDamage" -> owner.contains("Utils");
                     case "addEffect" -> owner.contains("LivingEntity") || owner.contains("Entity");
                     case "doPostAttackEffects" -> owner.contains("EnchantmentHelper");
                     default -> true;

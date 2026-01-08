@@ -24,11 +24,11 @@ public class ModCreativeModTabs {
                         output.accept(ModItems.ARCANE_MIXTURE);
                         output.accept(ModItems.TEST_TUBE);
                         output.accept(ModItems.LUMINAIRE_EXTRACT);
+                        output.accept(ModItems.FLASK);
                         output.accept(ModItems.TONIC);
                         output.accept(ModItems.IMP_SPAWN_EGG);
                         output.accept(ModItems.HEMOMANCER_SPAWN_EGG);
                         output.accept(ModItems.VENEMERUS_SPAWN_EGG);
-
                     })
                     .build());
 //    public static final Supplier<CreativeModeTab> MANA_BLOCKS_TAB = CREATIVE_MODE_TAB.register("mana_blocks_tab",

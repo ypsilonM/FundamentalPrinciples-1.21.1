@@ -193,8 +193,10 @@ public class SolProjectile extends AbstractMagicProjectile {
 
     @Override
     public void tick() {
-        if(tickCount%20==0 || tickCount==1) {
-            CameraShakeManager.addCameraShake(new CameraShakeData(this.level(),20, this.position(), 120));
+        if (!this.level().isClientSide()) {
+            if (tickCount % 20 == 0 || tickCount == 1) {
+                CameraShakeManager.addCameraShake(new CameraShakeData(this.level(), 20, this.position(), 120));
+            }
         }
         super.tick();
     }

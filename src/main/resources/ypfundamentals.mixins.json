@@ -15,7 +15,9 @@
     "UniqueBookMixin",
     "SpellBookTooltipMixin",
     "InscriptionMixin",
-    "TargetRaycastMixin"
+    "TargetRaycastMixin",
+    "ScrollInfoMixin",
+    "ArcaneAnvilMixin"
   ],
   "injectors": {
     "defaultRequire": 1

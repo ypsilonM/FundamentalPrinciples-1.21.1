@@ -2,12 +2,12 @@ package com.ypsi.fundamentalism.item;
 
 import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.entity.ModEntities;
+import com.ypsi.fundamentalism.item.custom.EchoShield;
+import com.ypsi.fundamentalism.item.custom.FlaskItem;
 import com.ypsi.fundamentalism.item.custom.TonicItem;
 import com.ypsi.fundamentalism.item.custom.food.ManaFruit;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.SwordItem;
-import net.minecraft.world.item.Tier;
-import net.minecraft.world.item.Tiers;
+import io.redspace.ironsspellbooks.util.ItemPropertiesHelper;
+import net.minecraft.world.item.*;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -30,10 +30,12 @@ public class ModItems {
             () -> new Item(new Item.Properties().stacksTo(1)));
 
     public static final DeferredItem<Item> TONIC = ITEMS.register("tonic",
-            TonicItem::new);
+            () -> new TonicItem(Rarity.EPIC));
+    public static final DeferredItem<Item> FLASK = ITEMS.register("flask",
+            () -> new FlaskItem(Rarity.RARE));
 
     public static final DeferredItem<Item> MANA_FRUIT = ITEMS.register("mana_fruit",
-            ManaFruit::new);
+            () -> new ManaFruit(Rarity.EPIC));
 
     public static final DeferredItem<Item> HEMOMANCER_SPAWN_EGG = ITEMS.register("hemomancer_spawn_egg",
             () -> new DeferredSpawnEggItem(ModEntities.HEMOMANCER, 0x120303, 0x704141,
@@ -47,6 +49,9 @@ public class ModItems {
 
     public static final DeferredItem<Item> FUNDAMENTALISM_SCROLL = ITEMS.register("scroll_fundamentalism",
             () -> new Item(new Item.Properties().stacksTo(1)));
+
+    public static final DeferredItem<Item> MAGICAL_SHIELD = ITEMS.register("magical_shield",
+            () -> new Item(new Item.Properties()));
 
 
     private static <T extends Item> DeferredItem<T> registerItem(String name, Supplier<T> item){

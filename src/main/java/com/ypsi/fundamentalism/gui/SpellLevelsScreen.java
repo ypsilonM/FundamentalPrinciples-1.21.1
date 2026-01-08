@@ -207,12 +207,18 @@ public class SpellLevelsScreen extends Screen {
             tooltip.add(Component.literal("• +" + addRange + " Distance")
                     .withStyle(ChatFormatting.GREEN));
         }
+        if(category.equals("createEntity")){
+            int addMana = getTotalMana(level);
+            tooltip.add(Component.literal("• +" + addMana + " Mana ")
+                    .withStyle(ChatFormatting.AQUA));
+        }
 
         renderTooltipBackgroundAndText(guiGraphics, tooltip, centerX, centerY, isMaxLevel ? -1 : progress);
     }
     private static int getTotalRange(int level){
         return (int) (level*1.5);
     }
+    private static int getTotalMana(int level) { return level*20; }
     private static float calculateProbabilityForAddTp(int categoryLevel) {
         return (float)((categoryLevel * 0.025) * 100);
     }

@@ -1,5 +1,6 @@
 package com.ypsi.fundamentalism.item.custom;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.ItemTags;
@@ -14,58 +15,18 @@ import net.minecraft.world.level.block.DispenserBlock;
 
 import java.util.List;
 
-public class EchoShield extends Item implements Equipable {
-    public static final int EFFECTIVE_BLOCK_DELAY = 5;
-    public static final float MINIMUM_DURABILITY_DAMAGE = 3.0F;
-
+public class EchoShield extends ShieldItem{
     public EchoShield(Item.Properties properties) {
         super(properties);
-        DispenserBlock.registerBehavior(this, ArmorItem.DISPENSE_ITEM_BEHAVIOR);
     }
 
     @Override
-    public String getDescriptionId(ItemStack stack) {
-        DyeColor dyecolor = stack.get(DataComponents.BASE_COLOR);
-        return dyecolor != null ? this.getDescriptionId() + "." + dyecolor.getName() : super.getDescriptionId(stack);
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.add(Component.translatable("Magical Shield").withStyle(ChatFormatting.GRAY));
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        BannerItem.appendHoverTextFromBannerBlockEntityTag(stack, tooltipComponents);
-    }
-
-    @Override
-    public UseAnim getUseAnimation(ItemStack stack) {
-        return UseAnim.BLOCK;
-    }
-
-    @Override
-    public int getUseDuration(ItemStack stack, LivingEntity entity) {
-        return 72000;
-    }
-
-    @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
-        ItemStack itemstack = player.getItemInHand(hand);
-        player.startUsingItem(hand);
-        return InteractionResultHolder.consume(itemstack);
-    }
-
-    /**
-     * Return whether this item is repairable in an anvil.
-     */
-    @Override
-    public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
-        return repair.is(ItemTags.PLANKS) || super.isValidRepairItem(toRepair, repair);
-    }
-
-    @Override
-    public EquipmentSlot getEquipmentSlot() {
-        return EquipmentSlot.OFFHAND;
-    }
-
-    @Override
-    public boolean canPerformAction(ItemStack stack, net.neoforged.neoforge.common.ItemAbility itemAbility) {
-        return net.neoforged.neoforge.common.ItemAbilities.DEFAULT_SHIELD_ACTIONS.contains(itemAbility);
+    public int getEnchantmentValue(ItemStack stack) {
+        return 15;
     }
 }

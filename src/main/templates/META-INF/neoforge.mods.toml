@@ -102,7 +102,7 @@ config="${mod_id}.mixins.json"
 [[dependencies.${mod_id}]]
     modId = "playeranimator"
     mandatory = true
-    versionRange = "[2.0.1+1.21.1]"
+    versionRange = "[2.0.1+1.21.1,)"
     ordering = "NONE"
     side = "BOTH"
 
