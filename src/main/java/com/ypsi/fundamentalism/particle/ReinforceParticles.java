@@ -1,6 +1,7 @@
 package com.ypsi.fundamentalism.particle;
 
 import com.ypsi.fundamentalism.effect.ModEffects;
+import com.ypsi.fundamentalism.util.Util;
 import io.redspace.ironsspellbooks.api.util.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -12,7 +13,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import static com.ypsi.fundamentalism.render.ReinforcementLayer.getElementalColor;
 import static com.ypsi.fundamentalism.render.ReinforcementLayer.rgbToArgb;
 
 public class ReinforceParticles extends TextureSheetParticle {
@@ -92,7 +92,7 @@ public class ReinforceParticles extends TextureSheetParticle {
                 }
             }
             if (nearestPlayerWithEffect != null) {
-                return rgbToArgb(Utils.packRGB(getElementalColor(nearestPlayerWithEffect)), 0.6f);
+                return rgbToArgb(Utils.packRGB(Util.getElementalColor(nearestPlayerWithEffect)), 0.6f);
             }
             return 0x4DB3E6FF;
         }

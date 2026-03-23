@@ -2,8 +2,8 @@ package com.ypsi.fundamentalism.network.packets;
 
 import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.network.packets.data.ClientCategoryLevelsData;
-import com.ypsi.fundamentalism.spellCategories.SpellCategoryLevels;
-import com.ypsi.fundamentalism.spellCategories.SpellCategoryProgression;
+import com.ypsi.fundamentalism.attachments.SpellCategoryLevelsAttachment;
+import com.ypsi.fundamentalism.attachments.SpellCategoryProgression;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.PacketFlow;
@@ -38,7 +38,7 @@ public record SyncCategoryLevelsPacket(Map<String, Integer> levels, Map<String, 
     }
 
     public static void sendToPlayer(ServerPlayer player) {
-        SpellCategoryLevels categoryLevels = SpellCategoryProgression.getCategoryLevels(player);
+        SpellCategoryLevelsAttachment categoryLevels = SpellCategoryProgression.getCategoryLevels(player);
         SyncCategoryLevelsPacket packet = new SyncCategoryLevelsPacket(
                 new HashMap<>(categoryLevels.getCategoryLevels()),
                 new HashMap<>(categoryLevels.getCategoryExperience())

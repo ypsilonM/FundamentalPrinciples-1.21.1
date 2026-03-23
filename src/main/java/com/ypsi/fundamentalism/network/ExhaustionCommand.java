@@ -4,8 +4,6 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.ypsi.fundamentalism.attachments.YpsAttachments;
 import com.ypsi.fundamentalism.attributes.YpsAttributes;
-import com.ypsi.fundamentalism.network.packets.SyncExhaustionLevelPacket;
-import com.ypsi.fundamentalism.network.packets.SyncExhaustionPacket;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
@@ -42,8 +40,8 @@ public class ExhaustionCommand {
             int maxEx = getMaxExPerLevel(level, player);
             int clampedAmount = Mth.clamp(amount, 0, maxEx);
             player.setData(YpsAttachments.CURRENT_EXHAUSTION, clampedAmount);
-            SyncExhaustionLevelPacket.sendToPlayer(player, level);
-            SyncExhaustionPacket.sendToPlayer(player, clampedAmount);
+            //SyncExhaustionLevelPacket.sendToPlayer(player, level);
+            //SyncExhaustionPacket.sendToPlayer(player, clampedAmount);
             player.getPersistentData().putInt("exhaustionTickCounter", 0);
             player.getPersistentData().putInt("reduceCounter", 0);
         }

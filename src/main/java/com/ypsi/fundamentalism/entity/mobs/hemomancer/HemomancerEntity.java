@@ -40,8 +40,10 @@ import java.util.List;
 import java.util.function.Supplier;
 
 public class HemomancerEntity extends AbstractSpellCastingMob implements Enemy {
+
     public HemomancerEntity(EntityType<? extends AbstractSpellCastingMob> entityType, Level level) {
         super(entityType, level);
+        xpReward = 30;
     }
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);

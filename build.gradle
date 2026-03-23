@@ -29,7 +29,6 @@ repositories {
         url = uri("https://code.redspace.io/releases")
     }
 
-
     maven {
         name = "Geckolib"
         url = "https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/"
@@ -164,8 +163,6 @@ dependencies {
 
     implementation "dev.kosmx.player-anim:player-animation-lib-forge:${player_animator_version}"
 
-    implementation "curse.maven:additional-attributes-986624:6388896"
-
     compileOnly "top.theillusivec4.curios:curios-neoforge:${curios_version}:api"
     runtimeOnly "top.theillusivec4.curios:curios-neoforge:${curios_version}"
 
@@ -196,7 +193,11 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
             mod_version            : mod_version,
             mod_authors            : mod_authors,
             mod_description        : mod_description,
-            irons_spells_version   : "${irons_spells_version}"
+            irons_spells_version   : "${irons_spells_version}",
+            geckolib_version       : "${geckolib_version}",
+            player_animator_version: "${player_animator_version}",
+            curios_version         : "${curios_version}",
+            jei_version            : "${jei_version}"
     ]
     inputs.properties replaceProperties
     expand replaceProperties

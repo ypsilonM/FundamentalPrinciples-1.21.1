@@ -55,10 +55,9 @@ public class ChargeSpellVisuals{
             Minecraft mc = Minecraft.getInstance();
             if (mc.screen != null) {
                 if (mc.screen instanceof CreativeModeInventoryScreen) {
-                    return true; // No es GUI para nuestros propósitos
+                    return true;
                 }
             }
-            // El resto del código para detectar por stack trace...
             StackTraceElement[] stack = Thread.currentThread().getStackTrace();
             for (int i = 0; i < Math.min(stack.length, 12); i++) {
                 if (stack[i].getClassName().contains("InventoryScreen") ||

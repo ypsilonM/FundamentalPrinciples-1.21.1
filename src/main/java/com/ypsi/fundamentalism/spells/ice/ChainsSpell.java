@@ -26,14 +26,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@AutoSpellConfig
 public class ChainsSpell extends AbstractSpell {
     private final ResourceLocation spellId = ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "chains");
 
     @Override
     public List<MutableComponent> getUniqueInfo(int spellLevel, LivingEntity caster) {
         return List.of(
-                Component.translatable("ui.irons_spellbooks.effect_length", Utils.timeFromTicks(getCastTime(spellLevel), 1))
+                //Component.translatable("ui.irons_spellbooks.effect_length", Utils.timeFromTicks(getCastTime(spellLevel), 1))
         );
     }
 
@@ -48,7 +47,7 @@ public class ChainsSpell extends AbstractSpell {
         this.manaCostPerLevel = 5;
         this.baseSpellPower = 5;
         this.spellPowerPerLevel = 1;
-        this.castTime = 300;
+        this.castTime = 15 * 20;
         this.baseManaCost = 20;
     }
 

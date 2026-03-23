@@ -76,7 +76,7 @@ public class ChainsEntity extends LivingEntity implements GeoEntity, PreventDism
     }
 
     public ChainsEntity(Level level, LivingEntity owner) {
-        this((EntityType) ModEntities.CHAINS.get(), level);
+        this(ModEntities.CHAINS.get(), level);
         this.setOwner(owner);
     }
 
@@ -113,7 +113,7 @@ public class ChainsEntity extends LivingEntity implements GeoEntity, PreventDism
         return false;
     }
 
-    public Vec3 getPassengerRidingPosition(Entity pEntity) {
+    public @NotNull Vec3 getPassengerRidingPosition(Entity pEntity) {
         return Vec3.ZERO;
     }
 
@@ -121,7 +121,7 @@ public class ChainsEntity extends LivingEntity implements GeoEntity, PreventDism
         return false;
     }
 
-    protected EntityDimensions getDefaultDimensions(Pose pPose) {
+    protected @NotNull EntityDimensions getDefaultDimensions(Pose pPose) {
         Entity rooted = this.getFirstPassenger();
         return rooted != null ? EntityDimensions.fixed(rooted.getBbWidth() * 1.25F, 0.75F) : super.getDefaultDimensions(pPose);
     }
@@ -135,21 +135,19 @@ public class ChainsEntity extends LivingEntity implements GeoEntity, PreventDism
         }
 
         if (!this.level().isClientSide) {
-            // Verificación más tolerante para teletransportes
             boolean shouldRemove = false;
 
             if (this.tickCount > this.duration) {
-                shouldRemove = true; // Tiempo terminado
+                shouldRemove = true;
             } else if (this.target != null && this.target.isDeadOrDying()) {
-                shouldRemove = true; // Target murió
+                shouldRemove = true;
             } else if (!this.isVehicle()) {
-                // Si no hay pasajero, contar ticks antes de remover
                 noPassengerTicks++;
-                if (noPassengerTicks > 20) { // 1 segundo sin pasajero
+                if (noPassengerTicks > 20) {
                     shouldRemove = true;
                 }
             } else {
-                noPassengerTicks = 0; // Resetear contador si hay pasajero
+                noPassengerTicks = 0;
             }
 
             if (shouldRemove) {
@@ -166,7 +164,6 @@ public class ChainsEntity extends LivingEntity implements GeoEntity, PreventDism
             this.setPos(this.target.getX(), this.target.getY(), this.target.getZ());
             this.setDeltaMovement(0, 0, 0);
 
-            // Si el target no está montado, montarlo
             if (this.target.getVehicle() != this && this.target.isAlive()) {
                 this.target.stopRiding();
                 this.target.startRiding(this, true);
@@ -220,7 +217,7 @@ public class ChainsEntity extends LivingEntity implements GeoEntity, PreventDism
         this.discard();
     }
 
-    public void addAdditionalSaveData(CompoundTag pCompound) {
+    public void addAdditionalSaveData(@NotNull CompoundTag pCompound) {
         super.addAdditionalSaveData(pCompound);
         pCompound.putInt("Age", this.tickCount);
         if (this.ownerUUID != null) {
@@ -230,7 +227,7 @@ public class ChainsEntity extends LivingEntity implements GeoEntity, PreventDism
         pCompound.putInt("Duration", this.duration);
     }
 
-    public void readAdditionalSaveData(CompoundTag pCompound) {
+    public void readAdditionalSaveData(@NotNull CompoundTag pCompound) {
         super.readAdditionalSaveData(pCompound);
         this.tickCount = pCompound.getInt("Age");
         if (pCompound.hasUUID("Owner")) {

@@ -2,6 +2,7 @@ package com.ypsi.fundamentalism.spells.fire;
 
 import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.entity.spells.sol.SolProjectile;
+import com.ypsi.fundamentalism.spells.ModSpells;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
@@ -13,14 +14,17 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
-@AutoSpellConfig
 public class SolSpell extends AbstractSpell {
     private final ResourceLocation spellId = ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "sol");
 
@@ -80,11 +84,11 @@ public class SolSpell extends AbstractSpell {
     }
     private float getTimeBoost(LivingEntity entity){
         if (entity == null) {
-            return 1.0f; // Valor por defecto cuando no hay entidad
+            return 1.0f;
         }
         Level level = entity.level();
         if (level == null) {
-            return 1.0f; // Valor por defecto cuando no hay nivel
+            return 1.0f;
         }
         float buffScale = 1;
         long dayTime = level.getDayTime();
@@ -118,4 +122,10 @@ public class SolSpell extends AbstractSpell {
     public boolean stopSoundOnCancel() {
         return true;
     }
+
+    @Override
+    public boolean requiresLearning() {
+        return true;
+    }
+
 }

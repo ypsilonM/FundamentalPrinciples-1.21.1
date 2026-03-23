@@ -31,6 +31,11 @@ public class YpsDataComponents {
                     objectBuilder -> objectBuilder.persistent(SpellBookLevel.CODEC)
                             .networkSynchronized(ByteBufCodecs.fromCodec(SpellBookLevel.CODEC)));
 
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> YP_SPELL_SLOTS = register("yp_slots",
+            integerBuilder -> integerBuilder.persistent(Codec.INT)
+                    .networkSynchronized(ByteBufCodecs.INT)
+            );
+
 
     private static <T> DeferredHolder<DataComponentType<?>, DataComponentType<T>> register(String name, UnaryOperator<DataComponentType.Builder<T>> builderUnaryOperator){
         return DATA_COMPONENT_TYPES.register(name, () -> builderUnaryOperator.apply(DataComponentType.builder()).build());

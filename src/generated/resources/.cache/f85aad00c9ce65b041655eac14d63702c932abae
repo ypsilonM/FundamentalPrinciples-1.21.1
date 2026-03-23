@@ -1,4 +1,5 @@
-// 1.21.1	2025-09-15T17:27:12.3514563	Tags for minecraft:entity_type mod id ypfundamentals
+// 1.21.1	2026-01-20T11:46:23.7440493	Tags for minecraft:entity_type mod id ypfundamentals
+520f798e54bea11c8cc8eccdb5c34e093bf97fc0 data/minecraft/tags/entity_type/arthropod.json
 41e9e284fd477afec27f935a778594c085f53b63 data/minecraft/tags/entity_type/ignores_poison_and_regen.json
 2f76f65e29cbd2ed6837c3d83ae4639b935a9cec data/minecraft/tags/entity_type/inverted_healing_and_harm.json
 520f798e54bea11c8cc8eccdb5c34e093bf97fc0 data/minecraft/tags/entity_type/sensitive_to_bane_of_arthropods.json

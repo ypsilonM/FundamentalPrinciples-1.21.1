@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_essence": {
+    "has_cinder_essence": {
       "conditions": {
         "items": [
           {
-            "items": "irons_spellbooks:arcane_essence"
+            "items": "irons_spellbooks:cinder_essence"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_essence"
+      "has_cinder_essence"
     ]
   ],
   "rewards": {

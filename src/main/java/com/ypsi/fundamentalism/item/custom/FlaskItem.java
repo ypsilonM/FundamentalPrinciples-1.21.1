@@ -2,8 +2,8 @@ package com.ypsi.fundamentalism.item.custom;
 
 import com.ypsi.fundamentalism.attachments.YpsAttachments;
 import com.ypsi.fundamentalism.component.YpsDataComponents;
+import com.ypsi.fundamentalism.effect.ModEffects;
 import com.ypsi.fundamentalism.item.ModFoodProperties;
-import com.ypsi.fundamentalism.network.packets.SyncExhaustionPacket;
 import com.ypsi.fundamentalism.particle.ModParticles;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.core.component.DataComponents;
@@ -14,6 +14,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -88,7 +89,10 @@ public class FlaskItem extends Item implements IExhaustionConsumable{
     private void applyTonicEffect(ServerPlayer player) {
         int currentExhaustion = player.getData(YpsAttachments.CURRENT_EXHAUSTION.get());
         player.setData(YpsAttachments.CURRENT_EXHAUSTION, Math.max(currentExhaustion-15, 0));
-        SyncExhaustionPacket.sendToPlayer(player, player.getData(YpsAttachments.CURRENT_EXHAUSTION));
+        //SyncExhaustionPacket.sendToPlayer(player, player.getData(YpsAttachments.CURRENT_EXHAUSTION));
+        player.addEffect(
+                new MobEffectInstance(ModEffects.SOOTHE_EFFECT, (20)*45, 3, false, true, true)
+        );
     }
 
     public int getCharges(ItemStack stack) {

@@ -43,10 +43,12 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import java.util.List;
 
 public class VenemerusEntity extends AbstractSpellCastingMob implements Enemy {
+
     private static final EntityDataAccessor<Byte> DATA_FLAGS_ID;
 
     public VenemerusEntity(EntityType<? extends AbstractSpellCastingMob> entityType, Level level) {
         super(entityType, level);
+        xpReward = 12;
     }
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
@@ -60,7 +62,6 @@ public class VenemerusEntity extends AbstractSpellCastingMob implements Enemy {
 
     @Override
     protected void registerGoals() {
-//        super.registerGoals();
         this.goalSelector.addGoal(1, new FloatGoal(this));
         this.goalSelector.addGoal(2, new WarlockAttackGoal(this, 1, 100, 140)
                 .setSpells(
@@ -78,7 +79,14 @@ public class VenemerusEntity extends AbstractSpellCastingMob implements Enemy {
         this.goalSelector.addGoal(3, new PatrolNearLocationGoal(this, 30, .75f));
         this.goalSelector.addGoal(3, new LeapAtTargetGoal(this, 0.8F));
         this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 8.0F));
-        this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
+        this.targetSelector.addGoal(1, new HurtByTargetGoal(this) {
+            @Override
+            public boolean canUse() {
+                return super.canUse() &&
+                        !(this.mob.getLastHurtByMob() != null &&
+                        this.mob.getLastHurtByMob().getType() == this.mob.getType());
+            }
+        });
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
     }
 
@@ -101,7 +109,8 @@ public class VenemerusEntity extends AbstractSpellCastingMob implements Enemy {
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "move_controller", 0, this::movePredicate));
-        controllers.add(new AnimationController<>(this, "spit_controller", 0, this::castPredicate).triggerableAnim("spit", SPELL_ANIM));
+        controllers.add(new AnimationController<>(this, "spit_controller", 0, this::castPredicate)
+                .triggerableAnim("spit", SPELL_ANIM));
         controllers.add(new AnimationController<>(this, "melee_controller", 0, this::meleePredicate)
                 .triggerableAnim("melee", ATTACK_1));
     }

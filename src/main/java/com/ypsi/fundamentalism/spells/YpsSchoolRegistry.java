@@ -1,6 +1,8 @@
 package com.ypsi.fundamentalism.spells;
 
 import com.ypsi.fundamentalism.FundamentalPrinciples;
+import com.ypsi.fundamentalism.attributes.YpsAttributes;
+import com.ypsi.fundamentalism.attributes.YpsDamageTypes;
 import com.ypsi.fundamentalism.util.Tags;
 import io.redspace.ironsspellbooks.api.registry.AttributeRegistry;
 import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
@@ -36,11 +38,13 @@ public class YpsSchoolRegistry extends SchoolRegistry {
         FUNDAMENTAL_RESOURCE,
             ModTags.SCHOOL_FOCUS,
             Component.translatable("school.ypfundamentals.fundamentalism").withStyle(ChatFormatting.GOLD),
-            AttributeRegistry.SPELL_POWER,
-            AttributeRegistry.SPELL_RESIST,
-            SoundRegistry.CLEANSE_CAST,
-            ISSDamageTypes.HOLY_MAGIC
+            YpsAttributes.FUNDAMENTALISM_SPELL_POWER,
+            YpsAttributes.FUNDAMENTALISM_MAGIC_RESIST,
+            SoundRegistry.HOLY_CAST,
+            YpsDamageTypes.FUNDAMENTAL_DAMAGE
     ));
+
+
 
     public static void register(IEventBus eventBus){
         FUNDAMENTAL_SCHOOLS.register(eventBus);

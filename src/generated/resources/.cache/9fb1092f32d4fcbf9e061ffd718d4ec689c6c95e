@@ -1,11 +1,11 @@
-// 1.21.1	2026-01-05T00:25:40.4223068	Recipes
+// 1.21.1	2026-03-08T18:09:53.5218525	Recipes
 de4c814a95febfcf6c85acf1b865db1e2db247af data/ypfundamentals/advancement/recipes/brewing/flask.json
 1e88f33d9b82a5447d243654259d09b326686587 data/ypfundamentals/advancement/recipes/brewing/test_tube.json
 cdf64d6c99fd041a99e1d944bd59092be5f4a352 data/ypfundamentals/advancement/recipes/brewing/tonic.json
 14466c28dd30240f732c524dcb8bade8d841c4b8 data/ypfundamentals/advancement/recipes/misc/arcane_mixture.json
-9fead9d326e72263624ce1aafa0e57ba9d61d6db data/ypfundamentals/advancement/recipes/misc/mana_fruit.json
+3bad038a0ca11b7c68c481af3ad90275154d5964 data/ypfundamentals/advancement/recipes/misc/mana_fruit.json
 ff9a550f0aeae46acd63cf98685703bd9d9879a0 data/ypfundamentals/recipe/arcane_mixture.json
 9fcba018928bcd6397ee5bfa8d0a8b273392e9b6 data/ypfundamentals/recipe/flask.json
-062ee5e0f72e92905edd53fc529fb705c5d2ad01 data/ypfundamentals/recipe/mana_fruit.json
+8fc7141f04248261b3f2b6a526404702caad9979 data/ypfundamentals/recipe/mana_fruit.json
 faf63e20a7d676e6f06f7614469e2bbfe9965951 data/ypfundamentals/recipe/test_tube.json
 dec595ac65d9265218192a658052e2c67fe222d5 data/ypfundamentals/recipe/tonic.json

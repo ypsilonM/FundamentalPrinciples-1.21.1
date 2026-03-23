@@ -38,7 +38,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-public class SolProjectile extends AbstractMagicProjectile {
+public class SolProjectile extends AbstractMagicProjectile{
     private static final EntityDataAccessor<Float> DATA_RADIUS = SynchedEntityData.defineId(SolProjectile.class, EntityDataSerializers.FLOAT);
     public SolProjectile(EntityType<? extends Projectile> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);

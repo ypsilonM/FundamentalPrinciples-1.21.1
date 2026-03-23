@@ -1,5 +1,6 @@
 package com.ypsi.fundamentalism.particle;
 
+import com.mojang.serialization.Decoder;
 import com.ypsi.fundamentalism.FundamentalPrinciples;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -7,6 +8,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import javax.xml.crypto.dsig.SignatureMethod;
 import java.util.function.Supplier;
 
 public class ModParticles {
@@ -17,6 +19,8 @@ public class ModParticles {
             PARTICLE_TYPES.register("reinforce_particles", () -> new SimpleParticleType(true));
     public static final Supplier<SimpleParticleType> CONSTELLATION_PARTICLE  =
             PARTICLE_TYPES.register("constellation_particle", () -> new SimpleParticleType(true));
+    public static final Supplier<SimpleParticleType> MINDFUL_PARTICLE =
+            PARTICLE_TYPES.register("mindful_particle", () -> new SimpleParticleType(true));
 
     //public static final Supplier<SimpleParticleType> SOL_PARTICLE =
             //PARTICLE_TYPES.register("sol_particle", () -> new SimpleParticleType(true));

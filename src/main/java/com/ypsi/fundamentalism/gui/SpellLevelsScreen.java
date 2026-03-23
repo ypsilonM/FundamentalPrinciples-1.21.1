@@ -2,42 +2,49 @@ package com.ypsi.fundamentalism.gui;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.keybind.ModKeyBinds;
 import com.ypsi.fundamentalism.network.packets.data.ClientCategoryLevelsData;
-import com.ypsi.fundamentalism.spellCategories.SpellCategoryProgression;
+import com.ypsi.fundamentalism.attachments.SpellCategoryProgression;
+import com.ypsi.fundamentalism.util.Util;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class SpellLevelsScreen extends Screen {
     private static final int WINDOW_WIDTH = 500;
     private static final int WINDOW_HEIGHT = 210;
     private int leftPos, topPos;
-    private float rotation = 0.0f;
 
     private String selectedCategory = null;
     private static final int LARGE_ICON_SIZE = 48;
     private static final int CENTER_ANIMATION_TIME = 30;
     private int animationTimer = 0;
 
+    private static final int ICON_SIZE = 32;
+    private static final int ICON_SPACING = 34; // Espacio entre iconos
+    private static final int ICONS_PER_ROW = 4; // Número de iconos por fila
+    private static final int GRID_START_X = 95; // Margen izquierdo para los iconos
+    private static final int GRID_START_Y = 60; // Margen superior para los iconos
+
     private final String[] CATEGORIES = {
             "createEntity", "usesShoot", "usesSummon", "usesTargeting",
             "hasRecasts", "usesTeleport", "addEffects",
             "createsAoeEntities", "usesMobility", "usesRaycast",
-            "usesHealing", "usesPotentiation"
+            "usesHealing", "usesPotentiation","immutable"
     };
 
-    private static final int ICON_SIZE = 24;
-    private static final int CIRCLE_RADIUS = 70;
+    private Map<String, Integer> hoverTimers = new HashMap<>();
+    private static final int HOVER_ANIMATION_TIME = 10;
+
 
     public SpellLevelsScreen() {
-        super(Component.literal("Fundamentals Experience"));
+        super(Component.literal("Magic Principles"));
     }
 
     @Override
@@ -47,109 +54,85 @@ public class SpellLevelsScreen extends Screen {
         this.topPos = (this.height - WINDOW_HEIGHT) / 2;
     }
 
-    @Override
-    protected void renderBlurredBackground(float partialTick) {
-        super.renderBlurredBackground(partialTick);
-    }
 
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        //guiGraphics.fill(0, 0, this.width, this.height, 0x80101010);
+        this.renderBlurredBackground(partialTick);
+        ResourceLocation backgroundTexture = ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "textures/gui/pbook.png");
+
+        float scale = 1.3f;
+
+        int originalWidth = 288;
+        int originalHeight = 180;
+
+        int scaledWidth = (int) (originalWidth * scale);
+        int scaledHeight = (int) (originalHeight * scale);
+
+        int offsetX = leftPos + (WINDOW_WIDTH - scaledWidth) / 2;
+        int offsetY = topPos + (WINDOW_HEIGHT - scaledHeight) / 2;
+
+        PoseStack poseStack = guiGraphics.pose();
+        poseStack.pushPose();
+
+        poseStack.translate(offsetX, offsetY, 0);
+        poseStack.scale(scale, scale, 1.0f);
+
+        guiGraphics.blit(backgroundTexture, 0, 0, 0, 0, originalWidth, originalHeight, originalWidth, originalHeight);
+
+        poseStack.popPose();
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        this.renderBlurredBackground(partialTick);
 
-        guiGraphics.fill(leftPos, topPos, leftPos + WINDOW_WIDTH, topPos + WINDOW_HEIGHT, 0x882D2D2D);
-        guiGraphics.renderOutline(leftPos, topPos, WINDOW_WIDTH, WINDOW_HEIGHT, 0xFF2D2D2D);
+        this.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
+        Component styledTitle = this.title.copy().withStyle(ChatFormatting.BOLD).withColor(0x4D4942);
 
-        Component styledTitle = this.title.copy().withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.LIGHT_PURPLE);
         int titleWidth = this.font.width(styledTitle);
-        int titleX = leftPos + (WINDOW_WIDTH - titleWidth) / 2;
-        guiGraphics.drawString(this.font, styledTitle, titleX, topPos + 6, 0xFFFFFF, false);
+        int titleX = leftPos+10 + (WINDOW_WIDTH - titleWidth) / 4;
+        guiGraphics.drawString(this.font, styledTitle, titleX, topPos + 30, 0xFFFFFF, false);
 
         guiGraphics.enableScissor(leftPos + 8, topPos + 20, leftPos + WINDOW_WIDTH - 8, topPos + WINDOW_HEIGHT - 8);
 
-        renderCircularIcons(guiGraphics, mouseX, mouseY);
+        renderGridIcons(guiGraphics, mouseX, mouseY);
 
         guiGraphics.disableScissor();
-
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
     }
 
-    private void renderCircularIcons(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+    private void renderGridIcons(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         int centerX = leftPos + WINDOW_WIDTH / 2;
         int centerY = topPos + WINDOW_HEIGHT / 2;
 
         if (selectedCategory != null) {
-            renderLargeCenterIcon(guiGraphics, selectedCategory, centerX, centerY);
+            int level = ClientCategoryLevelsData.getLevel(selectedCategory);
+            float progress = ClientCategoryLevelsData.getProgress(selectedCategory);
+            renderSelectedCategoryTooltip(guiGraphics, selectedCategory, level, progress, centerX, centerY);
         }
 
         for (int i = 0; i < CATEGORIES.length; i++) {
-            if (CATEGORIES[i].equals(selectedCategory)) continue;
 
-            double angle = 2 * Math.PI * i / CATEGORIES.length + rotation;
-            int x = centerX + (int) (CIRCLE_RADIUS * Math.cos(angle)) - ICON_SIZE / 2;
-            int y = centerY + (int) (CIRCLE_RADIUS * Math.sin(angle)) - ICON_SIZE / 2;
+            int row = i / ICONS_PER_ROW;
+            int col = i % ICONS_PER_ROW;
+            int x = leftPos + GRID_START_X + (col * ICON_SPACING);
+            int y = topPos + GRID_START_Y + (row * ICON_SPACING);
 
-            renderIcon(guiGraphics, CATEGORIES[i], x, y, mouseX, mouseY, i);
-        }
-    }
-
-    private void renderLargeCenterIcon(GuiGraphics guiGraphics, String category, int centerX, int centerY) {
-        float totalScale;
-
-        if (animationTimer > 0) {
-            float progress = 1.0f - (float)animationTimer / CENTER_ANIMATION_TIME;
-            // Animación de 0.5 a 2.0
-            totalScale = 0.5f + progress * 1.5f; // 0.5 → 2.0
-            animationTimer--;
-        } else {
-            // Cuando termina la animación, mantener en 2.0
-            totalScale = 2.0f;
+            if (!isMouseOverIcon(mouseX, mouseY, x, y)) {
+                renderIcon(guiGraphics, CATEGORIES[i], x, y, mouseX, mouseY, i, false);
+            }
         }
 
-        int x = centerX - LARGE_ICON_SIZE / 2;
-        int y = centerY - LARGE_ICON_SIZE / 2;
+        for (int i = 0; i < CATEGORIES.length; i++) {
 
-        // Fondo del icono grande (TAMAÑO ORIGINAL)
-        int bgColor = 0xFF444444;
-        guiGraphics.fill(x, y, x + LARGE_ICON_SIZE, y + LARGE_ICON_SIZE, bgColor);
+            int row = i / ICONS_PER_ROW;
+            int col = i % ICONS_PER_ROW;
+            int x = leftPos + GRID_START_X + (col * ICON_SPACING);
+            int y = topPos + GRID_START_Y + (row * ICON_SPACING);
 
-        // Borde resaltado (TAMAÑO ORIGINAL)
-        int borderColor = 0xFFAA00FF;
-        guiGraphics.renderOutline(x - 1, y - 1, LARGE_ICON_SIZE + 2, LARGE_ICON_SIZE + 2, borderColor);
-        guiGraphics.renderOutline(x, y, LARGE_ICON_SIZE, LARGE_ICON_SIZE, 0xFFCC44FF);
-
-        // Solo el símbolo se escala
-        PoseStack poseStack = guiGraphics.pose();
-        poseStack.pushPose();
-        poseStack.translate(centerX, centerY, 0);
-        poseStack.scale(totalScale, totalScale, 1.0f);
-
-        String symbol = SpellCategoryProgression.getCategorySymbol(category);
-        int symbolX = -this.font.width(symbol) / 2;
-        int symbolY = -4;
-
-        int textColor = 0xEFBF04;
-        guiGraphics.drawString(this.font, symbol, symbolX, symbolY, textColor, false);
-
-        poseStack.popPose();
-
-        // Nombre (sin escala)
-        String displayName = SpellCategoryProgression.getCategoryDisplayName(category).replace("Principle", "").trim();
-        int nameX = centerX - this.font.width(displayName) / 2;
-        int nameY = y + LARGE_ICON_SIZE + 8;
-
-        int nameBgWidth = this.font.width(displayName) + 6;
-        int nameBgX = nameX - 3;
-        guiGraphics.fill(nameBgX, nameY - 2, nameBgX + nameBgWidth, nameY + 10, 0xAA000000);
-        guiGraphics.drawString(this.font, displayName, nameX, nameY, 0xFFFFFF, true);
-
-        int level = ClientCategoryLevelsData.getLevel(category);
-        float progressValue = ClientCategoryLevelsData.getProgress(category);
-        renderSelectedCategoryTooltip(guiGraphics, category, level, progressValue, centerX, centerY);
+            if (isMouseOverIcon(mouseX, mouseY, x, y)) {
+                renderIcon(guiGraphics, CATEGORIES[i], x, y, mouseX, mouseY, i, true);
+                break;
+            }
+        }
     }
 
     private void renderSelectedCategoryTooltip(GuiGraphics guiGraphics, String category, int level, float progress, int centerX, int centerY) {
@@ -165,66 +148,133 @@ public class SpellLevelsScreen extends Screen {
                     .withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD, ChatFormatting.ITALIC));
             tooltip.add(Component.literal(""));
             tooltip.add(Component.literal(""));
+            tooltip.add(Component.literal(""));
+            tooltip.add(Component.literal(""));
+            tooltip.add(Component.literal(""));
 
         } else {
+            tooltip.add(Component.literal(""));
             tooltip.add(Component.literal("Level: " + level + "/20")
-                    .withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+                    .withColor(0x4D4942));
             tooltip.add(Component.literal("Progress: " + (int)(progress * 100) + "%")
-                    .withStyle(ChatFormatting.BLUE, ChatFormatting.ITALIC));
+                    .withStyle(ChatFormatting.BLUE));
 
             int currentExp = ClientCategoryLevelsData.getExperience(category);
-            int expNeeded = 100 * (level + 1);
+            int nextLevel = level+1;
+            int expNeeded = Util.getExpForLevel(nextLevel);
             tooltip.add(Component.literal("XP: " + currentExp + "/" + expNeeded)
-                    .withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+                    .withColor(0x4D4942));
             tooltip.add(Component.literal(""));
             tooltip.add(Component.literal(""));
         }
 
         tooltip.add(Component.literal("Stats:")
-                .withStyle(ChatFormatting.YELLOW, ChatFormatting.ITALIC));
+                .withColor(0x4D4942));
 
         float power = calculatePowerForCategory(category, level);
         power = Math.round(power * 100.0f)/100.0f;
         String sign = power > 0 ? "+" : "";
-        ChatFormatting color = power < 0 ? ChatFormatting.RED : ChatFormatting.BLUE;
-        tooltip.add(Component.literal("• " + sign + power + "% Power")
-                .withStyle(color));
-
+        //ChatFormatting color = power < 0 ? ChatFormatting.RED : ChatFormatting.BLUE;
+        int color = power < 0 ? 0xAD1330 : 0x192BB0;
+//        if(!category.equals("immutable")) {
+//            tooltip.add(Component.literal("• " + sign + power + "% Power")
+//                    .withColor(color));
+//        }
         if(category.equals("hasRecasts")) {
-            float recastProb = calculateProbabilityForRecast(level);
+            float recastProb = Util.getFloatRecastAddChance(level);
             recastProb = Math.round(recastProb * 100.0f) / 100.0f;
             tooltip.add(Component.literal("• " + recastProb + "% +1 Recast")
                     .withStyle(ChatFormatting.DARK_AQUA));
         }
         if(category.equals("usesTeleport")){
-            float addProb = calculateProbabilityForAddTp(level);
-            addProb = Math.round(addProb * 100.0f) / 100.0f;
+            int addProb = (int) (Util.getFailureTPReduction(level) * 100f);
             tooltip.add(Component.literal("• +" + addProb + "% Chance")
-                    .withStyle(ChatFormatting.LIGHT_PURPLE));
+                    .withColor(0x9E2997));
         }
         if(category.equals("usesTargeting")){
-            int addRange = getTotalRange(level);
+            int addRange = (int) (Util.getLocusMultiplier(level)*100);
+            tooltip.add(Component.literal("• " + addRange + "% Target Distance")
+                    .withColor(0x51A326));
+        }
+        if(category.equals("usesRaycast")){
+            int addRange = Util.getTotalRange(level);
             tooltip.add(Component.literal("• +" + addRange + " Distance")
-                    .withStyle(ChatFormatting.GREEN));
+                    .withColor(0x51A326));
         }
         if(category.equals("createEntity")){
-            int addMana = getTotalMana(level);
+            int addMana = Util.getTotalMana(level);
             tooltip.add(Component.literal("• +" + addMana + " Mana ")
-                    .withStyle(ChatFormatting.AQUA));
+                    .withColor(0x1B4EC2));
+        }
+        if(category.equals("usesShoot")){
+            int accuracy = (int) (Util.getAccuracy(level) * 100f);
+            tooltip.add(Component.literal("• " + accuracy + "% Accuracy")
+                    .withColor(0xC2AC1B));
+        }
+        if(category.equals("immutable")){
+            int percentage = (int) (Util.manaReduction(level) * 100);
+            tooltip.add(Component.literal("• -" + percentage + "% Fatigue Cost")
+                    .withColor(0xC2AC1B));
+        }
+        if(category.equals("createsAoeEntities")){
+            int size = (int) (Util.getVolumeMultiplier(level) * 100f);
+            tooltip.add(Component.literal("• " + size + "% Radius")
+                    .withStyle(ChatFormatting.DARK_RED) );
+        }
+        double additionalFatigue = 5.0 - (0.5*level);
+        tooltip.add(Component.literal("• "+(additionalFatigue>=0?"+":"") + additionalFatigue + "% Fatigue")
+                .withStyle((additionalFatigue>=0?ChatFormatting.RED:ChatFormatting.BLUE)));
+
+        renderLargeIconWithTooltip(guiGraphics, category, level, progress, centerX, centerY, tooltip, isMaxLevel ? -1 : progress);
+    }
+
+    private void renderLargeIconWithTooltip(GuiGraphics guiGraphics, String category, int level, float progress, int centerX, int centerY, List<Component> tooltipLines, float progressValue) {
+        int maxWidth = tooltipLines.stream()
+                .mapToInt(line -> this.font.width(line))
+                .max()
+                .orElse(120);
+        maxWidth = Math.max(maxWidth, 120);
+
+        int offsetX = 30;
+        int offsetY = -80;
+
+        int tooltipX = centerX + offsetX;
+        int tooltipY = centerY + offsetY;
+
+
+        int iconX = tooltipX +60+ (LARGE_ICON_SIZE) / 2;
+        int iconY = tooltipY  + 20;
+
+        float totalScale;
+        if (animationTimer > 0) {
+            float animProgress = 1.0f - (float)animationTimer / CENTER_ANIMATION_TIME;
+            totalScale = 0.5f + animProgress * 1.5f;
+            animationTimer--;
+        } else {
+            totalScale = 2.0f;
         }
 
-        renderTooltipBackgroundAndText(guiGraphics, tooltip, centerX, centerY, isMaxLevel ? -1 : progress);
+        PoseStack poseStack = guiGraphics.pose();
+        poseStack.pushPose();
+        poseStack.translate(iconX + LARGE_ICON_SIZE / 2, iconY + LARGE_ICON_SIZE / 2, 0);
+        poseStack.scale(totalScale, totalScale, 1.0f);
+
+        String symbol = SpellCategoryProgression.getCategorySymbol(category);
+        int symbolX = -this.font.width(symbol) / 2;
+        int symbolY = -4;
+        guiGraphics.drawString(this.font, symbol, symbolX, symbolY, 0xEFBF04, false);
+
+        poseStack.popPose();
+
+        for (int i = 0; i < tooltipLines.size(); i++) {
+            guiGraphics.drawString(this.font, tooltipLines.get(i), tooltipX, tooltipY + i * 10, 0xFFFFFF, false);
+        }
+        if (progressValue >= 0) {
+            renderProgressBar(guiGraphics, progressValue, tooltipX, tooltipY + tooltipLines.size() * 10 + 5, 0);
+        }
     }
-    private static int getTotalRange(int level){
-        return (int) (level*1.5);
-    }
-    private static int getTotalMana(int level) { return level*20; }
-    private static float calculateProbabilityForAddTp(int categoryLevel) {
-        return (float)((categoryLevel * 0.025) * 100);
-    }
-    private float calculateProbabilityForRecast(int categoryLevel) {
-        return (float)(categoryLevel * 0.04 * 100);
-    }
+
+
     private float calculatePowerForCategory(String category, int level) {
         if (category.equals("usesShoot") || category.equals("createsAoeEntities") || category.equals("usesSummon")) {
             return (float) getSubEntityModificator(level) * 100;
@@ -232,40 +282,6 @@ public class SpellLevelsScreen extends Screen {
             return (float) getModificator(level) * 100;
         }
     }
-
-    private void renderTooltipBackgroundAndText(GuiGraphics guiGraphics, List<Component> tooltip, int centerX, int centerY, float progress) {
-        int maxWidth = tooltip.stream()
-                .mapToInt(line -> this.font.width(line))
-                .max()
-                .orElse(120);
-        maxWidth = Math.max(maxWidth, 120);
-
-        int tooltipX = centerX + 100;
-        int tooltipY = centerY - 50;
-        int bgPadding = 6;
-
-        int bgX = tooltipX - bgPadding;
-        int bgY = tooltipY - bgPadding;
-        int bgWidth = maxWidth + bgPadding * 2;
-        int bgHeight = tooltip.size() * 10 + bgPadding * 2;
-
-        boolean hasProgressBar = progress >= 0;
-        if (hasProgressBar) {
-            bgHeight += 10;
-        }
-
-        guiGraphics.fill(bgX, bgY, bgX + bgWidth, bgY + bgHeight, 0xDD000000);
-        guiGraphics.renderOutline(bgX, bgY, bgWidth, bgHeight, 0xFFAA00FF);
-
-        if (hasProgressBar) {
-            renderProgressBar(guiGraphics, progress, tooltipX, tooltipY, 4);
-        }
-
-        for (int i = 0; i < tooltip.size(); i++) {
-            guiGraphics.drawString(this.font, tooltip.get(i), tooltipX, tooltipY + i * 10, 0xFFFFFF, false);
-        }
-    }
-
 
     private double getModificator(int level){
         double basePercentage = -0.10;
@@ -290,31 +306,42 @@ public class SpellLevelsScreen extends Screen {
         int barHeight = 6;
         int barX = x;
         int barY = y + lineIndex * 10 + 3;
-        guiGraphics.fill(barX, barY, barX + barWidth, barY + barHeight, 0xFF330033); // Morado muy oscuro
+
+        // Fondo de la barra
+        guiGraphics.fill(barX, barY, barX + barWidth, barY + barHeight, 0xFF8B7E6B);
+
         int progressWidth = (int) (barWidth * progress);
         if (progressWidth > 0) {
-            guiGraphics.fill(barX, barY, barX + progressWidth, barY + barHeight, 0xFFAA00FF);
-            drawPurpleGradientBar(guiGraphics, barX, barY, progressWidth, barHeight);
+            // Animación de brillo dorado
+            float time = (System.currentTimeMillis() % 4000) / 4000.0f; // Ciclo de 2 segundos
+            float pulse = 0.7f + 0.3f * (float) Math.sin(time * Math.PI * 2); // 0.7 a 1.3
+
+            // Color dorado base (0xFFD700)
+            int goldR = 0xFF;
+            int goldG = 0xD7;
+            int goldB = 0x00;
+
+            // Aplicar variación por el pulso
+            goldR = Math.min(255, (int) (goldR * pulse));
+            goldG = Math.min(255, (int) (goldG * pulse));
+
+            int animatedColor = (0xFF << 24) | (goldR << 16) | (goldG << 8) | goldB;
+
+            // Dibujar barra con color animado
+            guiGraphics.fill(barX, barY, barX + progressWidth, barY + barHeight, animatedColor);
+
         }
-        guiGraphics.renderOutline(barX, barY, barWidth, barHeight, 0xFFCC66FF);
+
+        // Outline color dorado fijo
+        guiGraphics.renderOutline(barX, barY, barWidth, barHeight, 0xFFD700);
     }
 
-    private void drawPurpleGradientBar(GuiGraphics guiGraphics, int x, int y, int width, int height) {
+    private void drawAncientGradientBar(GuiGraphics guiGraphics, int x, int y, int width, int height) {
         if (width <= 0) return;
-        int segments = Math.min(width, 10);
-        int segmentWidth = width / segments;
 
-        for (int i = 0; i < segments; i++) {
-            int segmentX = x + i * segmentWidth;
-            int segmentEndX = (i == segments - 1) ? x + width : segmentX + segmentWidth;
-            float t = (float) i / (segments - 1);
-            int r = (int)(85 + (170 * t));
-            int g = 0;
-            int b = (int)(128 + (127 * t));
+        int color = 0xFFB89F73;
 
-            int color = (0xFF << 24) | (r << 16) | (g << 8) | b;
-            guiGraphics.fill(segmentX, y, segmentEndX, y + height, color);
-        }
+        guiGraphics.fill(x, y, x + width, y + height, color);
     }
 
     private void renderTooltip(GuiGraphics guiGraphics, String category, int level, float progress, int mouseX, int mouseY) {
@@ -326,7 +353,8 @@ public class SpellLevelsScreen extends Screen {
 
         if (level < 20) {
             int currentExp = ClientCategoryLevelsData.getExperience(category);
-            int expNeeded = 100 * (level + 1);
+            int nextLevel = level+1;
+            int expNeeded = Util.getExpForLevel(nextLevel);
             tooltip.add(Component.literal("Progress: " + (int)(progress * 100) + "%")
                     .withStyle(ChatFormatting.BLUE).withStyle(ChatFormatting.ITALIC));
             tooltip.add(Component.literal("XP: " + currentExp + "/" + expNeeded)
@@ -338,32 +366,49 @@ public class SpellLevelsScreen extends Screen {
         guiGraphics.renderTooltip(this.font, tooltip, Optional.empty(), mouseX, mouseY);
     }
 
-    private void renderIcon(GuiGraphics guiGraphics, String category, int x, int y, int mouseX, int mouseY, int index) {
+    private void renderIcon(GuiGraphics guiGraphics, String category, int x, int y, int mouseX, int mouseY, int index, boolean isHovered) {
         int level = ClientCategoryLevelsData.getLevel(category);
         float progress = ClientCategoryLevelsData.getProgress(category);
 
-        int bgColor = 0xFF333333;
-        guiGraphics.fill(x, y, x + ICON_SIZE, y + ICON_SIZE, bgColor);
-        int borderColor = 0xFF888888;
+        int hoverTimer = hoverTimers.getOrDefault(category, 0);
+        if (isHovered && hoverTimer < HOVER_ANIMATION_TIME) {
+            hoverTimer++;
+            hoverTimers.put(category, hoverTimer);
+        } else if (!isHovered && hoverTimer > 0) {
+            hoverTimer--;
+            hoverTimers.put(category, hoverTimer);
+        }
+        float hoverScale = 1.0f + (hoverTimer / (float)HOVER_ANIMATION_TIME) * 0.2f;
 
+        PoseStack poseStack = guiGraphics.pose();
+        poseStack.pushPose();
+
+        poseStack.translate(x + ICON_SIZE / 2, y + ICON_SIZE / 2, 0);
+        poseStack.scale(hoverScale, hoverScale, 1.0f);
+        poseStack.translate(-(x + ICON_SIZE / 2), -(y + ICON_SIZE / 2), 0);
+
+        int borderColor = isHovered ? 0xFFFFD700 : 0xD1BFA188;
         guiGraphics.renderOutline(x, y, ICON_SIZE, ICON_SIZE, borderColor);
+
+        if (isHovered) {
+            guiGraphics.renderOutline(x - 1, y - 1, ICON_SIZE + 2, ICON_SIZE + 2, 0xFFFFD700);
+        }
 
         String symbol = SpellCategoryProgression.getCategorySymbol(category);
         int symbolX = x + (ICON_SIZE - this.font.width(symbol)) / 2;
         int symbolY = y + (ICON_SIZE - 8) / 2;
 
-        int textColor = 0xEFBF04;
+        int textColor = isHovered ? 0xEFBF04 : 0xD1BFA1;
         guiGraphics.drawString(this.font, symbol, symbolX, symbolY, textColor, false);
 
-        // Efecto de hover
-        if (isMouseOverIcon(mouseX, mouseY, x, y)) {
-            guiGraphics.fill(x, y, x + ICON_SIZE, y + ICON_SIZE, 0x44FFFFFF);
-            renderTooltip(guiGraphics, category, level, progress, mouseX, mouseY);
-        }
-
-        // Línea de progreso (opcional, alrededor del icono)
         if (level < 20 && progress > 0) {
             renderProgressOutline(guiGraphics, x, y, progress);
+        }
+
+        poseStack.popPose();
+
+        if (isHovered) {
+            renderTooltip(guiGraphics, category, level, progress, mouseX, mouseY);
         }
     }
 
@@ -408,45 +453,41 @@ public class SpellLevelsScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        int centerX = leftPos + WINDOW_WIDTH / 2;
-        int centerY = topPos + WINDOW_HEIGHT / 2;
-
+        // Verificar clics en los iconos de la cuadrícula
         for (int i = 0; i < CATEGORIES.length; i++) {
-            double angle = 2 * Math.PI * i / CATEGORIES.length + rotation;
-            int x = centerX + (int) (CIRCLE_RADIUS * Math.cos(angle)) - ICON_SIZE / 2;
-            int y = centerY + (int) (CIRCLE_RADIUS * Math.sin(angle)) - ICON_SIZE / 2;
+            int row = i / ICONS_PER_ROW;
+            int col = i % ICONS_PER_ROW;
+
+            int x = leftPos + GRID_START_X + (col * ICON_SPACING);
+            int y = topPos + GRID_START_Y + (row * ICON_SPACING);
 
             if (isMouseOverIcon((int)mouseX, (int)mouseY, x, y)) {
                 if (this.minecraft != null && this.minecraft.player != null) {
                     this.minecraft.player.playSound(
                             SoundEvents.UI_BUTTON_CLICK.value(),
-                            0.5f,  // volumen
-                            1.0f   // pitch
+                            0.5f,
+                            1.0f
                     );
                 }
-                // Seleccionar o deseleccionar categoría
+
                 if (CATEGORIES[i].equals(selectedCategory)) {
-                    selectedCategory = null; // Deseleccionar
+                    selectedCategory = null;
                 } else {
                     selectedCategory = CATEGORIES[i];
-                    animationTimer = CENTER_ANIMATION_TIME; // Iniciar animación
+                    animationTimer = CENTER_ANIMATION_TIME;
                 }
                 return true;
             }
         }
 
+        // Si se hace clic fuera de los iconos, deseleccionar
         selectedCategory = null;
         return super.mouseClicked(mouseX, mouseY, button);
     }
+
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
         return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
-    }
-
-    @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-        rotation += scrollY * 0.1f;
-        return true;
     }
 
     @Override

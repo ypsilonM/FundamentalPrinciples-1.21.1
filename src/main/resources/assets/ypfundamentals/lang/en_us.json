@@ -7,6 +7,7 @@
   "effect.ypfundamentals.flame_boost": "Life Flame",
   "effect.ypfundamentals.marked": "Marked",
   "effect.ypfundamentals.bloodstream": "Bloodstream",
+  "effect.ypfundamentals.soothe": "Soothe",
 
   "entity.ypfundamentals.hemomancer": "Hemomancer",
   "entity.ypfundamentals.imp": "Imp",
@@ -15,10 +16,11 @@
   "item.ypfundamentals.hemomancer_spawn_egg": "Hemomancer Spawn Egg",
   "item.ypfundamentals.imp_spawn_egg": "Imp Spawn Egg",
   "item.ypfundamentals.venemerus_spawn_egg": "Venemerus Spawn Egg",
-  "item.ypfundamentals.mana_fruit": "Mana Fruit",
+  "item.ypfundamentals.mana_fruit": "Ancient Fruit",
   "item.ypfundamentals.arcane_mixture": "Arcane Mixture",
   "item.ypfundamentals.test_tube": "Test Tube",
   "item.ypfundamentals.luminaire_extract": "Luminaire Extract",
+  "item.ypfundamentals.pitcher_extract": "Pitcher Extract",
   "item.ypfundamentals.tonic": "Tonic",
   "item.ypfundamentals.flask": "Flask",
 
@@ -33,10 +35,9 @@
   "spell.ypfundamentals.thorn": "Thorn",
   "spell.ypfundamentals.taunt": "Taunt",
   "spell.ypfundamentals.lapsus": "Lapsus",
-  "spell.ypfundamentals.sol": "Sol",
+  "spell.ypfundamentals.sol": "Tonatiuh",
   "spell.ypfundamentals.bloodmoon": "Blood Moon",
   "spell.ypfundamentals.sacred_disk": "Sacred Disk",
-  "spell.ypfundamentals.yggdrasil": "Yggdrasil",
 
   "spell.ypfundamentals.proiectum": "Proiectum Principle",
 
@@ -57,7 +58,9 @@
   "key.fundamentalism.selection": "Spell Level Wheel",
   "key.fundamentalism.spell_categories": "Magical Knowledge",
 
-  "school.ypfundamentals.fundamentalism": "Fundamentalism"
+  "school.ypfundamentals.fundamentalism": "Fundamentalism",
+
+  "attribute.ypfundamentals.exhaustion.max": "Max Exhaustion"
 
 
 

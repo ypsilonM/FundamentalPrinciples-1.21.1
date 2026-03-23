@@ -11,6 +11,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
@@ -32,16 +33,13 @@ public class SpellCategoriesGenerator {
     private static ConfigOutput loadedConfig = null;
     private static final File CONFIG_FILE = new File("config/fundamentalism/spell_categories.json");
 
+
     @SubscribeEvent
-    public static void onServerAboutToStart(ServerAboutToStartEvent event) {
-        LOGGER.info("y SERVER ABOUT TO START EVENT");
+    public static void onCommonSetup(FMLCommonSetupEvent event) {
+        LOGGER.info("Common Setup - Generating spell categories");
         generateCategoriesFromRegistry();
     }
-    @SubscribeEvent
-    public static void onPlayerLog(PlayerEvent.PlayerLoggedInEvent event){
-        LOGGER.info("y PLAYER LOGGING IN");
-        generateCategoriesFromRegistry();
-    }
+
 
     public static void generateCategoriesFromRegistry() {
         LOGGER.info("GENERATING SPELL CATEGORIES...");
@@ -108,6 +106,7 @@ public class SpellCategoriesGenerator {
         mapping.put("usesRaycast", "usesRaycast");
         mapping.put("usesHealing", "usesHealing");
         mapping.put("usesPotentiation", "usesPotentiation");
+        mapping.put("immutable", "immutable");
         return mapping;
     }
 
@@ -118,12 +117,10 @@ public class SpellCategoriesGenerator {
         String classResource = className + ".class";
 
         try (InputStream classStream = spell.getClass().getClassLoader().getResourceAsStream(classResource)){
-
             if (classStream == null) {
                 LOGGER.error("Cannot find class resource: {}", classResource);
                 return new Visitors.SpellAnalysisVisitor();
             }
-
             ClassReader classReader = new ClassReader(classStream);
             LOGGER.info("ClassReader created for: {}", className);
 
@@ -131,12 +128,12 @@ public class SpellCategoriesGenerator {
             classReader.accept(visitor, ClassReader.SKIP_DEBUG);
 
             LOGGER.info("ASM analysis completed for: {}", className);
-            LOGGER.info("¿ Detected: {}", visitor.getDetectedCategories());
+            LOGGER.info("-> Detected: {}", visitor.getDetectedCategories());
 
             return visitor;
         } catch (RuntimeException e) {
             LOGGER.error("ASM FAILED for: {} - {}", spell.getSpellId(), e.getMessage(), e);
-            return new Visitors.SpellAnalysisVisitor(); // Devolver visitor vacío
+            return new Visitors.SpellAnalysisVisitor();
         }
 
     }
@@ -146,7 +143,7 @@ public class SpellCategoriesGenerator {
                 "createEntity", "usesShoot", "usesSummon", "usesTargeting",
                 "hasRecasts", "usesTeleport", "addEffects",
                 "createsAoeEntities", "usesMobility", "usesRaycast",
-                "usesHealing", "usesPotentiation"
+                "usesHealing", "usesPotentiation","immutable"
         };
         for (String category : categoryNames) {
             categories.put(category, new ArrayList<>());
@@ -199,7 +196,9 @@ public class SpellCategoriesGenerator {
         Set<String> categories = new HashSet<>();
         for (Map.Entry<String, List<String>> entry : loadedConfig.spellCategories.entrySet()) {
             if (entry.getValue().contains(spellId)) {
-                categories.add(entry.getKey());
+                //if(!entry.getKey().contains("immutable")) {
+                    categories.add(entry.getKey());
+                //}
             }
         }
         return categories;

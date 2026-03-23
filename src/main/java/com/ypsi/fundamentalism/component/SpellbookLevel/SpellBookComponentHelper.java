@@ -1,17 +1,27 @@
 package com.ypsi.fundamentalism.component.SpellbookLevel;
 
 import com.ypsi.fundamentalism.component.YpsDataComponents;
+import com.ypsi.fundamentalism.event.SpellBookLevelUpEvent;
+import com.ypsi.fundamentalism.network.packets.SpellBookLevelUpPacket;
 import io.redspace.ironsspellbooks.api.spells.ISpellContainer;
 import io.redspace.ironsspellbooks.item.SpellBook;
+import io.redspace.ironsspellbooks.registries.ComponentRegistry;
+import net.minecraft.client.Minecraft;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 public class SpellBookComponentHelper {
     private static final int[] XP_REQUIREMENTS = {
             0,      // Nivel    COMMON
             50,    // Nivel     UNCOMMON
             200,    // Nivel    RARE
-            350,    // Nivel    EPIC
-            600   // Nivel     LEGENDARY
+            450,    // Nivel    EPIC
+            800   // Nivel     LEGENDARY
     };
 
     private static final int MAX_LEVEL = 5;
@@ -51,7 +61,7 @@ public class SpellBookComponentHelper {
         }
         return 0;
     }
-    public static void addXP(ItemStack stack, int xpToAdd) {
+    public static void addXP(ItemStack stack, int xpToAdd, Player player) {
         if (stack.getItem() instanceof SpellBook) {
             ensureSpellBookComponents(stack);
 
@@ -64,17 +74,32 @@ public class SpellBookComponentHelper {
             int newLevel = calculateLevelFromXP(newXP);
             if (newLevel > currentLevel) {
                 stack.set(YpsDataComponents.SPELLBOOK_LEVEL.get(), new SpellBookLevel(newLevel));
-                
                 var upgradedContainer = ISpellContainer.get(stack).mutableCopy();
-                upgradedContainer.setMaxSpellCount(upgradedContainer.getMaxSpellCount() + getSlotsToAdd(newLevel));
-                ISpellContainer.set(stack, upgradedContainer.toImmutable());
+                int slots = getSlots(newLevel);
+                upgradedContainer.setMaxSpellCount(slots);
+                stack.set(ComponentRegistry.SPELL_CONTAINER, upgradedContainer.toImmutable());
+
+                //ISpellContainer.set(stack, upgradedContainer.toImmutable());
+
+                if (!player.level().isClientSide()) {
+                    PacketDistributor.sendToPlayer(
+                            (ServerPlayer) player,
+                            new SpellBookLevelUpPacket(player.getId(), currentLevel, newLevel)
+                    );
+                    NeoForge.EVENT_BUS.post(new SpellBookLevelUpEvent(player, stack, currentLevel, newLevel));
+                }
+
             }
         }
     }
-    public static int getSlotsToAdd(int newLevel){
+    public static int getSlots(int newLevel){
         return switch (newLevel) {
-            case 4,5 -> 2;
-            default -> 1;
+            case 1 -> 4;
+            case 2 -> 5;
+            case 3 -> 6;
+            case 4 -> 8;
+            case 5 -> 10;
+            default -> 0;
         };
     }
 
@@ -90,15 +115,34 @@ public class SpellBookComponentHelper {
         }
     }
 
-    public static void setLevel(ItemStack stack, int level) {
+    public static void setLevel(ItemStack stack, int newLevel, Player player) {
         if (stack.getItem() instanceof SpellBook) {
             ensureSpellBookComponents(stack);
+            int currentLevel = getLevel(stack);
 
-            level = Math.min(Math.max(1, level), MAX_LEVEL);
-            stack.set(YpsDataComponents.SPELLBOOK_LEVEL.get(), new SpellBookLevel(level));
+            newLevel = Math.min(Math.max(1, newLevel), MAX_LEVEL);
 
-            int xpForLevel = getXPForLevel(level);
+            int xpForLevel = getXPForLevel(newLevel);
             stack.set(YpsDataComponents.SPELLBOOK_XP.get(), new SpellBookXP(xpForLevel));
+
+            if (newLevel != currentLevel) {
+                stack.set(YpsDataComponents.SPELLBOOK_LEVEL.get(), new SpellBookLevel(newLevel));
+                var upgradedContainer = ISpellContainer.get(stack).mutableCopy();
+                int slots = getSlots(newLevel);
+                upgradedContainer.setMaxSpellCount(slots);
+                //ISpellContainer.set(stack, upgradedContainer.toImmutable());
+                stack.set(ComponentRegistry.SPELL_CONTAINER, upgradedContainer.toImmutable());
+
+                if (!player.level().isClientSide()) {
+                    PacketDistributor.sendToPlayer(
+                            (ServerPlayer) player,
+                            new SpellBookLevelUpPacket(player.getId(), currentLevel, newLevel)
+                    );
+                    NeoForge.EVENT_BUS.post(new SpellBookLevelUpEvent(player, stack, currentLevel, newLevel));
+                }
+
+
+            }
         }
     }
 

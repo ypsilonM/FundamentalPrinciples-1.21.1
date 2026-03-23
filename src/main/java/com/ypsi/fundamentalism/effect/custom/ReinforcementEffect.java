@@ -2,12 +2,11 @@ package com.ypsi.fundamentalism.effect.custom;
 
 import com.ypsi.fundamentalism.particle.ModParticles;
 import io.redspace.ironsspellbooks.effect.MagicMobEffect;
-import io.redspace.ironsspellbooks.network.SyncManaPacket;
 import net.minecraft.core.particles.*;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
-
-import static com.ypsi.fundamentalism.event.ModEvents.getMaxExPerLevel;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 
 public class ReinforcementEffect extends MagicMobEffect {
 
@@ -23,6 +22,22 @@ public class ReinforcementEffect extends MagicMobEffect {
     }
 
     @Override
+    public void onEffectAdded(LivingEntity pLivingEntity, int pAmplifier) {
+        super.onEffectAdded(pLivingEntity, pAmplifier);
+        if(pLivingEntity instanceof Player player){
+            player.setGlowingTag(true);
+        }
+    }
+
+    @Override
+    public void onEffectRemoved(LivingEntity pLivingEntity, int pAmplifier) {
+        super.onEffectRemoved(pLivingEntity, pAmplifier);
+        if(pLivingEntity instanceof Player player){
+            player.setGlowingTag(false);
+        }
+    }
+
+    @Override
     public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
         return duration % 15 == 0;
     }
@@ -32,6 +47,7 @@ public class ReinforcementEffect extends MagicMobEffect {
     public int getColor() {
         return CUSTOM_COLOR;
     }
+
 
 
 }

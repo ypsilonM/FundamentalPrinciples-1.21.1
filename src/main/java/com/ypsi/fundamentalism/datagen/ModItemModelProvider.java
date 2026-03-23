@@ -21,9 +21,11 @@ public class ModItemModelProvider extends ItemModelProvider {
         basicItem(ModItems.MANA_FRUIT.get());
         basicItem(ModItems.ARCANE_MIXTURE.get());
         basicItem(ModItems.TEST_TUBE.get());
-        basicItem(ModItems.LUMINAIRE_EXTRACT.get());
-        basicItem(ModItems.FLASK.get());
 
+        basicItem(ModItems.PITCHER_EXTRACT.get());
+        basicItem(ModItems.LUMINAIRE_EXTRACT.get());
+
+        basicItem(ModItems.FLASK.get());
         basicItem(ModItems.MAGICAL_SHIELD.get());
 
         generateTonicModels();

@@ -88,21 +88,21 @@ config="${mod_id}.mixins.json"
 [[dependencies.${mod_id}]]
     modId = "irons_spellbooks"
     mandatory = true
-    versionRange = "[${irons_spells_version}, )"
+    versionRange = "[${irons_spells_version},)"
     ordering = "AFTER"
     side = "BOTH"
 
 [[dependencies.${mod_id}]]
     modId = "geckolib"
     mandatory = true
-    versionRange = "[4.7.5.1,)"
+    versionRange = "[${geckolib_version},)"
     ordering = "NONE"
     side = "BOTH"
 
 [[dependencies.${mod_id}]]
     modId = "playeranimator"
     mandatory = true
-    versionRange = "[2.0.1+1.21.1,)"
+    versionRange = "[${player_animator_version},)"
     ordering = "NONE"
     side = "BOTH"
 
@@ -112,15 +112,6 @@ config="${mod_id}.mixins.json"
     versionRange="[9.0.5+1.21.0,)"
     ordering="NONE"
     side="BOTH"
-
-[[dependencies.${mod_id}]]
-    modId = "additional_attributes"
-    mandatory = true
-    type = "required"
-    versionRange = "[1.2.2,)"
-    ordering = "NONE"
-    side = "BOTH"
-
 
 
 

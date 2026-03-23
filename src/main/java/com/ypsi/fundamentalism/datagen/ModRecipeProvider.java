@@ -1,15 +1,11 @@
 package com.ypsi.fundamentalism.datagen;
 
 import com.ypsi.fundamentalism.item.ModItems;
-import com.ypsi.fundamentalism.spellCategories.SpellCategoryProgression;
-import io.redspace.ironsspellbooks.IronsSpellbooks;
 import io.redspace.ironsspellbooks.registries.ItemRegistry;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.neoforge.common.conditions.IConditionBuilder;
 
 import java.util.concurrent.CompletableFuture;
@@ -36,14 +32,11 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .requires(Items.GLASS_PANE)
                 .unlockedBy("has_glass", has(Items.GLASS)).save(recipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.MANA_FRUIT.get())
-                .pattern("EFE")
-                .pattern("FAF")
-                .pattern("EFE")
-                .define('A', Items.GOLDEN_APPLE)
-                .define('F', Items.CHORUS_FRUIT)
-                .define('E', ItemRegistry.ARCANE_ESSENCE.get())
-                .unlockedBy("has_essence", has(ItemRegistry.ARCANE_ESSENCE.get())).save(recipeOutput);
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.MANA_FRUIT.get())
+                .requires(Items.GOLDEN_APPLE)
+                .requires(ModItems.PITCHER_EXTRACT)
+                .requires(ItemRegistry.CINDER_ESSENCE.get())
+                .unlockedBy("has_cinder_essence", has(ItemRegistry.CINDER_ESSENCE.get())).save(recipeOutput);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.BREWING, ModItems.TONIC.get())
                 .pattern(" C ")

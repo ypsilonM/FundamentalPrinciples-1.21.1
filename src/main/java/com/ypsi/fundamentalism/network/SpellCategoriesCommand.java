@@ -6,8 +6,9 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import com.ypsi.fundamentalism.spellCategories.SpellCategoryLevels;
-import com.ypsi.fundamentalism.spellCategories.SpellCategoryProgression;
+import com.ypsi.fundamentalism.attachments.SpellCategoryLevelsAttachment;
+import com.ypsi.fundamentalism.attachments.SpellCategoryProgression;
+import com.ypsi.fundamentalism.util.Principles;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
@@ -18,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class SpellCategoriesCommand {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-        dispatcher.register(Commands.literal("spellCategories")
+        dispatcher.register(Commands.literal("principle")
                 .requires(source -> source.hasPermission(0))
                 .then(Commands.literal("get")
                         .executes(context -> getLevels(context.getSource(), context.getSource().getPlayerOrException()))
@@ -35,7 +36,7 @@ public class SpellCategoriesCommand {
                                                 .executes(context -> setLevel(
                                                         context.getSource(),
                                                         EntityArgument.getPlayer(context, "target"),
-                                                        StringArgumentType.getString(context, "category"),
+                                                        Principles.valueOf(StringArgumentType.getString(context, "category").toUpperCase()),
                                                         IntegerArgumentType.getInteger(context, "level")
                                                 ))
                                         )
@@ -45,25 +46,15 @@ public class SpellCategoriesCommand {
         );
     }
     private static CompletableFuture<Suggestions> suggestCategories(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
-        String[] categories = {
-                "createEntity", "usesShoot", "usesSummon", "usesTargeting",
-                "hasRecasts", "usesTeleport", "addEffects",
-                "createsAoeEntities", "usesMobility", "usesRaycast",
-                "usesHealing", "usesPotentiation"
-        };
 
-        String currentInput = builder.getRemaining().toLowerCase();
-
-        for (String category : categories) {
-            if (category.toLowerCase().startsWith(currentInput)) {
-                builder.suggest(category);
-            }
+        for(Principles principle : Principles.values()){
+            builder.suggest(principle.name().toLowerCase());
         }
 
         return builder.buildFuture();
     }
     private static int getLevels(CommandSourceStack source, ServerPlayer player) {
-        SpellCategoryLevels levels = SpellCategoryProgression.getCategoryLevels(player);
+        SpellCategoryLevelsAttachment levels = SpellCategoryProgression.getCategoryLevels(player);
 
         source.sendSuccess(() -> Component.literal("Categories for " + player.getDisplayName().getString() + ":"), false);
 
@@ -71,7 +62,7 @@ public class SpellCategoriesCommand {
                 "createEntity", "usesShoot", "usesSummon", "usesTargeting",
                 "hasRecasts", "usesTeleport", "addEffects",
                 "createsAoeEntities", "usesMobility", "usesRaycast",
-                "usesHealing", "usesPotentiation"
+                "usesHealing", "usesPotentiation", "immutable"
         };
 
         for (String category : categories) {
@@ -91,12 +82,14 @@ public class SpellCategoriesCommand {
         return 1;
     }
 
-    private static int setLevel(CommandSourceStack source, ServerPlayer player, String category, int level) {
-        SpellCategoryProgression.setCategoryLevel(player, category, level);
-        SpellCategoryProgression.setCategoryExperience(player, category, 0);
+    private static int setLevel(CommandSourceStack source, ServerPlayer player, Principles principle, int level) {
+        String technicalName = SpellCategoryProgression.getTechnicalName(principle);
+
+        SpellCategoryProgression.setCategoryLevel(player, technicalName, level);
+        SpellCategoryProgression.setCategoryExperience(player, technicalName, 0);
 
         source.sendSuccess(() -> Component.literal(
-                "Set " + SpellCategoryProgression.getCategoryDisplayName(category) +
+                "Set " + SpellCategoryProgression.getCategoryDisplayName(technicalName) +
                         " to level " + level + " for " + player.getDisplayName().getString()
         ), true);
 

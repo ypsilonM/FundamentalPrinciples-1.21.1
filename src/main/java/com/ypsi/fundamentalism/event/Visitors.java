@@ -3,15 +3,20 @@ package com.ypsi.fundamentalism.event;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import org.objectweb.asm.*;
 
+import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import static com.ypsi.fundamentalism.FundamentalPrinciples.LOGGER;
 
 public class Visitors {
     public static class SpellAnalysisVisitor extends ClassVisitor {
         private final Set<String> detectedCategories = new HashSet<>();
         private final Set<String> entityClassesToAnalyze = new HashSet<>();
         private final Set<String> analyzedClasses = new HashSet<>();
+
+        private boolean foundGetSpellPower = false;
 
         public SpellAnalysisVisitor() {
             super(Opcodes.ASM9);
@@ -36,16 +41,26 @@ public class Visitors {
 
         public void analyzeChildEntity(String internalClassName) {
             try {
-                //System.out.println(" Analyzing Children C: " + internalClassName);
+                System.out.println(" Analyzing Children C: " + internalClassName);
+                LOGGER.info("          Children ASM Analyzing: {}", internalClassName);
 
-                ClassReader classReader = new ClassReader(internalClassName);
-                ChildEntityAnalyzer childVisitor = new ChildEntityAnalyzer();
-                classReader.accept(childVisitor, 0);
+                ClassLoader classLoader = this.getClass().getClassLoader();
+                String resourcePath = internalClassName + ".class";
 
-                Set<String> childCats = childVisitor.getDetectedCategories();
-                //System.out.println(" RESULT: " + internalClassName + " -> " + childCats);
+                try (InputStream classStream = classLoader.getResourceAsStream(resourcePath)) {
+                    if (classStream == null) {
+                        LOGGER.error("          Cannot find child class: {} with ClassLoader: {}", resourcePath, classLoader);
+                        return;
+                    }
 
-                detectedCategories.addAll(childCats);
+                    ClassReader classReader = new ClassReader(classStream);
+                    ChildEntityAnalyzer childVisitor = new ChildEntityAnalyzer();
+                    classReader.accept(childVisitor, ClassReader.SKIP_DEBUG);
+
+                    Set<String> childCats = childVisitor.getDetectedCategories();
+                    LOGGER.info("          RESULTs for {}: {}", internalClassName, childCats);
+                    detectedCategories.addAll(childCats);
+                }
 
             } catch (Exception e) {
                 System.out.println(" ERROR " + internalClassName + ": " + e.getClass().getSimpleName() + ": " + e.getMessage());
@@ -57,7 +72,16 @@ public class Visitors {
             if ("getRecastCount".equals(name) && descriptor.equals("(ILnet/minecraft/world/entity/LivingEntity;)I")) {
                 detectedCategories.add("hasRecasts");
             }
+            if ("getSpellPower".equals(name) || "getEntityPowerMultiplier".equals(name)) {
+                foundGetSpellPower = true;
+            }
             return new MethodAnalyzer();
+        }
+
+        public void processPowerCategory() {
+            if (!foundGetSpellPower) {
+                detectedCategories.add("immutable");
+            }
         }
 
         public class MethodAnalyzer extends MethodVisitor {
@@ -85,6 +109,9 @@ public class Visitors {
                 String category = categoryMapping.get(name);
                 if (category != null && matchesOwner(owner, name)) {
                     detectedCategories.add(category);
+                }
+                if ("getSpellPower".equals(name) || "getEntityPowerMultiplier".equals(name)) {
+                    foundGetSpellPower = true;
                 }
             }
 
@@ -199,7 +226,10 @@ public class Visitors {
             }
             return false;
         }
-        public Set<String> getDetectedCategories() { return detectedCategories; }
+        public Set<String> getDetectedCategories() {
+            processPowerCategory();
+            return detectedCategories;
+        }
         public Set<String> getEntityClassesToAnalyze() { return entityClassesToAnalyze; }
     }
 }

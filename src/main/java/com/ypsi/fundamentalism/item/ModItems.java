@@ -26,7 +26,10 @@ public class ModItems {
             () -> new Item(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<Item> TEST_TUBE = ITEMS.register("test_tube",
             () -> new Item(new Item.Properties().stacksTo(16)));
+
     public static final DeferredItem<Item> LUMINAIRE_EXTRACT = ITEMS.register("luminaire_extract",
+            () -> new Item(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> PITCHER_EXTRACT = ITEMS.register("pitcher_extract",
             () -> new Item(new Item.Properties().stacksTo(1)));
 
     public static final DeferredItem<Item> TONIC = ITEMS.register("tonic",
@@ -51,7 +54,7 @@ public class ModItems {
             () -> new Item(new Item.Properties().stacksTo(1)));
 
     public static final DeferredItem<Item> MAGICAL_SHIELD = ITEMS.register("magical_shield",
-            () -> new Item(new Item.Properties()));
+            () -> new EchoShield(new Item.Properties().durability(672)));
 
 
     private static <T extends Item> DeferredItem<T> registerItem(String name, Supplier<T> item){

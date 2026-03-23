@@ -1,5 +1,6 @@
 package com.ypsi.fundamentalism.mixins;
 
+import com.ypsi.fundamentalism.Config;
 import com.ypsi.fundamentalism.component.YpsDataComponents;
 import io.redspace.ironsspellbooks.api.spells.ISpellContainer;
 import io.redspace.ironsspellbooks.api.spells.SpellRarity;
@@ -9,6 +10,8 @@ import io.redspace.ironsspellbooks.item.SpellBook;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.neoforge.common.ModConfigSpec;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -28,7 +31,9 @@ public abstract class InscriptionMixin {
             shift = At.Shift.AFTER
     ), cancellable = true, remap = false)
     private void ypsi$verifySpellBookTier(Player pPlayer, int pId, CallbackInfoReturnable<Boolean> cir) {
-
+        if (!Config.restrictedInsc){
+            cir.setReturnValue(true);
+        }
         ItemStack spellBookItemStack = getSpellBookSlot().getItem();
         if (spellBookItemStack.getItem() instanceof SpellBook) {
             if (spellBookItemStack.has(YpsDataComponents.SPELLBOOK_LEVEL.get())) {

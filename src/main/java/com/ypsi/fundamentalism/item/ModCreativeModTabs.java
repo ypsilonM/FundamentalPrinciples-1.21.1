@@ -24,6 +24,7 @@ public class ModCreativeModTabs {
                         output.accept(ModItems.ARCANE_MIXTURE);
                         output.accept(ModItems.TEST_TUBE);
                         output.accept(ModItems.LUMINAIRE_EXTRACT);
+                        output.accept(ModItems.PITCHER_EXTRACT);
                         output.accept(ModItems.FLASK);
                         output.accept(ModItems.TONIC);
                         output.accept(ModItems.IMP_SPAWN_EGG);

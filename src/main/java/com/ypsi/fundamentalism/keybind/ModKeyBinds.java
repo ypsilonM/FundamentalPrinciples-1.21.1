@@ -35,7 +35,6 @@ public class ModKeyBinds {
                     "key.category.fundamentalism"
             );
 
-
     private static Supplier<KeyMapping> registerKey(String name, KeyConflictContext conflictContext, InputConstants.Type inputType, int keyCode, String category) {
         return Suppliers.memoize(() -> new KeyMapping(
                 "key.fundamentalism." + name,
@@ -45,11 +44,12 @@ public class ModKeyBinds {
                 category
         ))::get;
     }
-
+    @OnlyIn(Dist.CLIENT)
     public static void register(IEventBus eventBus) {
         eventBus.addListener(ModKeyBinds::registerKeybinds);
     }
 
+    @OnlyIn(Dist.CLIENT)
     private static void registerKeybinds(RegisterKeyMappingsEvent event) {
         event.register(REINFORCE_KEY.get());
         event.register(SELECTION_KEY.get());

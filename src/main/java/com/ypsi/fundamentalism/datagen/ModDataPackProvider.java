@@ -1,6 +1,7 @@
 package com.ypsi.fundamentalism.datagen;
 
 import com.ypsi.fundamentalism.FundamentalPrinciples;
+import com.ypsi.fundamentalism.attributes.YpsDamageTypes;
 import com.ypsi.fundamentalism.worldgen.ModBiomeModifiers;
 import com.ypsi.fundamentalism.worldgen.ModConfiguredFeatures;
 import com.ypsi.fundamentalism.worldgen.ModPlacedFeatures;
@@ -17,6 +18,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class ModDataPackProvider extends DatapackBuiltinEntriesProvider {
     public static final RegistrySetBuilder BUILDER = new RegistrySetBuilder()
+            .add(Registries.DAMAGE_TYPE, YpsDamageTypes::bootstrap)
             .add(Registries.CONFIGURED_FEATURE, ModConfiguredFeatures::bootstrap)
             .add(Registries.PLACED_FEATURE, ModPlacedFeatures::bootstrap)
             .add(NeoForgeRegistries.Keys.BIOME_MODIFIERS, ModBiomeModifiers::bootstrap)

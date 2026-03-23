@@ -5,9 +5,11 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.EntityTypeTagsProvider;
 import net.minecraft.tags.EntityTypeTags;
+import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 
 import javax.annotation.Nullable;
+import javax.swing.text.html.parser.Entity;
 import java.util.concurrent.CompletableFuture;
 
 public class ModEntityTagProvider extends EntityTypeTagsProvider {
@@ -27,5 +29,6 @@ public class ModEntityTagProvider extends EntityTypeTagsProvider {
 
         this.tag(EntityTypeTags.SENSITIVE_TO_BANE_OF_ARTHROPODS).add(ModEntities.VENEMERUS.get());
         this.tag(EntityTypeTags.IGNORES_POISON_AND_REGEN).add(ModEntities.VENEMERUS.get());
+        this.tag(EntityTypeTags.ARTHROPOD).add(ModEntities.VENEMERUS.get());
     }
 }

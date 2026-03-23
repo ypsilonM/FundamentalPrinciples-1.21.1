@@ -31,6 +31,8 @@ public class ModEventHandlers {
     public static void onAttributeCreate(EntityAttributeModificationEvent event) {
         event.add(EntityType.PLAYER, YpsAttributes.MAX_EXHAUSTION);
         event.add(EntityType.PLAYER, YpsAttributes.EXHAUSTION_REGEN);
+        event.add(EntityType.PLAYER, YpsAttributes.FUNDAMENTALISM_SPELL_POWER);
+        event.add(EntityType.PLAYER, YpsAttributes.FUNDAMENTALISM_MAGIC_RESIST);
     }
     @SubscribeEvent
     public static void registerSpawnPositions(RegisterSpawnPlacementsEvent event){

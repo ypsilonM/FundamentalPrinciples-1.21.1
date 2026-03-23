@@ -3,8 +3,7 @@ package com.ypsi.fundamentalism.entity;
 import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.entity.mobs.hemomancer.HemomancerEntity;
 import com.ypsi.fundamentalism.entity.mobs.imp.ImpEntity;
-import com.ypsi.fundamentalism.entity.mobs.venemerus.VenemerusEntity;
-import com.ypsi.fundamentalism.entity.mobs.witch.SummonedWitch;
+import com.ypsi.fundamentalism.entity.mobs.venemerus.VenemerusEntity; 
 import com.ypsi.fundamentalism.entity.spells.chains.ChainsEntity;
 import com.ypsi.fundamentalism.entity.spells.holy_lightning.HolyLightningProjectile;
 import com.ypsi.fundamentalism.entity.spells.proiectumProjectile.ProiectumProjectile;
@@ -93,7 +92,7 @@ public class ModEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<VenemerusEntity>> VENEMERUS =
             ENTITY_TYPES.register("venemerus", () ->
                     EntityType.Builder.<VenemerusEntity>of(VenemerusEntity::new, MobCategory.MONSTER)
-                            .sized(2f, 1.2f)
+                            .sized(1.5f, 1f)
                             .clientTrackingRange(10)
                             .build(String.valueOf(ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "venemerus")))
             );

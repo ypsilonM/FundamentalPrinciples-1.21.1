@@ -1,7 +1,11 @@
 package com.ypsi.fundamentalism.mixins;
 
+import com.ypsi.fundamentalism.attachments.YpsAttachments;
 import com.ypsi.fundamentalism.config.SpellCategoriesGenerator;
-import com.ypsi.fundamentalism.spellCategories.SpellCategoryProgression;
+import com.ypsi.fundamentalism.attachments.AvailableSpellsAttachment;
+import com.ypsi.fundamentalism.attachments.SpellCategoryProgression;
+import com.ypsi.fundamentalism.util.Principles;
+import com.ypsi.fundamentalism.util.Util;
 import io.redspace.ironsspellbooks.IronsSpellbooks;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import io.redspace.ironsspellbooks.capabilities.magic.MagicManager;
@@ -28,8 +32,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+
+//CLIENT STUFF
 @Mixin(SpellWheelOverlay.class)
 public class SpellWheelOverlayMixin {
+
     @Inject(method = "render", at = @At("TAIL"), remap = false)
     private void addAllExtraInfo(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
         try {
@@ -84,7 +91,7 @@ public class SpellWheelOverlayMixin {
                         int categoryLevel = SpellCategoryProgression.getCategoryLevel(minecraft.player, "usesTeleport");
                         int cooldown = MagicManager.getEffectiveSpellCooldown(selectedSpell.getSpell(), minecraft.player, swsm.getSpellSlot(wheelSelection).getCastSource()) / 20;
 
-                        int probability = (int) calculateProbabilityForFailedTp(categoryLevel, cooldown);
+                        int probability = (int) Util.getFailureTPChance(categoryLevel, cooldown);
                         String probabilityText = (100 - probability) + "% Success";
 
                         Component probabilityComponent = Component.literal(probabilityText)
@@ -124,17 +131,35 @@ public class SpellWheelOverlayMixin {
         }
     }
 
+    @Redirect(
+            method = "render",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lio/redspace/ironsspellbooks/api/spells/AbstractSpell;getManaCost(I)I"
+            ),
+            remap = false
+    )
+    private int redirectGetManaCost(AbstractSpell spell, int spellLevel,
+                                    GuiGraphics guiHelper,
+                                    DeltaTracker deltaTracker) {
+
+        Player player =Minecraft.getInstance().player;
+
+        int originalCost = spell.getManaCost(spellLevel);
+        int certumLevel = 0;
+        if(player!=null){
+            certumLevel = SpellCategoryProgression.getCategoryLevel(player, Principles.CERTUM);
+        }
+        if(SpellCategoriesGenerator.isInCategory(spell.getSpellId(), "immutable")){
+           originalCost = (int)(originalCost * (1+Util.manaMultiplier( player.getData(YpsAttachments.LEVEL_EXHAUSTION), certumLevel )));
+        }
+        return (originalCost);
+    }
+
 
     private List<String> getSpellCategories(AbstractSpell spell) {
         Set<String> categories = SpellCategoriesGenerator.getCategoriesForSpell(spell.getSpellId());
         return new ArrayList<>(categories);
     }
-    private static double calculateProbabilityForFailedTp(int categoryLevel, int cooldown) {
-        if(cooldown==0) cooldown = 1;
-        double chance = Math.min(90,((100/(cooldown))*2));
-        return chance - (categoryLevel*0.025*chance);
-    }
-    private float calculateProbabilityForRecast(int categoryLevel) {
-        return (float) (categoryLevel * 0.04 * 100);
-    }
+
 }

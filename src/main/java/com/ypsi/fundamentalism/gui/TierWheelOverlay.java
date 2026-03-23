@@ -3,48 +3,34 @@ package com.ypsi.fundamentalism.gui;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.ypsi.fundamentalism.network.ModNetwork;
-import com.ypsi.fundamentalism.network.packets.UpdateSpellLevelPacket;
-import com.ypsi.fundamentalism.util.SpellAttributeUtils;
+import com.ypsi.fundamentalism.attachments.YpsAttachments;
+import com.ypsi.fundamentalism.network.packets.ClientSpellsUpdatePacket;
+import com.ypsi.fundamentalism.attachments.AvailableSpellsAttachment;
 import com.ypsi.fundamentalism.util.Util;
 import io.redspace.ironsspellbooks.IronsSpellbooks;
-import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.magic.SpellSelectionManager;
 import io.redspace.ironsspellbooks.api.spells.SpellData;
 import io.redspace.ironsspellbooks.api.util.Utils;
-import io.redspace.ironsspellbooks.capabilities.magic.SyncedSpellData;
-import io.redspace.ironsspellbooks.gui.overlays.SpellSelection;
-import io.redspace.ironsspellbooks.gui.overlays.SpellWheelOverlay;
-import io.redspace.ironsspellbooks.network.gui.SelectSpellPacket;
-import io.redspace.ironsspellbooks.player.ClientInputEvents;
 import io.redspace.ironsspellbooks.player.ClientMagicData;
-import io.redspace.ironsspellbooks.util.TooltipsUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.LayeredDraw;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.core.Holder;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
-import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec2;
-import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
-import org.lwjgl.system.Platform;
+
+import java.util.HashMap;
+import java.util.List;
 
 public class TierWheelOverlay implements LayeredDraw.Layer {
     public static TierWheelOverlay instance = new TierWheelOverlay();
@@ -53,6 +39,7 @@ public class TierWheelOverlay implements LayeredDraw.Layer {
 
     private final Vector4f lineColor = new Vector4f(1f, .85f, .7f, 1f);
     private final Vector4f radialButtonColor = new Vector4f(.04f, .03f, .01f, .6f);
+
     private final Vector4f highlightColor = new Vector4f(.8f, .7f, .55f, .7f);
 
     private final float ringInnerEdge = 20;
@@ -77,28 +64,114 @@ public class TierWheelOverlay implements LayeredDraw.Layer {
         if (wheelSelection >= 0 && selectedSpell != null) {
             Player player = Minecraft.getInstance().player;
             if(player!=null) {
-                String spellId = selectedSpell.getSpell().getSpellId();
-                String aaSpellId = spellId.replace(":", "/");
+                AvailableSpellsAttachment att = player.getData(YpsAttachments.SPELL_LIST);
+                HashMap<String, Integer> updatedSpells = bin(player, att);
+                PacketDistributor.sendToServer(new ClientSpellsUpdatePacket(updatedSpells));
 
+//                String spellId = selectedSpell.getSpell().getSpellId();
+//                int totalLevels = selectedSpell.getLevel();
+//                int levelSelected = wheelSelection + 1;
+//                int targetLevel = levelSelected - totalLevels;
+//
+//                att.setSpellLevel(spellId, targetLevel);
+
+                //String aaSpellId = spellId.replace(":", "/");
+
+
+                //PacketDistributor.sendToServer(new ClientSpellsUpdatePacket(clientSpells));
+
+                //PacketDistributor.sendToServer(new UpdateSpellLevelPacket(aaSpellId, targetLevel));
+//                player.displayClientMessage(
+//                        Component.literal("Spell Level: " + att.getSpellLevel(spellId)).withStyle(ChatFormatting.GOLD),
+//                        true
+//                );
+//                player.playSound(
+//                        SoundEvents.BOOK_PAGE_TURN,
+//                        1,
+//                        1.2F
+//                );
+
+                //String spellId = selectedSpell.getSpell().getSpellId();
                 int totalLevels = selectedSpell.getLevel();
                 int levelSelected = wheelSelection + 1;
                 int targetLevel = levelSelected - totalLevels;
 
-
-                PacketDistributor.sendToServer(new UpdateSpellLevelPacket(aaSpellId, targetLevel));
                 player.displayClientMessage(
                         Component.literal("Spell Level: " + levelSelected).withStyle(ChatFormatting.GOLD),
                         true
                 );
-                player.playSound(
-                        SoundEvents.BOOK_PAGE_TURN,
-                        1,
-                        1.2F
-                );
+                player.playSound(SoundEvents.BOOK_PAGE_TURN, 1, 1.2F);
             }
         }
         Minecraft.getInstance().mouseHandler.grabMouse();
     }
+
+    private HashMap<String, Integer> bin(Player player, AvailableSpellsAttachment att){
+        // Obtener hechizos equipados actualmente
+        List<SpellSelectionManager.SelectionOption> equippedSpells = ClientMagicData.getSpellSelectionManager().getAllSpells();
+        HashMap<String, Integer> equippedMap = new HashMap<>();
+
+        // Llenar mapa con hechizos equipados
+        equippedSpells.forEach(selection -> {
+            String id = selection.spellData.getSpell().getSpellId();
+            //int lvl = selection.spellData.getLevel();
+            equippedMap.put(id, 0);
+        });
+
+        HashMap<String, Integer> attList = att.getSpells();
+
+        // Merge: si un hechizo existe en attachment, usar ese nivel
+        attList.forEach((string, integer) -> {
+            if(equippedMap.containsKey(string)){
+                equippedMap.put(string, integer); // Reemplazar con nivel del attachment
+            }
+        });
+
+        // Aplicar el cambio específico de la rueda
+        String spellId = selectedSpell.getSpell().getSpellId();
+        int totalLevels = selectedSpell.getLevel();
+        int levelSelected = wheelSelection + 1;
+        int levelReduction = -(levelSelected - totalLevels);
+
+
+        if (levelReduction < 0) {
+            equippedMap.remove(spellId);
+        } else {
+            equippedMap.remove(spellId);
+            equippedMap.put(spellId, levelReduction);
+        }
+
+        // Actualizar attachment LOCAL con los spells mergeados
+        att.clearSpells();
+        att.addSpells(equippedMap);
+
+        // Devolver el mapa actualizado para enviar al servidor
+        return equippedMap;
+    }
+//    private void bin(Player player, AvailableSpellsAttachment att){
+//        List<SpellSelectionManager.SelectionOption> equippedSpells = ClientMagicData.getSpellSelectionManager().getAllSpells();
+//        HashMap<String, Integer> equippedMap = new HashMap<>();
+//
+//        equippedSpells.forEach(selection -> {
+//            String id = selection.spellData.getSpell().getSpellId();
+//            int lvl = selection.spellData.getLevel();
+//            equippedMap.put(id, lvl);
+//        });
+//
+//
+//        HashMap<String, Integer> attList = att.getSpells();
+//
+//        attList.forEach(((string, integer) -> {
+//            if(equippedMap.containsKey(string)){
+//                equippedMap.remove(string);
+//                equippedMap.put(string, integer);
+//            }
+//        }));
+//
+//        att.clearSpells();
+//        att.addSpells(attList);
+//
+//    }
 
     public void render(GuiGraphics guiHelper, DeltaTracker deltaTracker) {
         if (Minecraft.getInstance().options.hideGui || Minecraft.getInstance().player.isSpectator()) {
@@ -149,7 +222,7 @@ public class TierWheelOverlay implements LayeredDraw.Layer {
 
         guiHelper.fill(0, 0, screenWidth, screenHeight, 0);
 
-        drawRadialBackgrounds(guiHelper, centerX, centerY, wheelSelection, totalLevels);
+        drawRadialBackgrounds(guiHelper, centerX, centerY, wheelSelection, totalLevels, selectedSpell);
         drawDividingLines(guiHelper, centerX, centerY, totalLevels);
 
 
@@ -254,7 +327,7 @@ public class TierWheelOverlay implements LayeredDraw.Layer {
         RenderSystem.disableBlend();
     }
 
-    private void drawRadialBackgrounds(GuiGraphics guiGraphics, float centerX, float centerY, int selectedSpellIndex, int totalLevels) {
+    private void drawRadialBackgrounds(GuiGraphics guiGraphics, float centerX, float centerY, int selectedSpellIndex, int totalLevels, SpellData spellData) {
         float quarterCircle = Mth.HALF_PI;
         int totalSpellsAvailable = totalLevels;
         int segments;
@@ -283,7 +356,18 @@ public class TierWheelOverlay implements LayeredDraw.Layer {
             boolean isHighlighted = (i * totalSpellsAvailable) / segments == selectedSpellIndex;
 
             Vector4f color = radialButtonColor;
-            if (isHighlighted) color = highlightColor;
+            if (isHighlighted) {
+                int intColor = spellData.getSpell().getRarity(selectedSpellIndex+1).getChatFormatting().getColor();
+                if (intColor != 0) {
+                    float r = ((intColor >> 16) & 0xFF) / 255.0f;
+                    float g = ((intColor >> 8) & 0xFF) / 255.0f;
+                    float b = (intColor & 0xFF) / 255.0f;
+
+                    color = new Vector4f(r, g, b, 0.7f);
+                } else {
+                    color = new Vector4f(.8f, .7f, .55f, .7f);
+                }
+            }
 
             final VertexConsumer vertexConsumer = guiGraphics.bufferSource().getBuffer(RenderType.gui());
             final Matrix4f m = guiGraphics.pose().last().pose();

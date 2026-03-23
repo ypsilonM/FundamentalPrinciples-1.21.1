@@ -16,9 +16,13 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.entries.EmptyLootItem;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.ApplyBonusCount;
+import net.minecraft.world.level.storage.loot.functions.EnchantedCountIncreaseFunction;
 import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
+import net.minecraft.world.level.storage.loot.predicates.LootItemKilledByPlayerCondition;
+import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceWithEnchantedBonusCondition;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
@@ -30,75 +34,77 @@ public class ModEntityLootTableProvider extends EntityLootSubProvider {
 
     protected ModEntityLootTableProvider(HolderLookup.Provider registries) {
         super(FeatureFlags.REGISTRY.allFlags(), registries);
+
     }
+
 
     @Override
     public void generate() {
         add(ModEntities.HEMOMANCER.get(),
                 LootTable.lootTable()
-                        .withPool(createHemomancerDrops(
-                                ItemRegistry.ARCANE_ESSENCE.get(), 3f, 7f,
-                                Items.BONE, 1f, 3f
-                        )));
+                        .withPool(createBonePool(1, 2))
+                        .withPool(createArcanePool(3,6, 0.5F, 1, 2))
+        );
         add(ModEntities.IMP.get(),
                 LootTable.lootTable()
-                        .withPool(createImpDrops(
-                                ItemRegistry.ARCANE_ESSENCE.get(), 1f, 4f,
-                                Items.COAL, 1f, 3f
-                        )));
+                        .withPool(createCoalPool(1, 4))
+                        .withPool(createArcanePool(2, 3, 0.3F, 0, 1))
+        );
         add(ModEntities.VENEMERUS.get(),
                 LootTable.lootTable()
-                        .withPool(createVenuDrops(
-                                ItemRegistry.ARCANE_ESSENCE.get(), 2f, 3f,
-                                Items.SPIDER_EYE, 1f, 1f
-                        )));
+                        .withPool(createSpiderEyePool(1, 1))
+                        .withPool(createArcanePool(2, 3, 0.2F, 1, 1))
+        );
+    }
 
-    }
-    protected LootPool.Builder createHemomancerDrops(Item item1, float minDrop1, float maxDrop1, Item item2, float minDrop2, float maxDrop2){
-        HolderLookup.RegistryLookup<Enchantment> registryLookup = this.registries.lookupOrThrow(Registries.ENCHANTMENT);
+    protected LootPool.Builder createCoalPool(int min, int max) {
         return LootPool.lootPool()
-                .setRolls(ConstantValue.exactly(2))
-                .add(LootItem.lootTableItem(item1)
-                        .setWeight(1)
-                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(minDrop1, maxDrop1)))
-                )
-//                        .apply(ApplyBonusCount.addUniformBonusCount(registryLookup.getOrThrow(Enchantments.LOOTING))))
-                .add(LootItem.lootTableItem(item2)
-                        .setWeight(2)
-                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(minDrop2, maxDrop2)))
+                .setRolls(ConstantValue.exactly(1))
+                .add(LootItem.lootTableItem(Items.COAL)
+                        .apply(SetItemCountFunction.setCount(
+                                UniformGenerator.between(min, max)
+                        ))
+                        .apply(EnchantedCountIncreaseFunction.lootingMultiplier(
+                                this.registries, UniformGenerator.between(0,1)))
+                        .when(LootItemKilledByPlayerCondition.killedByPlayer())
                 );
-//                        .apply(ApplyBonusCount.addUniformBonusCount(registryLookup.getOrThrow(Enchantments.LOOTING))));
     }
-    protected LootPool.Builder createImpDrops(Item item1, float minDrop1, float maxDrop1, Item item2, float minDrop2, float maxDrop2){
-        HolderLookup.RegistryLookup<Enchantment> registryLookup = this.registries.lookupOrThrow(Registries.ENCHANTMENT);
+    protected LootPool.Builder createSpiderEyePool(int min, int max) {
         return LootPool.lootPool()
-                .setRolls(ConstantValue.exactly(2))
-                .add(LootItem.lootTableItem(item1)
-                        .setWeight(1)
-                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(minDrop1, maxDrop1)))
-                )
-//                        .apply(ApplyBonusCount.addUniformBonusCount(registryLookup.getOrThrow(Enchantments.LOOTING))))
-                .add(LootItem.lootTableItem(item2)
-                        .setWeight(2)
-                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(minDrop2, maxDrop2)))
+                .setRolls(ConstantValue.exactly(1))
+                .add(LootItem.lootTableItem(Items.SPIDER_EYE)
+                        .apply(SetItemCountFunction.setCount(
+                                UniformGenerator.between(min, max)
+                        ))
+                        .apply(EnchantedCountIncreaseFunction.lootingMultiplier(
+                                this.registries, UniformGenerator.between(0,1)))
+                        .when(LootItemKilledByPlayerCondition.killedByPlayer())
                 );
-//                        .apply(ApplyBonusCount.addUniformBonusCount(registryLookup.getOrThrow(Enchantments.LOOTING))));
     }
-    protected LootPool.Builder createVenuDrops(Item item1, float minDrop1, float maxDrop1, Item item2, float minDrop2, float maxDrop2){
-        HolderLookup.RegistryLookup<Enchantment> registryLookup = this.registries.lookupOrThrow(Registries.ENCHANTMENT);
+    protected LootPool.Builder createBonePool(int min, int max) {
         return LootPool.lootPool()
-                .setRolls(ConstantValue.exactly(2))
-                .add(LootItem.lootTableItem(item1)
-                        .setWeight(1)
-                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(minDrop1, maxDrop1)))
-                )
-//                        .apply(ApplyBonusCount.addUniformBonusCount(registryLookup.getOrThrow(Enchantments.LOOTING))))
-                .add(LootItem.lootTableItem(item2)
-                        .setWeight(2)
-                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(minDrop2, maxDrop2)))
+                .setRolls(ConstantValue.exactly(1))
+                .add(LootItem.lootTableItem(Items.BONE)
+                        .apply(SetItemCountFunction.setCount(
+                                UniformGenerator.between(min, max)
+                        ))
+                        .apply(EnchantedCountIncreaseFunction.lootingMultiplier(
+                                this.registries, UniformGenerator.between(1,2)))
+                        .when(LootItemKilledByPlayerCondition.killedByPlayer())
                 );
-//                        .apply(ApplyBonusCount.addUniformBonusCount(registryLookup.getOrThrow(Enchantments.LOOTING))));
     }
+    protected LootPool.Builder createArcanePool(int min, int max, float chance, int minAd, int maxAd) {
+        return LootPool.lootPool()
+                .setRolls(ConstantValue.exactly(1))
+                .add(LootItem.lootTableItem(ItemRegistry.ARCANE_ESSENCE.get())
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(min, max)))
+                        .apply(EnchantedCountIncreaseFunction.lootingMultiplier(
+                                this.registries, UniformGenerator.between(minAd,maxAd)))
+                        .when(LootItemKilledByPlayerCondition.killedByPlayer())
+                        .when(LootItemRandomChanceCondition.randomChance(chance))
+                );
+    }
+
     @Override
     protected Stream<EntityType<?>> getKnownEntityTypes() {
         Set<EntityType<?>> entitiesWithLoot = Set.of(

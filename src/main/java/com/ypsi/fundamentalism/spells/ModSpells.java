@@ -7,11 +7,10 @@ import com.ypsi.fundamentalism.spells.ender.LapsusSpell;
 import com.ypsi.fundamentalism.spells.ender.PullSpell;
 import com.ypsi.fundamentalism.spells.blood.BloodstreamSpell;
 import com.ypsi.fundamentalism.spells.evocation.TauntSpell;
-import com.ypsi.fundamentalism.spells.fire.FlameStrengthSpell;
+import com.ypsi.fundamentalism.spells.fire.BurningSpiritSpell;
 import com.ypsi.fundamentalism.spells.fire.PyrokinesisSpell;
 import com.ypsi.fundamentalism.spells.fire.SolSpell;
-import com.ypsi.fundamentalism.spells.fundamentalism.ProiectumSpell;
-import com.ypsi.fundamentalism.spells.fundamentalism.VoidMirrorSpell;
+import com.ypsi.fundamentalism.spells.fundamentalism.RemediumSpell;
 import com.ypsi.fundamentalism.spells.holy.HolyLightningSpell;
 import com.ypsi.fundamentalism.spells.holy.SacredDiskSpell;
 import com.ypsi.fundamentalism.spells.ice.ChainsSpell;
@@ -36,7 +35,7 @@ public class ModSpells {
     //------------>ice<----------------
     public static final Supplier<AbstractSpell> CHAINS = registerSpell(new ChainsSpell());
     //------------>fire<----------------
-    public static final Supplier<AbstractSpell> FLAME_GRANT_STRENGTH = registerSpell(new FlameStrengthSpell());
+    public static final Supplier<AbstractSpell> FLAME_GRANT_STRENGTH = registerSpell(new BurningSpiritSpell());
     public static final Supplier<AbstractSpell> PYROKINESIS = registerSpell(new PyrokinesisSpell());
     public static final Supplier<AbstractSpell> SOL_SPELL = registerSpell(new SolSpell());
     //------------>blood<----------------
@@ -62,5 +61,5 @@ public class ModSpells {
 
     //FUNDAMENTALISM
     //public static final Supplier<AbstractSpell> PROIECTUM_PRINCIPLE = registerSpell(new ProiectumSpell());
-
+    public static final Supplier<AbstractSpell> REMEDIUM_SPELL = registerSpell(new RemediumSpell());
 }

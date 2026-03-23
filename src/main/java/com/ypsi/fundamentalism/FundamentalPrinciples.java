@@ -22,15 +22,14 @@ import com.ypsi.fundamentalism.keybind.ModKeyBinds;
 import com.ypsi.fundamentalism.network.ExhaustionCommand;
 import com.ypsi.fundamentalism.network.ModNetwork;
 import com.ypsi.fundamentalism.network.SpellCategoriesCommand;
-import com.ypsi.fundamentalism.particle.ConstellationParticle;
-import com.ypsi.fundamentalism.particle.ModParticles;
-import com.ypsi.fundamentalism.particle.ReinforceParticles;
-import com.ypsi.fundamentalism.particle.SolAppearanceParticle;
+import com.ypsi.fundamentalism.network.SpellbookLevelCommand;
+import com.ypsi.fundamentalism.particle.*;
 import com.ypsi.fundamentalism.spells.ModSpells;
 import com.ypsi.fundamentalism.spells.YpsSchoolRegistry;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTabs;
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
@@ -61,9 +60,9 @@ public class FundamentalPrinciples {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public FundamentalPrinciples(IEventBus modEventBus, ModContainer modContainer) {
+
         modEventBus.addListener(this::commonSetup);
         NeoForge.EVENT_BUS.register(this);
-
 
         ModCreativeModTabs.register(modEventBus);
         ModItems.register(modEventBus);
@@ -74,9 +73,7 @@ public class FundamentalPrinciples {
         ModEffects.register(modEventBus);
         ModParticles.register(modEventBus);
 
-        ModKeyBinds.register(modEventBus);
         ModNetwork.register(modEventBus);
-
         ModEntities.register(modEventBus);
 
         YpsAttributes.register(modEventBus);
@@ -89,23 +86,33 @@ public class FundamentalPrinciples {
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
 
+        if (FMLEnvironment.dist == Dist.CLIENT) {
+            clientReg(modEventBus);
+        }
+
+
     }
+    private void clientReg(IEventBus modEventBus) {
+        ModKeyBinds.register(modEventBus);
+    }
+
     @SubscribeEvent
     public void registerCommands(RegisterCommandsEvent event) {
         ExhaustionCommand.register(event.getDispatcher());
         SpellCategoriesCommand.register(event.getDispatcher());
+        SpellbookLevelCommand.register(event.getDispatcher());
 
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
-        LOGGER.info("HELLO FROM COMMON SETUP");
-
-        if (Config.logDirtBlock)
-            LOGGER.info("DIRT BLOCK >> {}", BuiltInRegistries.BLOCK.getKey(Blocks.DIRT));
-
-        LOGGER.info(Config.magicNumberIntroduction + Config.magicNumber);
-
-        Config.items.forEach((item) -> LOGGER.info("ITEM >> {}", item.toString()));
+//        LOGGER.info("HELLO FROM COMMON SETUP");
+//
+//        if (Config.logDirtBlock)
+//            LOGGER.info("DIRT BLOCK >> {}", BuiltInRegistries.BLOCK.getKey(Blocks.DIRT));
+//
+//        LOGGER.info(Config.magicNumberIntroduction + Config.magicNumber);
+//
+//        Config.items.forEach((item) -> LOGGER.info("ITEM >> {}", item.toString()));
     }
 
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
@@ -142,6 +149,8 @@ public class FundamentalPrinciples {
         public static void registerParticleFactories(RegisterParticleProvidersEvent event) {
             event.registerSpriteSet(ModParticles.REINFORCEMENT_PARTICLE.get(), ReinforceParticles.Provider::new);
             event.registerSpriteSet(ModParticles.CONSTELLATION_PARTICLE.get(), ConstellationParticle.Provider::new);
+
+            event.registerSpriteSet(ModParticles.MINDFUL_PARTICLE.get(), MindfulParticle.Provider::new);
             //event.registerSpriteSet(ModParticles.SOL_PARTICLE.get(), SolAppearanceParticle.Provider::new);
         }
 

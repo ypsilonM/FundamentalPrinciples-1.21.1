@@ -35,7 +35,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Optional;
 
-@AutoSpellConfig
 public class StealSummonSpell extends AbstractSpell {
     private final ResourceLocation spellId = ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "summon_steal");
 
@@ -105,47 +104,48 @@ public class StealSummonSpell extends AbstractSpell {
     }
 
 
-    @Override
-    public void onCast(Level world, int spellLevel, LivingEntity entity, CastSource castSource, MagicData playerMagicData) {
-        if (playerMagicData.getAdditionalCastData() instanceof TargetEntityCastData targetingData) {
-
-            var targetEntity = targetingData.getTarget((ServerLevel) world);
-            if (targetEntity != null) {
-
-                if(targetEntity instanceof IMagicSummon summon) {
-
-                    if (!SummonManager.getSummons(entity).contains(targetEntity)) {
-                        SummonManager.setOwner(targetEntity, entity);
-                    }
-                    if (targetEntity instanceof Mob mob) {
-                        mob.setTarget(null);
-                    }
-
-                    ClientMagicData.getActiveSummons().add(targetEntity.getUUID());
-                }
-            }
-
-        }
-
-        super.onCast(world, spellLevel, entity, castSource, playerMagicData);
-
-
-//        var recasts = playerMagicData.getPlayerRecasts();
-//        if (!recasts.hasRecastForSpell(this)) {
-//            SummonedEntitiesCastData summonedEntitiesCastData = new SummonedEntitiesCastData();
-//            int summonTime = 20 * 60 * 10;
-//            int count = getSummonCount(spellLevel, entity);
-//            for (int i = 0; i < count; i++) {
-//                SummonedVex vex = new SummonedVex(world, entity);
-//                vex.moveTo(entity.getEyePosition().add(new Vec3(Utils.getRandomScaled(2), 1, Utils.getRandomScaled(2))));
-//                vex.finalizeSpawn((ServerLevel) world, world.getCurrentDifficultyAt(vex.getOnPos()), MobSpawnType.MOB_SUMMONED, null);
-//                var creature = NeoForge.EVENT_BUS.post(new SpellSummonEvent<>(entity, vex, this.spellId, spellLevel)).getCreature();
-//                world.addFreshEntity(creature);
-//                SummonManager.initSummon(entity, creature, summonTime, summonedEntitiesCastData);
+//    @Override
+//    public void onCast(Level world, int spellLevel, LivingEntity entity, CastSource castSource, MagicData playerMagicData) {
+//        if (playerMagicData.getAdditionalCastData() instanceof TargetEntityCastData targetingData) {
+//
+//            var targetEntity = targetingData.getTarget((ServerLevel) world);
+//            if (targetEntity != null) {
+//
+//                if(targetEntity instanceof IMagicSummon summon) {
+//
+//                    if (!SummonManager.getSummons(entity).contains(targetEntity)) {
+//                        SummonManager.setOwner(targetEntity, entity);
+//                    }
+//
+//                    if (targetEntity instanceof Mob mob) {
+//                        mob.setTarget(null);
+//                    }
+//
+//                    ClientMagicData.getActiveSummons().add(targetEntity.getUUID());
+//                }
 //            }
-//            RecastInstance recastInstance = new RecastInstance(this.getSpellId(), spellLevel, getRecastCount(spellLevel, entity), summonTime, castSource, summonedEntitiesCastData);
-//            recasts.addRecast(recastInstance, playerMagicData);
+//
 //        }
+//
 //        super.onCast(world, spellLevel, entity, castSource, playerMagicData);
-    }
+//
+//
+////        var recasts = playerMagicData.getPlayerRecasts();
+////        if (!recasts.hasRecastForSpell(this)) {
+////            SummonedEntitiesCastData summonedEntitiesCastData = new SummonedEntitiesCastData();
+////            int summonTime = 20 * 60 * 10;
+////            int count = getSummonCount(spellLevel, entity);
+////            for (int i = 0; i < count; i++) {
+////                SummonedVex vex = new SummonedVex(world, entity);
+////                vex.moveTo(entity.getEyePosition().add(new Vec3(Utils.getRandomScaled(2), 1, Utils.getRandomScaled(2))));
+////                vex.finalizeSpawn((ServerLevel) world, world.getCurrentDifficultyAt(vex.getOnPos()), MobSpawnType.MOB_SUMMONED, null);
+////                var creature = NeoForge.EVENT_BUS.post(new SpellSummonEvent<>(entity, vex, this.spellId, spellLevel)).getCreature();
+////                world.addFreshEntity(creature);
+////                SummonManager.initSummon(entity, creature, summonTime, summonedEntitiesCastData);
+////            }
+////            RecastInstance recastInstance = new RecastInstance(this.getSpellId(), spellLevel, getRecastCount(spellLevel, entity), summonTime, castSource, summonedEntitiesCastData);
+////            recasts.addRecast(recastInstance, playerMagicData);
+////        }
+////        super.onCast(world, spellLevel, entity, castSource, playerMagicData);
+//    }
 }

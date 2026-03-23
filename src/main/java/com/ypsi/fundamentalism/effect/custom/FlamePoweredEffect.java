@@ -1,5 +1,6 @@
 package com.ypsi.fundamentalism.effect.custom;
 
+import com.mojang.blaze3d.shaders.Effect;
 import com.ypsi.fundamentalism.effect.ModEffects;
 import com.ypsi.fundamentalism.spells.ModSpells;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
@@ -16,10 +17,14 @@ import io.redspace.ironsspellbooks.util.ParticleHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.common.EffectCure;
+import net.neoforged.neoforge.common.EffectCures;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
@@ -31,9 +36,17 @@ public class FlamePoweredEffect extends MagicMobEffect {
     @Override
     public boolean applyEffectTick(LivingEntity pLivingEntity, int pAmplifier) {
         if(!pLivingEntity.level().isClientSide){
-                float damageApplied = 1.0f * (pAmplifier);
-                float radius = 2.0f * (pAmplifier+1);
-                var entities = pLivingEntity.level().getEntities(pLivingEntity, pLivingEntity.getBoundingBox().inflate(radius));
+
+            if(pLivingEntity.hasEffect(MobEffects.POISON))
+                pLivingEntity.removeEffect(MobEffects.POISON);
+            if(pLivingEntity.hasEffect(MobEffects.WITHER))
+                pLivingEntity.removeEffect(MobEffects.WITHER);
+            if(pLivingEntity.isFreezing())
+                pLivingEntity.setTicksFrozen(0);
+
+            float damageApplied = 3.0f * (pAmplifier);
+            float radius = 2.0f * (pAmplifier+1);
+            var entities = pLivingEntity.level().getEntities(pLivingEntity, pLivingEntity.getBoundingBox().inflate(radius));
             MagicManager.spawnParticles(pLivingEntity.level(), new BlastwaveParticleOptions(SchoolRegistry.FIRE.get().getTargetingColor(), radius), pLivingEntity.getX(), pLivingEntity.getBoundingBox().getCenter().y, pLivingEntity.getZ(), 1, 0, 0, 0, 0, true);
             pLivingEntity.level().playSound(null, pLivingEntity.blockPosition(), SoundRegistry.FIRE_CAST.get(), SoundSource.PLAYERS, 3, Utils.random.nextIntBetweenInclusive(8, 12) * .1f);
             for (Entity entity : entities) {

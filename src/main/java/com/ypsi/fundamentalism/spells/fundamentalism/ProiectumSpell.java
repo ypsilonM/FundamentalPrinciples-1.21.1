@@ -21,7 +21,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-@AutoSpellConfig
 public class ProiectumSpell extends AbstractSpell {
     private final ResourceLocation spellId = ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "proiectum");
 

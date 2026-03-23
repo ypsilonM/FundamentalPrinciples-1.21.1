@@ -36,7 +36,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Optional;
 
-@AutoSpellConfig
 public class LapsusSpell extends AbstractSpell {
     private final ResourceLocation spellId = ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "lapsus");
     private BlockPos location = null;
@@ -56,7 +55,7 @@ public class LapsusSpell extends AbstractSpell {
     }
 
     public LapsusSpell() {
-        this.manaCostPerLevel = 20;
+        this.manaCostPerLevel = 10;
         this.baseSpellPower = 15;
         this.spellPowerPerLevel = 0;
         this.castTime = 0;

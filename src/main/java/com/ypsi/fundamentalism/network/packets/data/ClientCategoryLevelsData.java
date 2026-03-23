@@ -1,5 +1,7 @@
 package com.ypsi.fundamentalism.network.packets.data;
 
+import com.ypsi.fundamentalism.util.Util;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,8 +26,9 @@ public class ClientCategoryLevelsData {
         int level = getLevel(category);
         if (level >= 20) return 1.0f;
 
+        int nextLevel = level+1;
         int exp = getExperience(category);
-        int expNeeded = 100 * (level + 1);
+        int expNeeded = Util.getExpForLevel(nextLevel);
 
         return (float) exp / expNeeded;
     }

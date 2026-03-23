@@ -26,7 +26,6 @@ import org.joml.Vector3f;
 import java.util.List;
 import java.util.Optional;
 
-@AutoSpellConfig
 public class PullSpell extends AbstractSpell {
     private final ResourceLocation spellId = ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "pull_spell");
 
@@ -46,11 +45,11 @@ public class PullSpell extends AbstractSpell {
             .build();
 
     public PullSpell() {
-        this.manaCostPerLevel = 30;
+        this.manaCostPerLevel = 10;
         this.baseSpellPower = 1;
-        this.spellPowerPerLevel = 0;
+        this.spellPowerPerLevel = 2;
         this.castTime = 0;
-        this.baseManaCost = 50;
+        this.baseManaCost = 40;
     }
 
     @Override

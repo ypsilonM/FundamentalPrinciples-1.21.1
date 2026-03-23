@@ -28,6 +28,7 @@ import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.attachment.AttachmentType;
 import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.*;
@@ -40,6 +41,7 @@ public class ImpEntity extends AbstractSpellCastingMob implements Enemy {
 
     public ImpEntity(EntityType<? extends AbstractSpellCastingMob> entityType, Level level) {
         super(entityType, level);
+        xpReward = 8;
     }
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);

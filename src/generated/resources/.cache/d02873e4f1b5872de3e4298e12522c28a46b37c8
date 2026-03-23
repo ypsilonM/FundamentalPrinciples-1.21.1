@@ -1,4 +1,4 @@
-// 1.21.1	2026-01-08T02:22:21.5038518	Item Models: ypfundamentals
+// 1.21.1	2026-03-08T15:04:33.3805068	Item Models: ypfundamentals
 70f8c64eccf2deef2ace4821114d73da3827b5cf assets/ypfundamentals/models/item/arcane_mixture.json
 6c548fb9ca9a4c702547018971e56027b280e4d0 assets/ypfundamentals/models/item/flask.json
 63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/ypfundamentals/models/item/hemomancer_spawn_egg.json
@@ -6,6 +6,7 @@
 6eb1326b5e8fc3cc5837dcb0071007763755dbb6 assets/ypfundamentals/models/item/luminaire_extract.json
 a4edd8659cff65b9ffa48b17b735d53449fb3d03 assets/ypfundamentals/models/item/magical_shield.json
 9a1a9fcdcc48dad1c5f6150482b304b06f339d5a assets/ypfundamentals/models/item/mana_fruit.json
+04e532287cee2b16b0081d87f48d79c1a1326d3b assets/ypfundamentals/models/item/pitcher_extract.json
 6938fbc99a01b875aa4204e830d8c282e1b02ab9 assets/ypfundamentals/models/item/test_tube.json
 b225175e8eb5f65c205f23aa469c8d908b8c3141 assets/ypfundamentals/models/item/tonic_0.json
 4ba649162fa3f1d509ab3d331462f9aa7964c4aa assets/ypfundamentals/models/item/tonic_1.json

@@ -20,7 +20,6 @@ import net.minecraft.world.level.Level;
 
 import java.util.List;
 
-@AutoSpellConfig
 public class BloodstreamSpell extends AbstractSpell {
     private final ResourceLocation spellId = ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "bloodstream");
 
@@ -28,7 +27,7 @@ public class BloodstreamSpell extends AbstractSpell {
             .setMinRarity(SpellRarity.EPIC)
             .setSchoolResource(SchoolRegistry.BLOOD_RESOURCE)
             .setMaxLevel(3)
-            .setCooldownSeconds(80)
+            .setCooldownSeconds(60)
             .build();
 
 
@@ -37,7 +36,7 @@ public class BloodstreamSpell extends AbstractSpell {
         this.baseSpellPower = 30;
         this.spellPowerPerLevel = 10;
         this.castTime = 0;
-        this.baseManaCost = 100;
+        this.baseManaCost = 60;
     }
 
     @Override

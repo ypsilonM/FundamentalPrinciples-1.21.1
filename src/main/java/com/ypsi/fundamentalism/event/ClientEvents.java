@@ -3,18 +3,18 @@ package com.ypsi.fundamentalism.event;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.ypsi.fundamentalism.FundamentalPrinciples;
+import com.ypsi.fundamentalism.attachments.YpsAttachments;
 import com.ypsi.fundamentalism.entity.spells.proiectumProjectile.ProiectumRenderer;
 import com.ypsi.fundamentalism.entity.spells.sacredDisk.SacredDiskRenderer;
 import com.ypsi.fundamentalism.entity.spells.thorn.ThornRenderer;
 import com.ypsi.fundamentalism.gui.SpellLevelsScreen;
 import com.ypsi.fundamentalism.gui.TierWheelOverlay;
+import com.ypsi.fundamentalism.keybind.KeyState;
 import com.ypsi.fundamentalism.keybind.ModKeyBinds;
-import com.ypsi.fundamentalism.network.packets.data.ClientExhaustionData;
 import com.ypsi.fundamentalism.network.packets.ToggleReinforcementPacket;
 import com.ypsi.fundamentalism.render.ChargeSpellVisuals;
 import com.ypsi.fundamentalism.render.ReinforcementLayer;
 import io.redspace.ironsspellbooks.player.ClientSpellCastHelper;
-import io.redspace.ironsspellbooks.player.KeyState;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -29,19 +29,25 @@ import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.network.PacketDistributor;
 import java.util.ArrayList;
-
-import static com.ypsi.fundamentalism.event.ModEvents.getMaxExPerLevel;
+import static com.ypsi.fundamentalism.util.Util.getMaxExPerLevel;
 
 
 public class ClientEvents {
     @EventBusSubscriber(modid = FundamentalPrinciples.MOD_ID, value = Dist.CLIENT)
     public static class Registration {
         //Eventos MOD
+
+//        @SubscribeEvent
+//        public static void onSpellBookLevelUp(SpellBookLevelUpEvent event) {
+//            Minecraft mc = Minecraft.getInstance();
+//            if (mc.player != null && mc.player.equals(event.getPlayer())) {
+//                mc.player.playSound(SoundEvents.ENCHANTMENT_TABLE_USE, 1, 1);
+//            }
+//        }
 
         @SubscribeEvent
         public static void registerOverlays(RegisterGuiLayersEvent event) {
@@ -54,8 +60,8 @@ public class ClientEvents {
                         Minecraft minecraft = Minecraft.getInstance();
                         if (minecraft.player == null || minecraft.options.hideGui) return;
                         Player player = minecraft.player;
-                        int exhaustion = ClientExhaustionData.getCurrentExhaustion();
-                        int exhaustionLvl = ClientExhaustionData.getLevelExhaustion();
+                        int exhaustion = player.getData(YpsAttachments.CURRENT_EXHAUSTION);
+                        int exhaustionLvl = player.getData(YpsAttachments.LEVEL_EXHAUSTION);
                         if (exhaustion <= 0 && exhaustionLvl == 0) return;
                         int screenWidth = minecraft.getWindow().getGuiScaledWidth();
                         int screenHeight = minecraft.getWindow().getGuiScaledHeight();
@@ -215,7 +221,6 @@ public class ClientEvents {
 
         @EventBusSubscriber(modid = FundamentalPrinciples.MOD_ID,  value = Dist.CLIENT)
         public static class Runtime {
-            //Eventos FORGE
 
             private static int useKeyId = Integer.MIN_VALUE;
             public static boolean isUseKeyDown;
@@ -228,10 +233,19 @@ public class ClientEvents {
 
             @SubscribeEvent
             public static void onKeyInput(InputEvent.Key event) {
+                updateAllKeyStates();
                 handleInputEvent(event.getKey(), event.getAction());
             }
             @SubscribeEvent
-            public static void onMouseInput(InputEvent.MouseButton.Pre event) {handleInputEvent(event.getButton(), event.getAction());}
+            public static void onMouseInput(InputEvent.MouseButton.Pre event) {
+                updateAllKeyStates();
+                handleInputEvent(event.getButton(), event.getAction());
+            }
+            private static void updateAllKeyStates() {
+                for (KeyState k : KEY_STATES) {
+                    k.update();
+                }
+            }
 
             private static void handleInputEvent(int button, int action) {
                 var minecraft = Minecraft.getInstance();
@@ -259,13 +273,8 @@ public class ClientEvents {
                         TierWheelOverlay.instance.close();
                     }
                 }
-                update();
             }
-            private static void update() {
-                for (KeyState k : KEY_STATES) {
-                    k.update();
-                }
-            }
+
 
             private static KeyState register(KeyMapping key) {
                 var k = new KeyState(key);
@@ -288,8 +297,11 @@ public class ClientEvents {
                     }
                 }
             }
+            
 
         }
+
+
 
 
     }

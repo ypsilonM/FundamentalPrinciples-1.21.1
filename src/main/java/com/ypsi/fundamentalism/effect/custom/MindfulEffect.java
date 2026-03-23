@@ -1,5 +1,6 @@
 package com.ypsi.fundamentalism.effect.custom;
 
+import com.ypsi.fundamentalism.particle.ModParticles;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -28,7 +29,7 @@ public class MindfulEffect extends MobEffect implements IMobEffectExtension {
 
     @Override
     public ParticleOptions createParticleOptions(MobEffectInstance effect) {
-        return super.createParticleOptions(effect);
+        return ModParticles.MINDFUL_PARTICLE.get();
     }
 
     @Override

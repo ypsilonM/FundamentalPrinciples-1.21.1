@@ -22,38 +22,39 @@ public class ModNetwork {
                 SyncCategoryLevelsPacket::handle
         );
 
+        //Reinforcement
         registrar.playToServer(
                 ToggleReinforcementPacket.TYPE,
                 ToggleReinforcementPacket.STREAM_CODEC,
                 ToggleReinforcementPacket::handle
         );
+
+        //Reinforcement
         registrar.playToClient(
                 SyncReinforcementPacket.TYPE,
                 SyncReinforcementPacket.STREAM_CODEC,
                 SyncReinforcementPacket::handle
         );
 
-        //Exhaustion
-        registrar.playToClient(
-                SyncExhaustionPacket.TYPE,
-                SyncExhaustionPacket.STREAM_CODEC,
-                SyncExhaustionPacket::handle
-        );
-        //LvlExhaustion
-        registrar.playToClient(
-                SyncExhaustionLevelPacket.TYPE,
-                SyncExhaustionLevelPacket.STREAM_CODEC,
-                SyncExhaustionLevelPacket::handle
-        );
+        //Looking
         registrar.playToClient(
                 LookAtEntityPacket.TYPE,
                 LookAtEntityPacket.STREAM_CODEC,
                 LookAtEntityPacket::handle
         );
+
+
+        //SPELL LEVELS
         registrar.playToServer(
-                UpdateSpellLevelPacket.TYPE,
-                UpdateSpellLevelPacket.STREAM_CODEC,
-                UpdateSpellLevelPacket::handle
+                ClientSpellsUpdatePacket.TYPE,
+                ClientSpellsUpdatePacket.STREAM_CODEC,
+                ClientSpellsUpdatePacket::handle
+        );
+
+        registrar.playToClient(
+                SpellBookLevelUpPacket.TYPE,
+                SpellBookLevelUpPacket.STREAM_CODEC,
+                SpellBookLevelUpPacket::handle
         );
     }
 }

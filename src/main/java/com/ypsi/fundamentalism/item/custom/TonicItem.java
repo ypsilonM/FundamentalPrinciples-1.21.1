@@ -3,8 +3,8 @@ package com.ypsi.fundamentalism.item.custom;
 import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.attachments.YpsAttachments;
 import com.ypsi.fundamentalism.component.YpsDataComponents;
+import com.ypsi.fundamentalism.effect.ModEffects;
 import com.ypsi.fundamentalism.item.ModFoodProperties;
-import com.ypsi.fundamentalism.network.packets.SyncExhaustionPacket;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -92,7 +92,10 @@ public class TonicItem extends Item implements IExhaustionConsumable{
     private void applyTonicEffect(ServerPlayer player) {
         int currentExhaustion = player.getData(YpsAttachments.CURRENT_EXHAUSTION.get());
         player.setData(YpsAttachments.CURRENT_EXHAUSTION, Math.max(currentExhaustion-25, 0));
-        SyncExhaustionPacket.sendToPlayer(player, player.getData(YpsAttachments.CURRENT_EXHAUSTION));
+        //SyncExhaustionPacket.sendToPlayer(player, player.getData(YpsAttachments.CURRENT_EXHAUSTION));
+        player.addEffect(
+                new MobEffectInstance(ModEffects.SOOTHE_EFFECT, (20)*45, 6, false, true, true)
+        );
     }
 
     public int getCharges(ItemStack stack) {

@@ -2,15 +2,14 @@ package com.ypsi.fundamentalism.attributes;
 
 import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.attachments.YpsAttachments;
-import com.ypsi.fundamentalism.spellCategories.SpellCategoryLevels;
+import com.ypsi.fundamentalism.attachments.SpellCategoryLevelsAttachment;
+import com.ypsi.fundamentalism.util.Util;
 import io.redspace.ironsspellbooks.api.registry.AttributeRegistry;
 import net.minecraft.core.Holder;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
@@ -29,7 +28,7 @@ public class YpsManaAttributeSystem {
     private static final Map<UUID, Integer> lastKnownLevels = new HashMap<>();
 
     public static void initializeForPlayer(Player player) {
-        SpellCategoryLevels levels = player.getData(YpsAttachments.SPELL_CATEGORY_LEVELS.get());
+        SpellCategoryLevelsAttachment levels = player.getData(YpsAttachments.SPELL_CATEGORY_LEVELS.get());
 
         if (levels != null) {
             levels.setLevelChangeListener((category, oldLevel, newLevel) -> {
@@ -57,7 +56,7 @@ public class YpsManaAttributeSystem {
         if (attributeInstance != null) {
             removeModifier(attributeInstance, MODIFIER_ID);
             if (level > 0) {
-                double bonus = calculateBonus(level);
+                double bonus = Util.getTotalMana(level);
                 addModifier(attributeInstance, MODIFIER_ID, MODIFIER_NAME, bonus, OPERATION);
             }
         }
@@ -83,9 +82,6 @@ public class YpsManaAttributeSystem {
         attributeInstance.addTransientModifier(modifier);
     }
 
-    private static double calculateBonus(int level) {
-        return level * 20;
-    }
     public static void cleanupPlayer(Player player) {
         lastKnownLevels.remove(player.getUUID());
         AttributeInstance attribute = player.getAttribute(TARGET_ATTRIBUTE);
