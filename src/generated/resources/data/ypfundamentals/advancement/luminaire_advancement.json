@@ -1,0 +1,29 @@
+{
+  "parent": "ypfundamentals:root",
+  "criteria": {
+    "get_lum": {
+      "conditions": {
+        "items": [
+          {
+            "items": "ypfundamentals:luminaire_extract"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": "Obtain Luminaire Extract",
+    "icon": {
+      "count": 1,
+      "id": "ypfundamentals:luminaire_extract"
+    },
+    "title": "Deep Blue"
+  },
+  "requirements": [
+    [
+      "get_lum"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

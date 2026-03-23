@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_cinder": {
+      "conditions": {
+        "items": [
+          {
+            "items": "irons_spellbooks:cinder_essence"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "ypfundamentals:tonic"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_cinder"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "ypfundamentals:tonic"
+    ]
+  }
+}

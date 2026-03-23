@@ -1,0 +1,28 @@
+{
+  "parent": "ypfundamentals:root",
+  "criteria": {
+    "get_so_exhausted": {
+      "conditions": {
+        "effects": {
+          "ypfundamentals:burnout": {}
+        }
+      },
+      "trigger": "minecraft:effects_changed"
+    }
+  },
+  "display": {
+    "description": "Experience for the first time the spell burnout.",
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:fire_charge"
+    },
+    "title": "Under Pressure"
+  },
+  "requirements": [
+    [
+      "get_so_exhausted"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

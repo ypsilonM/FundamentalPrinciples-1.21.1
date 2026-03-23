@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "irons_spellbooks:arcane_essence"
+    },
+    "B": {
+      "item": "minecraft:glass_bottle"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "P": {
+      "item": "minecraft:blaze_powder"
+    }
+  },
+  "pattern": [
+    " A ",
+    "IBI",
+    "IPI"
+  ],
+  "result": {
+    "count": 1,
+    "id": "ypfundamentals:flask"
+  }
+}

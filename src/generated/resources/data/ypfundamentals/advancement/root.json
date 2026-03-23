@@ -1,0 +1,22 @@
+{
+  "criteria": {
+    "tick": {
+      "trigger": "minecraft:tick"
+    }
+  },
+  "display": {
+    "background": "minecraft:textures/gui/advancements/backgrounds/adventure.png",
+    "description": "The principles are the basis for the magical epitome.",
+    "icon": {
+      "count": 1,
+      "id": "ypfundamentals:scroll_fundamentalism"
+    },
+    "title": "Fundamentalism Path"
+  },
+  "requirements": [
+    [
+      "tick"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

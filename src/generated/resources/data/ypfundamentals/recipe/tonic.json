@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "minecraft:glass_bottle"
+    },
+    "C": {
+      "item": "irons_spellbooks:cinder_essence"
+    },
+    "I": {
+      "item": "irons_spellbooks:arcane_ingot"
+    },
+    "M": {
+      "item": "irons_spellbooks:mithril_scrap"
+    }
+  },
+  "pattern": [
+    " C ",
+    "IBI",
+    "IMI"
+  ],
+  "result": {
+    "count": 1,
+    "id": "ypfundamentals:tonic"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "parent": "ypfundamentals:root",
+  "criteria": {
+    "its_so_clear": {
+      "conditions": {
+        "effects": {
+          "ypfundamentals:mindful": {}
+        }
+      },
+      "trigger": "minecraft:effects_changed"
+    }
+  },
+  "display": {
+    "description": "Experience for the first time star alignment.",
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:ender_eye"
+    },
+    "title": "So clear!"
+  },
+  "requirements": [
+    [
+      "its_so_clear"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
