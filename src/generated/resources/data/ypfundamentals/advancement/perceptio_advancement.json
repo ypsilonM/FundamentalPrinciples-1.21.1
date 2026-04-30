@@ -1,0 +1,29 @@
+{
+  "parent": "ypfundamentals:root_principles",
+  "criteria": {
+    "goalPerceptio": {
+      "conditions": {
+        "category": "usesRaycast",
+        "level": {
+          "min": 20
+        }
+      },
+      "trigger": "ypfundamentals:principles_trigger_level"
+    }
+  },
+  "display": {
+    "description": "Reach the highest knowledge of Perceptio Principle",
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:observer"
+    },
+    "title": "Perceptio"
+  },
+  "requirements": [
+    [
+      "goalPerceptio"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

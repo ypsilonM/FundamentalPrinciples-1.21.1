@@ -2,11 +2,8 @@ package com.ypsi.fundamentalism.item;
 
 import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.entity.ModEntities;
-import com.ypsi.fundamentalism.item.custom.EchoShield;
-import com.ypsi.fundamentalism.item.custom.FlaskItem;
-import com.ypsi.fundamentalism.item.custom.TonicItem;
+import com.ypsi.fundamentalism.item.custom.FatigueReducerContainer;
 import com.ypsi.fundamentalism.item.custom.food.ManaFruit;
-import io.redspace.ironsspellbooks.util.ItemPropertiesHelper;
 import net.minecraft.world.item.*;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.DeferredSpawnEggItem;
@@ -33,9 +30,11 @@ public class ModItems {
             () -> new Item(new Item.Properties().stacksTo(1)));
 
     public static final DeferredItem<Item> TONIC = ITEMS.register("tonic",
-            () -> new TonicItem(Rarity.EPIC));
+            () -> new FatigueReducerContainer(Rarity.EPIC, 10, 32,
+                    25, 45, 6));
     public static final DeferredItem<Item> FLASK = ITEMS.register("flask",
-            () -> new FlaskItem(Rarity.RARE));
+            () -> new FatigueReducerContainer(Rarity.RARE, 5, 32,
+                    15,45,3));
 
     public static final DeferredItem<Item> MANA_FRUIT = ITEMS.register("mana_fruit",
             () -> new ManaFruit(Rarity.EPIC));
@@ -49,12 +48,16 @@ public class ModItems {
     public static final DeferredItem<Item> VENEMERUS_SPAWN_EGG = ITEMS.register("venemerus_spawn_egg",
             () -> new DeferredSpawnEggItem(ModEntities.VENEMERUS, 0x03941B, 0x74992E,
                     new Item.Properties()));
+    public static final DeferredItem<Item> RUNEAR_SPAWN_EGG = ITEMS.register("runear_spawn_egg",
+            () -> new DeferredSpawnEggItem(ModEntities.RUNEAR, 0x221E26, 0x2a252f,
+                    new Item.Properties()));
+
 
     public static final DeferredItem<Item> FUNDAMENTALISM_SCROLL = ITEMS.register("scroll_fundamentalism",
             () -> new Item(new Item.Properties().stacksTo(1)));
 
-    public static final DeferredItem<Item> MAGICAL_SHIELD = ITEMS.register("magical_shield",
-            () -> new EchoShield(new Item.Properties().durability(672)));
+    public static final DeferredItem<Item> URSIDAE_FUR = ITEMS.register("ursidae_fur",
+            () -> new Item(new Item.Properties().stacksTo(8)));
 
 
     private static <T extends Item> DeferredItem<T> registerItem(String name, Supplier<T> item){

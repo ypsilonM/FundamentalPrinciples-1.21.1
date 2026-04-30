@@ -1,8 +1,8 @@
 package com.ypsi.fundamentalism.mixins;
 
+import com.ypsi.fundamentalism.ServerConfig;
 import com.ypsi.fundamentalism.component.YpsDataComponents;
 import io.redspace.ironsspellbooks.api.spells.ISpellContainer;
-import io.redspace.ironsspellbooks.block.arcane_anvil.ArcaneAnvilBlock;
 import io.redspace.ironsspellbooks.gui.arcane_anvil.ArcaneAnvilMenu;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,6 +20,9 @@ public abstract class ArcaneAnvilMixin {
             remap = false
     )
     private int addLevel5Requirement(ISpellContainer container) {
+        if(!ServerConfig.spellbookLevel){
+            return container.getMaxSpellCount();
+        }
         ArcaneAnvilMenu menu = (ArcaneAnvilMenu)(Object)this;
         ItemStack spellbook = menu.getSlot(0).getItem();
         if (spellbook.get(YpsDataComponents.SPELLBOOK_LEVEL.get()).level() >= 5) {

@@ -1,0 +1,29 @@
+{
+  "parent": "ypfundamentals:root_principles",
+  "criteria": {
+    "goalCertum": {
+      "conditions": {
+        "category": "immutable",
+        "level": {
+          "min": 20
+        }
+      },
+      "trigger": "ypfundamentals:principles_trigger_level"
+    }
+  },
+  "display": {
+    "description": "Reach the highest knowledge of Certum Principle",
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:crying_obsidian"
+    },
+    "title": "Certum"
+  },
+  "requirements": [
+    [
+      "goalCertum"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

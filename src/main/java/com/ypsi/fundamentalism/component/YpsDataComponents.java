@@ -23,18 +23,13 @@ public class YpsDataComponents {
 
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<SpellBookXP>> SPELLBOOK_XP =
-            register("spellbook_xp",
-                    objectBuilder -> objectBuilder.persistent(SpellBookXP.CODEC)
-                            .networkSynchronized(ByteBufCodecs.fromCodec(SpellBookXP.CODEC)));
+            register("spellbook_xp", objectBuilder -> objectBuilder.persistent(SpellBookXP.CODEC)
+                    .networkSynchronized(ByteBufCodecs.fromCodec(SpellBookXP.CODEC)));
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<SpellBookLevel>> SPELLBOOK_LEVEL =
-            register("spellbook_level",
-                    objectBuilder -> objectBuilder.persistent(SpellBookLevel.CODEC)
-                            .networkSynchronized(ByteBufCodecs.fromCodec(SpellBookLevel.CODEC)));
-
+            register("spellbook_level", objectBuilder -> objectBuilder.persistent(SpellBookLevel.CODEC)
+                    .networkSynchronized(ByteBufCodecs.fromCodec(SpellBookLevel.CODEC)));
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> YP_SPELL_SLOTS = register("yp_slots",
-            integerBuilder -> integerBuilder.persistent(Codec.INT)
-                    .networkSynchronized(ByteBufCodecs.INT)
-            );
+            integerBuilder -> integerBuilder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.INT));
 
 
     private static <T> DeferredHolder<DataComponentType<?>, DataComponentType<T>> register(String name, UnaryOperator<DataComponentType.Builder<T>> builderUnaryOperator){

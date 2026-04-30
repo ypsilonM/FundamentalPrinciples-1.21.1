@@ -26,30 +26,23 @@ public class ModItemModelProvider extends ItemModelProvider {
         basicItem(ModItems.LUMINAIRE_EXTRACT.get());
 
         basicItem(ModItems.FLASK.get());
-        basicItem(ModItems.MAGICAL_SHIELD.get());
+
+        basicItem(ModItems.URSIDAE_FUR.get());
 
         generateTonicModels();
 
         withExistingParent(ModItems.HEMOMANCER_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
         withExistingParent(ModItems.IMP_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
         withExistingParent(ModItems.VENEMERUS_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
+        withExistingParent(ModItems.RUNEAR_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
 
-//        withExistingParent(ModItems.MAGICAL_SHIELD.getId().getPath(), mcLoc("item/shield"))
-//                .texture("layer0", modLoc("item/magical_shield"))
-//                .override()
-//                .predicate(ResourceLocation.fromNamespaceAndPath( FundamentalPrinciples.MOD_ID, "blocking"), 1)
-//                .model(withExistingParent(
-//                        ModItems.MAGICAL_SHIELD.getId().getPath() + "_blocking",
-//                        mcLoc("item/shield_blocking"))
-//                        .texture("layer0", modLoc("item/magical_shield")))
-//                .end();
     }
 
     private void generateTonicModels() {
         String tonicPath = ModItems.TONIC.getId().getPath();
         for (int charges = 0; charges <= 10; charges++) {
             withExistingParent(tonicPath + "_" + charges, mcLoc("item/generated"))
-                    .texture("layer0", modLoc("item/tonic_" + charges));
+                    .texture("layer0", modLoc("item/tonic/ton_" + charges));
         }
     }
 

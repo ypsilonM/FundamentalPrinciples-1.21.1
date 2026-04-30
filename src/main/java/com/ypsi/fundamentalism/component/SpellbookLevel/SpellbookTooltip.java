@@ -1,5 +1,6 @@
 package com.ypsi.fundamentalism.component.SpellbookLevel;
 
+import com.ypsi.fundamentalism.ServerConfig;
 import io.redspace.ironsspellbooks.item.SpellBook;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -11,7 +12,7 @@ import java.util.List;
 public class SpellbookTooltip {
 
     public static void addSpellBookInfo(ItemStack stack, List<Component> tooltip) {
-        if (stack.getItem() instanceof SpellBook) {
+        if (stack.getItem() instanceof SpellBook && ServerConfig.spellbookLevel) {
             int level = SpellBookComponentHelper.getLevel(stack);
             float progress = SpellBookComponentHelper.getProgressToNextLevel(stack);
             ChatFormatting chatFormatting = getChatFormatting(level);

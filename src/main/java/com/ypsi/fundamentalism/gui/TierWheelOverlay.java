@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.ypsi.fundamentalism.attachments.YpsAttachments;
 import com.ypsi.fundamentalism.network.packets.ClientSpellsUpdatePacket;
-import com.ypsi.fundamentalism.attachments.AvailableSpellsAttachment;
+import com.ypsi.fundamentalism.attachments.customAtt.AvailableSpellsAttachment;
 import com.ypsi.fundamentalism.util.Util;
 import io.redspace.ironsspellbooks.IronsSpellbooks;
 import io.redspace.ironsspellbooks.api.magic.SpellSelectionManager;

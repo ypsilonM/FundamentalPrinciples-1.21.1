@@ -29,7 +29,10 @@ import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.navigation.WallClimberNavigation;
+import net.minecraft.world.entity.animal.Chicken;
+import net.minecraft.world.entity.animal.axolotl.Axolotl;
 import net.minecraft.world.entity.monster.Enemy;
+import net.minecraft.world.entity.monster.Slime;
 import net.minecraft.world.entity.monster.Spider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -57,8 +60,9 @@ public class VenemerusEntity extends AbstractSpellCastingMob implements Enemy {
     private static final RawAnimation SPELL_ANIM = RawAnimation.begin().thenPlay("spit");
     private static final RawAnimation ATTACK_1 = RawAnimation.begin().thenPlay("melee");
 
-    private int castingTimer = 0;
     private int meleeTimer = 0;
+    private double originalMovementSpeed = -1;
+    private boolean wasRooted = false;
 
     @Override
     protected void registerGoals() {
@@ -88,6 +92,8 @@ public class VenemerusEntity extends AbstractSpellCastingMob implements Enemy {
             }
         });
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
+        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Slime.class, true));
+        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Axolotl.class, true));
     }
 
     protected PathNavigation createNavigation(Level level) {
@@ -116,7 +122,17 @@ public class VenemerusEntity extends AbstractSpellCastingMob implements Enemy {
     }
 
     private <E extends GeoAnimatable> PlayState movePredicate(AnimationState<E> event) {
-        if (this.castingTimer > 0 || this.meleeTimer > 0) {
+        boolean isCastingRootSpell = false;
+        if (isCasting()) {
+            AbstractSpell castingSpell = getMagicData().getCastingSpell() != null
+                    ? getMagicData().getCastingSpell().getSpell() : null;
+
+            isCastingRootSpell = (
+                    castingSpell == SpellRegistry.ACID_ORB_SPELL.get()
+            );
+        }
+
+        if (isCastingRootSpell || this.meleeTimer > 0) {
             return PlayState.STOP;
         }
         if (event.isMoving()) {
@@ -128,7 +144,7 @@ public class VenemerusEntity extends AbstractSpellCastingMob implements Enemy {
     }
 
     private <E extends GeoAnimatable> PlayState castPredicate(AnimationState<E> event) {
-        return this.castingTimer>0?PlayState.CONTINUE:PlayState.STOP;
+        return isCasting()?PlayState.CONTINUE:PlayState.STOP;
     }
 
     private <E extends GeoAnimatable> PlayState meleePredicate(AnimationState<E> event) {
@@ -138,11 +154,9 @@ public class VenemerusEntity extends AbstractSpellCastingMob implements Enemy {
     @Override
     public void initiateCastSpell(AbstractSpell spell, int spellLevel) {
             super.initiateCastSpell(spell, spellLevel);
-            if(spell.getSpellId().equals(SpellRegistry.ACID_ORB_SPELL.get().getSpellId())){
-                this.castingTimer = 20;
-                this.triggerAnim("spit_controller", "spit");
-            }else{
 
+            if(spell == SpellRegistry.ACID_ORB_SPELL){
+                this.triggerAnim("spit_controller", "spit");
             }
 
     }
@@ -156,12 +170,33 @@ public class VenemerusEntity extends AbstractSpellCastingMob implements Enemy {
     public void tick() {
         super.tick();
 
-        if (this.castingTimer > 0) {
-            this.castingTimer--;
-        }
-
         if (this.meleeTimer > 0) {
             this.meleeTimer--;
+        }
+
+        boolean shouldBeRooted = false;
+        if (isCasting()) {
+            AbstractSpell castingSpell = getMagicData().getCastingSpell() != null
+                    ? getMagicData().getCastingSpell().getSpell()
+                    : null;
+            if (castingSpell == SpellRegistry.ACID_ORB_SPELL.get()) {
+                shouldBeRooted = true;
+            }
+        }
+
+        if (shouldBeRooted && !wasRooted) {
+            originalMovementSpeed = this.getAttributeBaseValue(Attributes.MOVEMENT_SPEED);
+            this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0);
+            this.setNoGravity(true);
+            wasRooted = true;
+        }
+        else if (!shouldBeRooted && wasRooted) {
+            if (originalMovementSpeed != -1) {
+                this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(originalMovementSpeed);
+            }
+            this.setNoGravity(false);
+            wasRooted = false;
+            originalMovementSpeed = -1;
         }
 
         if (!this.level().isClientSide) {
@@ -222,6 +257,14 @@ public class VenemerusEntity extends AbstractSpellCastingMob implements Enemy {
 
     static {
         DATA_FLAGS_ID = SynchedEntityData.defineId(VenemerusEntity.class, EntityDataSerializers.BYTE);
+    }
+
+    @Override
+    public void makeStuckInBlock(BlockState state, Vec3 motionMultiplier) {
+        if (!state.is(Blocks.COBWEB)) {
+            super.makeStuckInBlock(state, motionMultiplier);
+        }
+
     }
 
     @Override

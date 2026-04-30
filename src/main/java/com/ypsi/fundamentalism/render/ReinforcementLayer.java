@@ -57,7 +57,7 @@ public class ReinforcementLayer extends RenderLayer<Player, PlayerModel<Player>>
         if (player.hasEffect(ModEffects.REINFORCEMENT_EFFECT)) {
             PlayerModel<Player> currentModel = determineModel(player);
 
-            int color1 = increaseSaturation(Utils.packRGB(Util.getElementalColor(player)), 1f);
+            int color1 = Utils.packRGB(Util.getElementalColor(player));
 
             float gameTime = player.tickCount + partialTicks;
             float pulse = (float) Math.sin(gameTime * 0.15f) * 0.075f + 0.325f;

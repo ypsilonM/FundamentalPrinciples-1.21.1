@@ -1,0 +1,29 @@
+{
+  "parent": "ypfundamentals:root_principles",
+  "criteria": {
+    "goalApparitio": {
+      "conditions": {
+        "category": "usesTeleport",
+        "level": {
+          "min": 20
+        }
+      },
+      "trigger": "ypfundamentals:principles_trigger_level"
+    }
+  },
+  "display": {
+    "description": "Reach the highest knowledge of Apparitio Principle",
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:ender_pearl"
+    },
+    "title": "Apparitio"
+  },
+  "requirements": [
+    [
+      "goalApparitio"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

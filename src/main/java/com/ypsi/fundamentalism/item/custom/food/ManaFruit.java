@@ -1,5 +1,7 @@
 package com.ypsi.fundamentalism.item.custom.food;
 
+import com.ypsi.fundamentalism.ServerConfig;
+import com.ypsi.fundamentalism.attachments.FatigueManager;
 import com.ypsi.fundamentalism.attachments.YpsAttachments;
 import com.ypsi.fundamentalism.item.ModFoodProperties;
 import net.minecraft.server.level.ServerPlayer;
@@ -21,9 +23,10 @@ public class ManaFruit extends Item {
     @Override
     public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity livingEntity) {
         if(!level.isClientSide && livingEntity instanceof ServerPlayer player){
-            int currentExhaustion = player.getData(YpsAttachments.CURRENT_EXHAUSTION.get());
-            player.setData(YpsAttachments.CURRENT_EXHAUSTION, Math.max(currentExhaustion-50, 0));
-            //SyncExhaustionPacket.sendToPlayer(player, player.getData(YpsAttachments.CURRENT_EXHAUSTION));
+            if(ServerConfig.fatigueSystem) {
+                int currentExhaustion = FatigueManager.getFatigueAmount(player);
+                FatigueManager.setFatigueAmount(player, Math.max(currentExhaustion - 50, 0));
+            }
         }
         return super.finishUsingItem(stack, level, livingEntity);
     }

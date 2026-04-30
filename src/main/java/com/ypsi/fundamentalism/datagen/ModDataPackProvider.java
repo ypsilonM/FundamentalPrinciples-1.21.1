@@ -2,6 +2,7 @@ package com.ypsi.fundamentalism.datagen;
 
 import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.attributes.YpsDamageTypes;
+import com.ypsi.fundamentalism.enchantment.FundEnchantments;
 import com.ypsi.fundamentalism.worldgen.ModBiomeModifiers;
 import com.ypsi.fundamentalism.worldgen.ModConfiguredFeatures;
 import com.ypsi.fundamentalism.worldgen.ModPlacedFeatures;
@@ -22,6 +23,7 @@ public class ModDataPackProvider extends DatapackBuiltinEntriesProvider {
             .add(Registries.CONFIGURED_FEATURE, ModConfiguredFeatures::bootstrap)
             .add(Registries.PLACED_FEATURE, ModPlacedFeatures::bootstrap)
             .add(NeoForgeRegistries.Keys.BIOME_MODIFIERS, ModBiomeModifiers::bootstrap)
+            .add(Registries.ENCHANTMENT, FundEnchantments::bootstrap)
             ;
 
     public ModDataPackProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {

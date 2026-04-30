@@ -2,6 +2,7 @@ package com.ypsi.fundamentalism.spells.fire;
 
 import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.effect.ModEffects;
+import com.ypsi.fundamentalism.spells.Animations;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
@@ -14,6 +15,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 
 public class BurningSpiritSpell extends AbstractSpell {
@@ -34,7 +37,7 @@ public class BurningSpiritSpell extends AbstractSpell {
             .build();
 
     public BurningSpiritSpell(){
-        this.manaCostPerLevel = 50;
+        this.manaCostPerLevel = 20;
         this.baseSpellPower = 30;
         this.spellPowerPerLevel = 10;
         this.castTime = 20;
@@ -49,6 +52,11 @@ public class BurningSpiritSpell extends AbstractSpell {
 
     @Override
     public ResourceLocation getSpellResource() { return spellId; }
+
+    @Override
+    public int getEffectiveCastTime(int spellLevel, @Nullable LivingEntity entity) {
+        return getCastTime(spellLevel);
+    }
 
     @Override
     public void onCast(Level level, int spellLevel, LivingEntity entity, CastSource castSource, MagicData playerMagicData) {
@@ -66,7 +74,10 @@ public class BurningSpiritSpell extends AbstractSpell {
 
     @Override
     public AnimationHolder getCastStartAnimation() {
-        return SpellAnimations.CHARGE_ANIMATION;
+        return Animations.SPIRIT_CHARGE;
     }
-
+    @Override
+    public AnimationHolder getCastFinishAnimation() {
+        return Animations.SPIRIT_END;
+    }
 }

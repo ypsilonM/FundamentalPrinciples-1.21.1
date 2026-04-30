@@ -1,7 +1,7 @@
 package com.ypsi.fundamentalism.mixins.principlesMixins;
 
 import com.ypsi.fundamentalism.config.SpellCategoriesGenerator;
-import com.ypsi.fundamentalism.attachments.SpellCategoryProgression;
+import com.ypsi.fundamentalism.attachments.PrinciplesProgressionManager;
 import com.ypsi.fundamentalism.util.Principles;
 import com.ypsi.fundamentalism.util.Util;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
@@ -44,7 +44,7 @@ public abstract class PlayerRecastsMixin {
             int totalRecasts = recastInstance.getTotalRecasts();
 
             if (categories.contains("hasRecasts")) {
-                int categoryLevel = SpellCategoryProgression.getCategoryLevel(player, Principles.REPETITIO);
+                int categoryLevel = PrinciplesProgressionManager.getCategoryLevel(player, Principles.REPETITIO);
                 probability = Util.getRecastAddChance(categoryLevel);
             }
             boolean isAdded = serverPlayer.getRandom().nextDouble()< probability;

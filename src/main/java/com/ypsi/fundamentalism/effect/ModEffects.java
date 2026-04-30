@@ -4,6 +4,7 @@ import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.attributes.YpsAttributes;
 import com.ypsi.fundamentalism.effect.custom.*;
 import io.redspace.ironsspellbooks.api.registry.AttributeRegistry;
+import io.redspace.ironsspellbooks.effect.MagicMobEffect;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -19,10 +20,13 @@ public class ModEffects {
             DeferredRegister.create(BuiltInRegistries.MOB_EFFECT, FundamentalPrinciples.MOD_ID);
 
     public static final Holder<MobEffect> MARKED_EFFECT = MOB_EFFECTS.register("marked",
-            () -> new MarkedEffect(MobEffectCategory.HARMFUL, 0xA52A2A));
+            () -> new MagicMobEffect(MobEffectCategory.HARMFUL, 0xA52A2A));
+
+//    public static final Holder<MobEffect> BURNOUT_EFFECT = MOB_EFFECTS.register("burnout",
+//            () -> new BurnoutEffect(MobEffectCategory.HARMFUL, 0xeb0c2d));
 
     public static final Holder<MobEffect> BURNOUT_EFFECT = MOB_EFFECTS.register("burnout",
-            () -> new BurnoutEffect(MobEffectCategory.HARMFUL, 0xeb0c2d));
+            () -> new UnclearableEffect(MobEffectCategory.HARMFUL, 0xeb0c2d));
 
     public static final Holder<MobEffect> MINDFUL_EFFECT = MOB_EFFECTS.register("mindful",
             () -> new MindfulEffect(MobEffectCategory.BENEFICIAL, 0x0722a9)
@@ -57,10 +61,19 @@ public class ModEffects {
                             ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "reinforcement"), 4, AttributeModifier.Operation.ADD_VALUE)
         );
     public static final Holder<MobEffect> SOOTHE_EFFECT = MOB_EFFECTS.register("soothe",
-            () -> new SootheEffect(MobEffectCategory.BENEFICIAL, 0x5cd3db)
-                    .addAttributeModifier(YpsAttributes.EXHAUSTION_REGEN,
+            () -> new UnclearableEffect(MobEffectCategory.BENEFICIAL, 0x5cd3db)
+                    .addAttributeModifier(YpsAttributes.FATIGUE_REGEN,
                             ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "soothe"), 1, AttributeModifier.Operation.ADD_VALUE)
         );
+
+    //Change color
+    public static final Holder<MobEffect> CHAINED_EFFECT = MOB_EFFECTS.register("chained",
+            () -> new ChainedEffect(MobEffectCategory.HARMFUL, 0xeb0c2d)
+    );
+    public static final Holder<MobEffect> LACERATED_EFFECT = MOB_EFFECTS.register("lacerated",
+            () -> new LaceratedEffect(MobEffectCategory.HARMFUL, 0xeb0c2d)
+    );
+
 
 //    public static final Holder<MobEffect>
 

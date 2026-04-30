@@ -27,6 +27,7 @@ import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Enemy;
+import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -54,8 +55,9 @@ public class HemomancerEntity extends AbstractSpellCastingMob implements Enemy {
     private static final RawAnimation ATTACK_1 = RawAnimation.begin().thenPlay("attack");
     private static final RawAnimation ATTACK_2 = RawAnimation.begin().thenPlay("attack2");
 
-    private int castingTimer = 0;
     private int meleeTimer = 0;
+    private double originalMovementSpeed = -1;
+    private boolean wasRooted = false;
 
     @Override
     protected void registerGoals() {
@@ -76,17 +78,19 @@ public class HemomancerEntity extends AbstractSpellCastingMob implements Enemy {
         this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 8.0F));
         this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
+        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, AbstractPiglin.class, true));
     }
 
     public static AttributeSupplier.Builder createAttributes() {
         return LivingEntity.createLivingAttributes()
-                .add(Attributes.MAX_HEALTH, 40.0)
+                .add(Attributes.MAX_HEALTH, 50.0)
                 .add(Attributes.MOVEMENT_SPEED, 0.3)
                 .add(Attributes.ARMOR, 12.0)
                 .add(Attributes.ATTACK_DAMAGE, 8.0)
                 .add(Attributes.FOLLOW_RANGE, 25.0)
                 .add(Attributes.ENTITY_INTERACTION_RANGE, 2.5)
-                .add(AttributeRegistry.SPELL_POWER, 1.0);
+                .add(AttributeRegistry.SPELL_POWER, 1.0)
+                .add(Attributes.SCALE, 1.2);
     }
 
     @Override
@@ -106,7 +110,18 @@ public class HemomancerEntity extends AbstractSpellCastingMob implements Enemy {
     }
 
     private <E extends GeoAnimatable> PlayState movePredicate(AnimationState<E> event) {
-        if (this.castingTimer > 0 || this.meleeTimer > 0) {
+        boolean isCastingRootSpell = false;
+        if (isCasting()) {
+            AbstractSpell castingSpell = getMagicData().getCastingSpell() != null
+                    ? getMagicData().getCastingSpell().getSpell() : null;
+
+            isCastingRootSpell =
+                    (castingSpell == SpellRegistry.DEVOUR_SPELL.get() ||
+                    castingSpell == SpellRegistry.BLOOD_SLASH_SPELL.get() ||
+                    castingSpell == SpellRegistry.ACUPUNCTURE_SPELL.get());
+        }
+
+        if (isCastingRootSpell || this.meleeTimer > 0) {
             return PlayState.STOP;
         }
         if (event.isMoving()) {
@@ -118,7 +133,7 @@ public class HemomancerEntity extends AbstractSpellCastingMob implements Enemy {
     }
 
     private <E extends GeoAnimatable> PlayState castPredicate(AnimationState<E> event) {
-        return this.castingTimer>0?PlayState.CONTINUE:PlayState.STOP;
+        return isCasting()?PlayState.CONTINUE:PlayState.STOP;
     }
 
     private <E extends GeoAnimatable> PlayState meleePredicate(AnimationState<E> event) {
@@ -131,11 +146,13 @@ public class HemomancerEntity extends AbstractSpellCastingMob implements Enemy {
         castSpells.add(SpellRegistry.DEVOUR_SPELL.get());
         castSpells.add(SpellRegistry.BLOOD_SLASH_SPELL.get());
         castSpells.add(SpellRegistry.ACUPUNCTURE_SPELL.get());
+
+        super.initiateCastSpell(spell, spellLevel);
+
         if (castSpells.contains(spell)) {
-            super.initiateCastSpell(spell, spellLevel);
-            this.castingTimer = 10;
             this.triggerAnim("devour_controller", "cast");
         }
+
     }
 
     public void triggerMeleeAttack(){
@@ -151,12 +168,37 @@ public class HemomancerEntity extends AbstractSpellCastingMob implements Enemy {
     public void tick() {
         super.tick();
 
-        if (this.castingTimer > 0) {
-            this.castingTimer--;
-        }
-
         if (this.meleeTimer > 0) {
             this.meleeTimer--;
+        }
+
+        boolean shouldBeRooted = false;
+        if (isCasting()) {
+            AbstractSpell castingSpell = getMagicData().getCastingSpell() != null
+                    ? getMagicData().getCastingSpell().getSpell()
+                    : null;
+            if (castingSpell == SpellRegistry.DEVOUR_SPELL.get() ||
+                    castingSpell == SpellRegistry.BLOOD_SLASH_SPELL.get() ||
+                    castingSpell == SpellRegistry.ACUPUNCTURE_SPELL.get()) {
+                shouldBeRooted = true;
+            }
+        }
+
+        if (shouldBeRooted && !wasRooted) {
+            // Entering rooted state: store original speed and immobilise
+            originalMovementSpeed = this.getAttributeBaseValue(Attributes.MOVEMENT_SPEED);
+            this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0);
+            this.setNoGravity(true);
+            wasRooted = true;
+        }
+        else if (!shouldBeRooted && wasRooted) {
+            // Exiting rooted state: restore speed and gravity
+            if (originalMovementSpeed != -1) {
+                this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(originalMovementSpeed);
+            }
+            this.setNoGravity(false);
+            wasRooted = false;
+            originalMovementSpeed = -1;
         }
     }
 

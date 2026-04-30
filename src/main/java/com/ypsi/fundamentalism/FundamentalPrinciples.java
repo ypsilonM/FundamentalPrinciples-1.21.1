@@ -1,15 +1,16 @@
 package com.ypsi.fundamentalism;
+import com.ypsi.fundamentalism.advancements.triggers.YpTriggers;
 import com.ypsi.fundamentalism.attributes.YpsAttributes;
 import com.ypsi.fundamentalism.block.YpsBlocks;
 import com.ypsi.fundamentalism.component.YpsDataComponents;
-import com.ypsi.fundamentalism.config.SpellCategoriesGenerator;
+import com.ypsi.fundamentalism.datagen.RecipeSerializers;
 import com.ypsi.fundamentalism.effect.ModEffects;
 import com.ypsi.fundamentalism.entity.ModEntities;
 import com.ypsi.fundamentalism.entity.mobs.hemomancer.HemomancerRenderer;
 import com.ypsi.fundamentalism.entity.mobs.imp.ImpRenderer;
+import com.ypsi.fundamentalism.entity.mobs.runear.RunearRenderer;
 import com.ypsi.fundamentalism.entity.mobs.venemerus.VenemerusRenderer;
 import com.ypsi.fundamentalism.entity.spells.chains.ChainsRenderer;
-import com.ypsi.fundamentalism.entity.spells.proiectumProjectile.ProiectumRenderer;
 import com.ypsi.fundamentalism.entity.spells.pull.PullRenderer;
 import com.ypsi.fundamentalism.entity.spells.holy_lightning.HolyLightningRenderer;
 import com.ypsi.fundamentalism.attachments.YpsAttachments;
@@ -26,20 +27,15 @@ import com.ypsi.fundamentalism.network.SpellbookLevelCommand;
 import com.ypsi.fundamentalism.particle.*;
 import com.ypsi.fundamentalism.spells.ModSpells;
 import com.ypsi.fundamentalism.spells.YpsSchoolRegistry;
-import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
 
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.level.block.Blocks;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -72,19 +68,21 @@ public class FundamentalPrinciples {
 
         ModEffects.register(modEventBus);
         ModParticles.register(modEventBus);
-
         ModNetwork.register(modEventBus);
         ModEntities.register(modEventBus);
 
         YpsAttributes.register(modEventBus);
         YpsAttachments.register(modEventBus);
+        YpTriggers.register(modEventBus);
 
         YpsSchoolRegistry.register(modEventBus);
         ModSpells.register(modEventBus);
 
         modEventBus.addListener(this::addCreative);
-        // Register our mod's ModConfigSpec so that FML can create and load the config file for us
-        modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+
+        RecipeSerializers.registrar(modEventBus);
+
+        modContainer.registerConfig(ModConfig.Type.COMMON, ServerConfig.SPEC);
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
             clientReg(modEventBus);
@@ -107,12 +105,12 @@ public class FundamentalPrinciples {
     private void commonSetup(final FMLCommonSetupEvent event) {
 //        LOGGER.info("HELLO FROM COMMON SETUP");
 //
-//        if (Config.logDirtBlock)
+//        if (ServerConfig.logDirtBlock)
 //            LOGGER.info("DIRT BLOCK >> {}", BuiltInRegistries.BLOCK.getKey(Blocks.DIRT));
 //
-//        LOGGER.info(Config.magicNumberIntroduction + Config.magicNumber);
+//        LOGGER.info(ServerConfig.magicNumberIntroduction + ServerConfig.magicNumber);
 //
-//        Config.items.forEach((item) -> LOGGER.info("ITEM >> {}", item.toString()));
+//        ServerConfig.items.forEach((item) -> LOGGER.info("ITEM >> {}", item.toString()));
     }
 
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
@@ -134,6 +132,7 @@ public class FundamentalPrinciples {
             event.registerEntityRenderer(ModEntities.IMP.get(), ImpRenderer::new);
             event.registerEntityRenderer(ModEntities.HEMOMANCER.get(), HemomancerRenderer::new);
             event.registerEntityRenderer(ModEntities.VENEMERUS.get(), VenemerusRenderer::new);
+            event.registerEntityRenderer(ModEntities.RUNEAR.get(), RunearRenderer::new);
 
             event.registerEntityRenderer(ModEntities.HOLY_LIGHTNING_PROJECTILE.get(), HolyLightningRenderer::new);
             event.registerEntityRenderer(ModEntities.CHAINS.get(), ChainsRenderer::new);
@@ -143,7 +142,6 @@ public class FundamentalPrinciples {
             event.registerEntityRenderer(ModEntities.THORN_PROJECTILE.get(), ThornRenderer::new);
             event.registerEntityRenderer(ModEntities.SACRED_DISK.get(), SacredDiskRenderer::new);
 
-            event.registerEntityRenderer(ModEntities.PROIECTUM_PROJECTILE.get(), ProiectumRenderer::new);
         }
         @SubscribeEvent
         public static void registerParticleFactories(RegisterParticleProvidersEvent event) {

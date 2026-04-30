@@ -1,15 +1,13 @@
 package com.ypsi.fundamentalism.component.SpellbookLevel;
 
+import com.ypsi.fundamentalism.ServerConfig;
 import com.ypsi.fundamentalism.component.YpsDataComponents;
 import com.ypsi.fundamentalism.event.SpellBookLevelUpEvent;
 import com.ypsi.fundamentalism.network.packets.SpellBookLevelUpPacket;
 import io.redspace.ironsspellbooks.api.spells.ISpellContainer;
 import io.redspace.ironsspellbooks.item.SpellBook;
 import io.redspace.ironsspellbooks.registries.ComponentRegistry;
-import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.NeoForge;
@@ -27,7 +25,7 @@ public class SpellBookComponentHelper {
     private static final int MAX_LEVEL = 5;
 
     public static void ensureSpellBookComponents(ItemStack stack) {
-        if (stack.getItem() instanceof SpellBook) {
+        if (stack.getItem() instanceof SpellBook && ServerConfig.spellbookLevel) {
             if (!stack.has(YpsDataComponents.SPELLBOOK_XP.get())) {
                 stack.set(YpsDataComponents.SPELLBOOK_XP.get(), new SpellBookXP(0));
             }
@@ -46,7 +44,7 @@ public class SpellBookComponentHelper {
         return 4;
     }
     public static int getXP(ItemStack stack) {
-        if (stack.getItem() instanceof SpellBook) {
+        if (stack.getItem() instanceof SpellBook && ServerConfig.spellbookLevel) {
             ensureSpellBookComponents(stack);
             SpellBookXP xp = stack.get(YpsDataComponents.SPELLBOOK_XP.get());
             return xp != null ? xp.xp() : 0;
@@ -54,7 +52,7 @@ public class SpellBookComponentHelper {
         return 0;
     }
     public static int getLevel(ItemStack stack) {
-        if (stack.getItem() instanceof SpellBook) {
+        if (stack.getItem() instanceof SpellBook && ServerConfig.spellbookLevel) {
             ensureSpellBookComponents(stack);
             SpellBookLevel level = stack.get(YpsDataComponents.SPELLBOOK_LEVEL.get());
             return level != null ? level.level() : 1;
@@ -62,7 +60,7 @@ public class SpellBookComponentHelper {
         return 0;
     }
     public static void addXP(ItemStack stack, int xpToAdd, Player player) {
-        if (stack.getItem() instanceof SpellBook) {
+        if (stack.getItem() instanceof SpellBook && ServerConfig.spellbookLevel) {
             ensureSpellBookComponents(stack);
 
             int currentXP = getXP(stack);
@@ -116,7 +114,7 @@ public class SpellBookComponentHelper {
     }
 
     public static void setLevel(ItemStack stack, int newLevel, Player player) {
-        if (stack.getItem() instanceof SpellBook) {
+        if (stack.getItem() instanceof SpellBook && ServerConfig.spellbookLevel) {
             ensureSpellBookComponents(stack);
             int currentLevel = getLevel(stack);
 

@@ -9,13 +9,17 @@
   "effect.ypfundamentals.bloodstream": "Bloodstream",
   "effect.ypfundamentals.soothe": "Soothe",
 
+  "enchantment.ypfundamentals.aegis": "Aegis",
+
   "entity.ypfundamentals.hemomancer": "Hemomancer",
   "entity.ypfundamentals.imp": "Imp",
   "entity.ypfundamentals.venemerus": "Venemerus",
+  "entity.ypfundamentals.runear": "Runear",
 
   "item.ypfundamentals.hemomancer_spawn_egg": "Hemomancer Spawn Egg",
   "item.ypfundamentals.imp_spawn_egg": "Imp Spawn Egg",
   "item.ypfundamentals.venemerus_spawn_egg": "Venemerus Spawn Egg",
+  "item.ypfundamentals.runear_spawn_egg": "Runear Spawn Egg",
   "item.ypfundamentals.mana_fruit": "Ancient Fruit",
   "item.ypfundamentals.arcane_mixture": "Arcane Mixture",
   "item.ypfundamentals.test_tube": "Test Tube",
@@ -23,6 +27,7 @@
   "item.ypfundamentals.pitcher_extract": "Pitcher Extract",
   "item.ypfundamentals.tonic": "Tonic",
   "item.ypfundamentals.flask": "Flask",
+  "item.ypfundamentals.ursidae_fur": "Ursidae Fur",
 
   "attribute.name.technique.exhaustion": "Exhaustion",
 
@@ -38,6 +43,7 @@
   "spell.ypfundamentals.sol": "Tonatiuh",
   "spell.ypfundamentals.bloodmoon": "Blood Moon",
   "spell.ypfundamentals.sacred_disk": "Sacred Disk",
+  "spell.ypfundamentals.ignite": "Ignite",
 
   "spell.ypfundamentals.proiectum": "Proiectum Principle",
 
@@ -60,8 +66,9 @@
 
   "school.ypfundamentals.fundamentalism": "Fundamentalism",
 
-  "attribute.ypfundamentals.exhaustion.max": "Max Exhaustion"
+  "attribute.ypfundamentals.exhaustion.max": "Max Exhaustion",
 
-
+  "ui.ypfundamentals.fire_time": "%d on fire",
+  "ui.ypfundamentals.summon_target_failure": "You must target a summon"
 
 }

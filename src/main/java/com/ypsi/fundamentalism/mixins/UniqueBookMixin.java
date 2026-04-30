@@ -1,6 +1,6 @@
 package com.ypsi.fundamentalism.mixins;
 
-import com.ypsi.fundamentalism.Config;
+import com.ypsi.fundamentalism.ServerConfig;
 import com.ypsi.fundamentalism.component.SpellbookLevel.SpellBookComponentHelper;
 import com.ypsi.fundamentalism.component.YpsDataComponents;
 import io.redspace.ironsspellbooks.api.spells.ISpellContainer;
@@ -10,7 +10,6 @@ import io.redspace.ironsspellbooks.item.UniqueSpellBook;
 import io.redspace.ironsspellbooks.registries.ComponentRegistry;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -31,13 +30,18 @@ public abstract class UniqueBookMixin {
         }
         SpellBookComponentHelper.ensureSpellBookComponents(itemStack);
         if (!ISpellContainer.isSpellContainer(itemStack)) {
-            var spellContainer = ISpellContainer.create(4, true, true).mutableCopy();
-            getSpells().forEach(spellSlot -> spellContainer.addSpell(spellSlot.getSpell(), spellSlot.getLevel(), Config.lockedSpells));
-            SpellBook spellBook = (SpellBook) (Object) this;
-            itemStack.set(YpsDataComponents.YP_SPELL_SLOTS.get(), spellBook.getMaxSpellSlots());
-            //stack.set(ComponentRegistry.SPELL_CONTAINER, upgradedContainer.toImmutable());
-            itemStack.set(ComponentRegistry.SPELL_CONTAINER, spellContainer.toImmutable());
-            //ISpellContainer.set(itemStack, spellContainer.toImmutable());
+            if(ServerConfig.spellbookLevel) {
+                var spellContainer = ISpellContainer.create(4, true, true).mutableCopy();
+                getSpells().forEach(spellSlot -> spellContainer.addSpell(spellSlot.getSpell(), spellSlot.getLevel(), ServerConfig.lockedSpells));
+                SpellBook spellBook = (SpellBook) (Object) this;
+                itemStack.set(YpsDataComponents.YP_SPELL_SLOTS.get(), spellBook.getMaxSpellSlots());
+                itemStack.set(ComponentRegistry.SPELL_CONTAINER, spellContainer.toImmutable());
+            }else{
+                SpellBook spellBook = (SpellBook) (Object) this;
+                var spellContainer = ISpellContainer.create(spellBook.getMaxSpellSlots(), true, true).mutableCopy();
+                getSpells().forEach(spellSlot -> spellContainer.addSpell(spellSlot.getSpell(), spellSlot.getLevel(), ServerConfig.lockedSpells));
+                itemStack.set(ComponentRegistry.SPELL_CONTAINER, spellContainer.toImmutable());
+            }
         }
         ci.cancel();
     }

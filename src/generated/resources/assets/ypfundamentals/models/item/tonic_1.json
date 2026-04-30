@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "ypfundamentals:item/tonic_1"
+    "layer0": "ypfundamentals:item/tonic/ton_1"
   }
 }

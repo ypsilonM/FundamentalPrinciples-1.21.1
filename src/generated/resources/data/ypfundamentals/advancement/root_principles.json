@@ -1,0 +1,25 @@
+{
+  "parent": "ypfundamentals:root",
+  "criteria": {
+    "tick": {
+      "trigger": "minecraft:tick"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "background": "minecraft:textures/gui/advancements/backgrounds/adventure.png",
+    "description": "Follow the path of the scholar",
+    "icon": {
+      "count": 1,
+      "id": "ypfundamentals:scroll_fundamentalism"
+    },
+    "show_toast": false,
+    "title": "Principles"
+  },
+  "requirements": [
+    [
+      "tick"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

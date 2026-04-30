@@ -13,7 +13,7 @@ import static com.ypsi.fundamentalism.FundamentalPrinciples.LOGGER;
 public class Visitors {
     public static class SpellAnalysisVisitor extends ClassVisitor {
         private final Set<String> detectedCategories = new HashSet<>();
-        private final Set<String> entityClassesToAnalyze = new HashSet<>();
+        //private final Set<String> entityClassesToAnalyze = new HashSet<>();
         private final Set<String> analyzedClasses = new HashSet<>();
 
         private boolean foundGetSpellPower = false;
@@ -34,7 +34,7 @@ public class Visitors {
 
             if(isEntityClass(internalClassName)) {
                 detectedCategories.add("createsEntity");
-                entityClassesToAnalyze.add(internalClassName);
+                //entityClassesToAnalyze.add(internalClassName);
                 analyzeChildEntity(internalClassName);
             }
         }
@@ -103,7 +103,8 @@ public class Visitors {
                         Map.entry("getTargetBlock", "usesRaycast"),
                         Map.entry("doPostAttackEffects","usesPotentiation"),
                         Map.entry("setDeltaMovement","usesImpulseCastData"),
-                        Map.entry("getWeaponDamage", "usesPotentiation")
+                        Map.entry("getWeaponDamage", "usesPotentiation"),
+                        Map.entry("begin", "usesRaycast")
                 );
 
                 String category = categoryMapping.get(name);
@@ -129,6 +130,7 @@ public class Visitors {
                 if (type.contains("SpellHealEvent")) {
                     detectedCategories.add("usesHealing");
                 }
+
             }
             private boolean matchesOwner(String owner, String methodName) {
                 return switch (methodName) {
@@ -136,6 +138,7 @@ public class Visitors {
                     case "preCastTargetHelper", "handleSpellTeleport", "raycastForEntity", "getTargetBlock", "getWeaponDamage" -> owner.contains("Utils");
                     case "addEffect" -> owner.contains("LivingEntity") || owner.contains("Entity");
                     case "doPostAttackEffects" -> owner.contains("EnchantmentHelper");
+                    case "begin" -> owner.contains("RaycastBuilder");
                     default -> true;
                 };
             }
@@ -210,6 +213,12 @@ public class Visitors {
             }
             return checkClassHierarchy(internalName, "net.minecraft.world.entity.Entity");
         }
+        private boolean isEffectClass(String internalName){
+            if(internalName == null){
+                return false;
+            }
+            return checkClassHierarchy(internalName, "net.minecraft.world.effect.MobEffect");
+        }
 
         private boolean checkClassHierarchy(String internalName, String targetClassName) {
             if (internalName == null) return false;
@@ -230,6 +239,6 @@ public class Visitors {
             processPowerCategory();
             return detectedCategories;
         }
-        public Set<String> getEntityClassesToAnalyze() { return entityClassesToAnalyze; }
+        //public Set<String> getEntityClassesToAnalyze() { return entityClassesToAnalyze; }
     }
 }

@@ -2,6 +2,7 @@ package com.ypsi.fundamentalism.spells.fire;
 
 import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.entity.spells.sol.SolProjectile;
+import com.ypsi.fundamentalism.spells.Animations;
 import com.ypsi.fundamentalism.spells.ModSpells;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
@@ -113,6 +114,12 @@ public class SolSpell extends AbstractSpell {
     private float getRadius(int spellLevel, LivingEntity entity) {
         return (float) ((Math.sqrt(spellLevel)) + (.15f * getSpellPower(spellLevel, entity))*(getTimeBoost(entity)));
     }
+
+    @Override
+    public AnimationHolder getCastStartAnimation() {
+        return Animations.TONATIUH_START;
+    }
+
     @Override
     public AnimationHolder getCastFinishAnimation() {
         return SpellAnimations.FINISH_ANIMATION;

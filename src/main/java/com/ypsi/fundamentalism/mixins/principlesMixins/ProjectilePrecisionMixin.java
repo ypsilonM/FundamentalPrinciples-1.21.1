@@ -1,6 +1,6 @@
 package com.ypsi.fundamentalism.mixins.principlesMixins;
 
-import com.ypsi.fundamentalism.attachments.SpellCategoryProgression;
+import com.ypsi.fundamentalism.attachments.PrinciplesProgressionManager;
 import com.ypsi.fundamentalism.util.Principles;
 import com.ypsi.fundamentalism.util.Util;
 import io.redspace.ironsspellbooks.entity.spells.AbstractMagicProjectile;
@@ -22,7 +22,7 @@ public class ProjectilePrecisionMixin {
         AbstractMagicProjectile magicProjectile = (AbstractMagicProjectile)(Object) this;
         Entity owner = magicProjectile.getOwner();
         if(owner instanceof ServerPlayer player && !player.level().isClientSide){
-            int level = SpellCategoryProgression.getCategoryLevel(player, Principles.POTENTIA);
+            int level = PrinciplesProgressionManager.getCategoryLevel(player, Principles.POTENTIA);
             float accuracy = Util.getAccuracy(level);
             return applyAccuracyVariation(original, accuracy, player.getRandom());
         }

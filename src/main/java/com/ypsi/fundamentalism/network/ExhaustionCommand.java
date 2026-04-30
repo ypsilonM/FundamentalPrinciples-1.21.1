@@ -2,7 +2,7 @@ package com.ypsi.fundamentalism.network;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.ypsi.fundamentalism.attachments.YpsAttachments;
+import com.ypsi.fundamentalism.attachments.FatigueManager;
 import com.ypsi.fundamentalism.attributes.YpsAttributes;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -36,10 +36,12 @@ public class ExhaustionCommand {
     }
     private static int setExhaustion(CommandSourceStack source, Collection<ServerPlayer> targets, int level, int amount) {
         for (ServerPlayer player : targets) {
-            player.setData(YpsAttachments.LEVEL_EXHAUSTION, level);
+            FatigueManager.setFatigueLevel(player, level);
+            //player.setData(YpsAttachments.LEVEL_EXHAUSTION, level);
             int maxEx = getMaxExPerLevel(level, player);
             int clampedAmount = Mth.clamp(amount, 0, maxEx);
-            player.setData(YpsAttachments.CURRENT_EXHAUSTION, clampedAmount);
+            FatigueManager.setFatigueAmount(player, clampedAmount);
+           // player.setData(YpsAttachments.CURRENT_EXHAUSTION, clampedAmount);
             //SyncExhaustionLevelPacket.sendToPlayer(player, level);
             //SyncExhaustionPacket.sendToPlayer(player, clampedAmount);
             player.getPersistentData().putInt("exhaustionTickCounter", 0);
@@ -66,6 +68,6 @@ public class ExhaustionCommand {
             case 1,3 -> 100;
             case 2 -> 200;
             default -> 100;
-        })+player.getAttributeValue(YpsAttributes.MAX_EXHAUSTION));
+        })+player.getAttributeValue(YpsAttributes.MAX_FATIGUE));
     }
 }

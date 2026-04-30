@@ -1,13 +1,14 @@
 package com.ypsi.fundamentalism.event;
 
-import com.ypsi.fundamentalism.Config;
+import com.ypsi.fundamentalism.ServerConfig;
 import com.ypsi.fundamentalism.FundamentalPrinciples;
-import com.ypsi.fundamentalism.attachments.YpsAttachments;
+import com.ypsi.fundamentalism.attachments.FatigueManager;
 import com.ypsi.fundamentalism.attributes.YpsAttributes;
 import com.ypsi.fundamentalism.component.SpellbookLevel.SpellBookComponentHelper;
 import com.ypsi.fundamentalism.component.YpsDataComponents;
 import com.ypsi.fundamentalism.config.SpellCategoriesGenerator;
 import com.ypsi.fundamentalism.effect.ModEffects;
+import com.ypsi.fundamentalism.enchantment.FundEnchantments;
 import com.ypsi.fundamentalism.entity.mobs.imp.ImpEntity;
 import com.ypsi.fundamentalism.entity.mobs.venemerus.VenemerusEntity;
 import com.ypsi.fundamentalism.item.ModItems;
@@ -15,8 +16,7 @@ import com.ypsi.fundamentalism.item.custom.IExhaustionConsumable;
 import com.ypsi.fundamentalism.network.packets.SyncCategoryLevelsPacket;
 import com.ypsi.fundamentalism.network.packets.SyncReinforcementPacket;
 import com.ypsi.fundamentalism.particle.ModParticles;
-import com.ypsi.fundamentalism.attachments.AvailableSpellsAttachment;
-import com.ypsi.fundamentalism.attachments.SpellCategoryProgression;
+import com.ypsi.fundamentalism.attachments.PrinciplesProgressionManager;
 import com.ypsi.fundamentalism.spells.ModSpells;
 import com.ypsi.fundamentalism.util.Principles;
 import com.ypsi.fundamentalism.util.Util;
@@ -38,10 +38,12 @@ import io.redspace.ironsspellbooks.item.SpellBook;
 import io.redspace.ironsspellbooks.item.weapons.StaffItem;
 import io.redspace.ironsspellbooks.network.SyncManaPacket;
 import io.redspace.ironsspellbooks.network.casting.*;
+import io.redspace.ironsspellbooks.registries.MobEffectRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetEntityLinkPacket;
 import net.minecraft.resources.ResourceLocation;
@@ -57,11 +59,14 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.food.FoodData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
@@ -69,6 +74,7 @@ import net.neoforged.neoforge.event.entity.living.*;
 import net.neoforged.neoforge.event.entity.player.CriticalHitEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.event.level.SleepFinishedTimeEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
@@ -78,7 +84,7 @@ import top.theillusivec4.curios.api.event.CurioAttributeModifierEvent;
 
 import java.util.*;
 
-import static com.ypsi.fundamentalism.util.Util.getMaxExPerLevel;
+import static com.ypsi.fundamentalism.util.Util.getMaxFatigue;
 
 @EventBusSubscriber(modid = FundamentalPrinciples.MOD_ID)
 public class ModEvents {
@@ -112,15 +118,15 @@ public class ModEvents {
         PotionBrewing.Builder builder = event.getBuilder();
 
         builder.addRecipe(
-                Ingredient.of(ModItems.TEST_TUBE),  Ingredient.of(Items.PITCHER_PLANT),      ModItems.PITCHER_EXTRACT.toStack(1)
+                Ingredient.of(ModItems.TEST_TUBE),  Ingredient.of(Items.PITCHER_PLANT),
+                ModItems.PITCHER_EXTRACT.toStack(1)
         );
         builder.addRecipe(
-                Ingredient.of(ModItems.TEST_TUBE),  Ingredient.of(ModItems.ARCANE_MIXTURE),  ModItems.LUMINAIRE_EXTRACT.toStack(1)
+                Ingredient.of(ModItems.TEST_TUBE),  Ingredient.of(ModItems.ARCANE_MIXTURE),
+                ModItems.LUMINAIRE_EXTRACT.toStack(1)
         );
 
     }
-
-
 
 
     @SubscribeEvent
@@ -168,8 +174,9 @@ public class ModEvents {
                     double knockbackZ = -Math.cos(yawRad);
                     enemy.knockback(knockbackStrength, knockbackX, knockbackZ);
 
-                    player.setData(YpsAttachments.CURRENT_EXHAUSTION, 0);
-                    player.setData(YpsAttachments.LEVEL_EXHAUSTION, 0);
+                    FatigueManager.cleanFatigue(player);
+//                    player.setData(YpsAttachments.CURRENT_EXHAUSTION, 0);
+//                    player.setData(YpsAttachments.LEVEL_EXHAUSTION, 0);
                     //SyncExhaustionPacket.sendToPlayer((ServerPlayer) player, player.getData(YpsAttachments.CURRENT_EXHAUSTION));
                     //SyncExhaustionLevelPacket.sendToPlayer((ServerPlayer) player, player.getData(YpsAttachments.LEVEL_EXHAUSTION));
 
@@ -223,6 +230,7 @@ public class ModEvents {
 
     @SubscribeEvent
     public static void onPlayerLoginExSync(PlayerEvent.@NotNull PlayerLoggedInEvent event) {
+        if(!ServerConfig.fatigueSystem) return;
         if (event.getEntity() instanceof ServerPlayer player) {
             if (!player.getPersistentData().contains("exhaustionTickCounter")) {
                 player.getPersistentData().putInt("exhaustionTickCounter", 0);
@@ -244,7 +252,7 @@ public class ModEvents {
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onManaReinforcementDamage(LivingDamageEvent.Pre event) {
         if(event.getEntity() instanceof ServerPlayer serverPlayer) {
             if(serverPlayer.hasEffect(ModEffects.REINFORCEMENT_EFFECT)) {
@@ -260,17 +268,20 @@ public class ModEvents {
                 double removeSpellBase = baseSpellPower*0.2;
                 double spellPower = serverPlayer.getAttributeValue(AttributeRegistry.SPELL_POWER)+removeSpellBase;
 
-                int currentExLvl = serverPlayer.getData(YpsAttachments.LEVEL_EXHAUSTION.get());
-                float manaMult = switch(currentExLvl){
-                    case 1 -> 0.125f;
-                    case 2 -> 0.25f;
-                    case 3 -> 0.375f;
-                    case 4 -> 0.5f;
-                    default -> 0;
-                };
-
-                float mitigatedDamage = (float)(Math.sqrt((maxMana/100))*spellPower);
-                mitigatedDamage = mitigatedDamage-(mitigatedDamage*manaMult);
+                int currentExLvl = FatigueManager.getFatigueLevel(serverPlayer);
+                //int currentExLvl = serverPlayer.getData(YpsAttachments.LEVEL_EXHAUSTION.get());
+                float fatigueMult = 1;
+                if(ServerConfig.fatigueSystem){
+                    fatigueMult = switch(currentExLvl){
+                        case 1 -> 0.125f;
+                        case 2 -> 0.25f;
+                        case 3 -> 0.375f;
+                        case 4 -> 0.5f;
+                        default -> 0;
+                    };
+                }
+                float mitigatedDamage = (float)(Math.sqrt((maxMana/150))*spellPower);
+                mitigatedDamage = mitigatedDamage-(mitigatedDamage*fatigueMult);
                 float modifiedDamage = originalDamage;
 
                 float manaToConsume = (float)(maxMana*0.05);
@@ -298,10 +309,8 @@ public class ModEvents {
                     PacketDistributor.sendToPlayer(serverPlayer, new SyncManaPacket(magicData));
                 }
 
-                addExhaustion(serverPlayer, exhaustionAcc);
-
-//                SyncExhaustionPacket.sendToPlayer(serverPlayer,serverPlayer.getData(YpsAttachments.CURRENT_EXHAUSTION));
-//                SyncExhaustionLevelPacket.sendToPlayer(serverPlayer, serverPlayer.getData(YpsAttachments.LEVEL_EXHAUSTION));
+                if(ServerConfig.fatigueSystem)
+                    addExhaustion(serverPlayer, exhaustionAcc);
 
                 event.setNewDamage(modifiedDamage);
             }
@@ -340,8 +349,9 @@ public class ModEvents {
         Set<String> categories = SpellCategoriesGenerator.getCategoriesForSpell(spellId);
 
         if(player instanceof ServerPlayer caster){
-
-            if (caster.hasEffect(ModEffects.BURNOUT_EFFECT) && !caster.level().isClientSide) {
+            if ((
+                    caster.hasEffect(ModEffects.BURNOUT_EFFECT) || caster.hasEffect(ModEffects.CHAINED_EFFECT)
+            ) && !caster.level().isClientSide) {
                 cancelCast(event, magicData, caster, spell);
                 return;
             }
@@ -361,11 +371,12 @@ public class ModEvents {
 
 
     }
+
     @SubscribeEvent
     public static void onServerTickCancelingCast(ServerTickEvent.Post event){
         if(event.getServer().getTickCount()%5!=0) return;
         event.getServer().getPlayerList().getPlayers().forEach(player -> {
-            if(player.hasEffect(ModEffects.BURNOUT_EFFECT)){
+            if((player.hasEffect(ModEffects.BURNOUT_EFFECT) || player.hasEffect(ModEffects.CHAINED_EFFECT))){
                 if(MagicData.getPlayerMagicData(player).isCasting()) {
                     Utils.serverSideCancelCast(player, true);
                 }
@@ -373,6 +384,7 @@ public class ModEvents {
         });
 
     }
+
     @SubscribeEvent
     public static void SpellNerfCast(SpellOnCastEvent event){
         Player p = event.getEntity();
@@ -381,11 +393,13 @@ public class ModEvents {
             String spellId = event.getSpellId();
 
             int mana = event.getManaCost();
-            int currentExLvl = player.getData(YpsAttachments.LEVEL_EXHAUSTION.get());
-
-            if(SpellCategoriesGenerator.isInCategory(spellId, "immutable")) {
-                int certumLevel = SpellCategoryProgression.getCategoryLevel(player, Principles.CERTUM);
-                event.setManaCost((int) (mana*(1+Util.manaMultiplier(currentExLvl, certumLevel))));
+            int currentExLvl = FatigueManager.getFatigueLevel(p);
+            //int currentExLvl = player.getData(YpsAttachments.LEVEL_EXHAUSTION.get());
+            if(ServerConfig.fatigueSystem) {
+                if (SpellCategoriesGenerator.isInCategory(spellId, "immutable")) {
+                    int certumLevel = PrinciplesProgressionManager.getCategoryLevel(player, Principles.CERTUM);
+                    event.setManaCost((int) (mana * (1 + Util.certumManaMultiplier(currentExLvl, certumLevel))));
+                }
             }
 
             CastSource castSource = event.getCastSource();
@@ -409,8 +423,10 @@ public class ModEvents {
                 case EPIC -> 1.20;
                 case LEGENDARY -> 1.25;
             };
+
             boolean castedByStaff = player.getOffhandItem().getItem() instanceof StaffItem || player.getMainHandItem().getItem() instanceof StaffItem;
             double staffReduction = castedByStaff ? 0.8 : 1;
+
             Set<String> categories = SpellCategoriesGenerator.getCategoriesForSpell(spellId);
 
             float formulaAdd = 0;
@@ -418,51 +434,52 @@ public class ModEvents {
                 formulaAdd = 1;
             } else {
                 formulaAdd =
-                        Math.max(
-                                (float) (
-                                        (
-                                                (Math.pow(MANA_USED, 1f / 1.3f)) /
-                                                        (spellPower * entitySchoolPowerModifier) * staffReduction * rarityRatio * principleRatio(categories, player)
-                                        ) * Config.fatigueGen)
-                                , 1f);
+                        Math.max((float) (
+                            ((Math.pow(MANA_USED, 1f / 1.3f))
+                            / (spellPower * entitySchoolPowerModifier) * staffReduction * rarityRatio * principleFatigueRatio(categories, player)
+                            ) * ServerConfig.fatigueMultiplier) , 1f);
 
             }
 
-            addExhaustion(player, (int) formulaAdd);
+            if(ServerConfig.fatigueSystem)
+                addExhaustion(player, (int) formulaAdd);
 
-            //->Leveling up
+            // -> Leveling up
             int levelBonus = calculateXpFromSpell(LEVEL, spell);
             if (castSource != CastSource.SCROLL) {
                 for (String category : categories) {
-                    SpellCategoryProgression.addCategoryExperience(player, category, levelBonus);
+                    PrinciplesProgressionManager.addCategoryExperience(player, category, levelBonus);
                 }
             }
-            //-> Search Equipped Spellbook
-            CuriosApi.getCuriosInventory(player).ifPresent(inv -> {
-                inv.findCurios(Curios.SPELLBOOK_SLOT).forEach(curio -> {
-                    ItemStack spellBook = curio.stack();
-                    if (spellBook.getItem() instanceof SpellBook) {
-                        int xpGained = calculateXpFromSpell(LEVEL, spell);
-                        SpellBookComponentHelper.addXP(spellBook, xpGained, player);
-                    }
+
+            // -> Search Equipped Spellbook
+
+            if(ServerConfig.spellbookLevel) {
+                CuriosApi.getCuriosInventory(player).ifPresent(inv -> {
+                    inv.findCurios(Curios.SPELLBOOK_SLOT).forEach(curio -> {
+                        ItemStack spellBook = curio.stack();
+                        if (spellBook.getItem() instanceof SpellBook) {
+                            int xpGained = calculateXpFromSpell(LEVEL, spell);
+                            SpellBookComponentHelper.addXP(spellBook, xpGained, player);
+                        }
+                    });
                 });
-            });
-            //->ServerPlayer to ClientPlayer
-//            SyncExhaustionPacket.sendToPlayer(player, player.getData(YpsAttachments.CURRENT_EXHAUSTION));
-//            SyncExhaustionLevelPacket.sendToPlayer(player, player.getData(YpsAttachments.LEVEL_EXHAUSTION));
+            }
 
             //--------------------------------------------//
 
-            if (currentExLvl == 4) { //10%
-                if (player.getRandom().nextDouble() < 0.10) {
-                    addBurnoutEffect(player, 60);
-                    burnoutSound(player.serverLevel(), player);
+            if(ServerConfig.fatigueSystem) {
+                if (currentExLvl == 4) { //10%
+                    if (player.getRandom().nextDouble() < 0.10) {
+                        addBurnoutEffect(player, 60);
+                        burnoutSound(player.serverLevel(), player);
+                    }
                 }
-            }
-            if (currentExLvl == 3) { //3%
-                if (player.getRandom().nextDouble() < 0.03) {
-                    addBurnoutEffect(player, 15);
-                    burnoutSound(player.serverLevel(), player);
+                if (currentExLvl == 3) { //3%
+                    if (player.getRandom().nextDouble() < 0.03) {
+                        addBurnoutEffect(player, 15);
+                        burnoutSound(player.serverLevel(), player);
+                    }
                 }
             }
 
@@ -486,7 +503,7 @@ public class ModEvents {
             SpellRarity spellRarity = spell.getRarity(level);
             int minLevel = getLevelRequiredForRARITY(spellRarity);
             for (String category : categories){
-                int categoryLevel =  SpellCategoryProgression.getCategoryLevel(serverPlayer, category);
+                int categoryLevel =  PrinciplesProgressionManager.getCategoryLevel(serverPlayer, category);
                 if (categoryLevel<minLevel){
                     return true;
                 }
@@ -498,7 +515,7 @@ public class ModEvents {
     public static boolean teleportCanceled(Set<String> categories, ServerPlayer caster, AbstractSpell spell, SpellPreCastEvent event, MagicData magicData){
         if(categories.contains("usesTeleport")) {
             double probabilityForFail = 0;
-            int categoryLevel = SpellCategoryProgression.getCategoryLevel(caster, "usesTeleport");
+            int categoryLevel = PrinciplesProgressionManager.getCategoryLevel(caster, "usesTeleport");
             int cooldown = MagicManager.getEffectiveSpellCooldown(spell, caster, event.getCastSource()) / 20;
             probabilityForFail = Util.getFailureTPChance(categoryLevel, cooldown) / 100;
             double random = caster.getRandom().nextDouble();
@@ -515,11 +532,11 @@ public class ModEvents {
 
     public static int getLevelRequiredForRARITY(SpellRarity rarity){
         return switch (rarity) {
-            case COMMON -> Config.dominanLvls.get(0);
-            case UNCOMMON -> Config.dominanLvls.get(1);
-            case RARE -> Config.dominanLvls.get(2);
-            case EPIC -> Config.dominanLvls.get(3);
-            case LEGENDARY -> Config.dominanLvls.get(4);
+            case COMMON -> ServerConfig.dominanLvls.get(0);
+            case UNCOMMON -> ServerConfig.dominanLvls.get(1);
+            case RARE -> ServerConfig.dominanLvls.get(2);
+            case EPIC -> ServerConfig.dominanLvls.get(3);
+            case LEGENDARY -> ServerConfig.dominanLvls.get(4);
         };
     }
     public static void vanishCastEffects(ServerPlayer caster){
@@ -538,9 +555,9 @@ public class ModEvents {
         );
     }
 
-
     @SubscribeEvent
     public static void exhaustionDecrement(ServerTickEvent.Post event) {
+        if(!ServerConfig.fatigueSystem) return;
         for (ServerPlayer player : event.getServer().getPlayerList().getPlayers()) {
             final String TICK_COUNTER_KEY = "exhaustionTickCounter";
             final String LEVEL_COUNTER_KEY = "exhaustionLevelCounter";
@@ -549,14 +566,15 @@ public class ModEvents {
             tickCounter++;
 
             int TICKS_PER_SECOND = 20;
-            int regen = (int) player.getAttributeValue(YpsAttributes.EXHAUSTION_REGEN);
+            int regen = (int) player.getAttributeValue(YpsAttributes.FATIGUE_REGEN);
             regen = Math.clamp(regen, 0, 10);
 
             TICKS_PER_SECOND-= regen*2;
 
             if (tickCounter >= TICKS_PER_SECOND) {
-                int levelEx = player.getData(YpsAttachments.LEVEL_EXHAUSTION);
-                int currentEx = player.getData(YpsAttachments.CURRENT_EXHAUSTION);
+
+                int levelEx = FatigueManager.getFatigueLevel(player);
+                int currentEx = FatigueManager.getFatigueAmount(player);
 
                 int levelCounter = player.getPersistentData().getInt(LEVEL_COUNTER_KEY);
 
@@ -566,14 +584,17 @@ public class ModEvents {
 
                     if (levelEx >= 1 && levelCounter >= 5) {
                         int newLevel = levelEx - 1;
-                        player.setData(YpsAttachments.LEVEL_EXHAUSTION, newLevel);
-                        int newMax = getMaxExPerLevel(newLevel, player);
-                        player.setData(YpsAttachments.CURRENT_EXHAUSTION, newMax);
+                        FatigueManager.setFatigueLevel(player, newLevel);
+                        //player.setData(YpsAttachments.LEVEL_EXHAUSTION, newLevel);
+                        int newMax = getMaxFatigue(newLevel, player);
+                        FatigueManager.setFatigueAmount(player, newMax);
+                        //player.setData(YpsAttachments.CURRENT_EXHAUSTION, newMax);
                         player.getPersistentData().putInt(LEVEL_COUNTER_KEY, 0);
                     }
                 } else {
                     int result = currentEx - 1;
-                    player.setData(YpsAttachments.CURRENT_EXHAUSTION, Math.max(result, 0));
+                    FatigueManager.setFatigueAmount(player,Math.max(result, 0) );
+                    //player.setData(YpsAttachments.CURRENT_EXHAUSTION, Math.max(result, 0));
                     if (levelCounter > 0) {
                         player.getPersistentData().putInt(LEVEL_COUNTER_KEY, 0);
                     }
@@ -588,7 +609,6 @@ public class ModEvents {
                 player.getPersistentData().putInt(TICK_COUNTER_KEY, tickCounter);
             }
             //Refresh every second
-
         }
     }
 
@@ -614,44 +634,23 @@ public class ModEvents {
         ));
     }
 
-    public static float principleRatio(Set<String> categories, Player player){
+    public static float principleFatigueRatio(Set<String> categories, Player player){
         float ratio = 1f;
         for(String category: categories){
             //5% per category
-            int principleLevel = SpellCategoryProgression.getCategoryLevel(player, category);
+            int principleLevel = PrinciplesProgressionManager.getCategoryLevel(player, category);
             ratio+= 0.05f-(0.005f*principleLevel);
         }
         return ratio;
     }
 
     private static void addExhaustion(ServerPlayer player, int amountToAdd) {
-        int currentLevel = player.getData(YpsAttachments.LEVEL_EXHAUSTION);
-        int currentEx = player.getData(YpsAttachments.CURRENT_EXHAUSTION);
-        int remainingToAdd = amountToAdd;
 
-        while (remainingToAdd > 0 && currentLevel <= 4) {
-            int maxExPts = getMaxExPerLevel(currentLevel, player);
-            int remainingSpace = maxExPts - currentEx;
+        FatigueManager.addFatigue(player, amountToAdd);
 
-            if (remainingToAdd <= remainingSpace) {
-                currentEx += remainingToAdd;
-                remainingToAdd = 0;
-            } else {
-                currentEx = maxExPts;
-                remainingToAdd -= remainingSpace;
-
-                if (currentLevel < 4) {
-                    currentLevel++;
-                    currentEx = 0;
-                } else {
-                    remainingToAdd = 0;
-                }
-            }
-        }
-        player.setData(YpsAttachments.LEVEL_EXHAUSTION, currentLevel);
-        player.setData(YpsAttachments.CURRENT_EXHAUSTION, currentEx);
-
-        int maxEx = getMaxExPerLevel(currentLevel, player);
+        int currentLevel = FatigueManager.getFatigueLevel(player);
+        int maxEx = getMaxFatigue(currentLevel, player);
+        int currentEx = FatigueManager.getFatigueAmount(player);
 
         if(currentLevel==4 && currentEx==maxEx && !player.hasEffect(ModEffects.BURNOUT_EFFECT)){
             player.addEffect(new MobEffectInstance(
@@ -689,7 +688,7 @@ public class ModEvents {
                 case SpellRarity.LEGENDARY:
                     return 5;
                 default:
-                    return 0;
+                    return 5;
             }
         }else{
             switch (spellRarity) {
@@ -700,19 +699,10 @@ public class ModEvents {
                 case SpellRarity.LEGENDARY:
                     return 3;
                 default:
-                    return 0;
+                    return 3;
             }
         }
     }
-
-
-//    @SubscribeEvent
-//    public static void brainDamage(SpellOnCastEvent event){
-//        Player player = event.getEntity();
-//        if(player instanceof ServerPlayer serverPlayer) {
-//
-//        }
-//    }
 
     @SubscribeEvent
     public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
@@ -730,8 +720,9 @@ public class ModEvents {
     @SubscribeEvent
     public static void uselessShield(LivingShieldBlockEvent event){
         DamageSource source = event.getDamageSource();
-        if (source instanceof SpellDamageSource spellDamageSource
-                && event.getEntity() instanceof ServerPlayer player && event.getBlocked()){
+        float blockedDamage = event.getBlockedDamage();
+
+        if (source instanceof SpellDamageSource && event.getEntity() instanceof ServerPlayer player && event.getBlocked()){
 
             final int SHIELD_COOLDOWN_TICKS = 300;
             InteractionHand shieldHand = null;
@@ -744,19 +735,136 @@ public class ModEvents {
                 shieldHand = InteractionHand.OFF_HAND;
                 shield = shieldItem;
             }
-            player.getCooldowns().addCooldown(shield, SHIELD_COOLDOWN_TICKS);
 
             if (player.isUsingItem() && shieldHand != null) {
                 ItemStack activeItem = player.getItemInHand(shieldHand);
+
                 if (activeItem.getItem() instanceof ShieldItem) {
-                    player.stopUsingItem();
-                    player.connection.send(new ClientboundSetEntityLinkPacket(player, null));
+                        Holder<Enchantment> aegisHolder = player.level().registryAccess()
+                            .lookupOrThrow(Registries.ENCHANTMENT)
+                            .get(FundEnchantments.AEGIS)
+                            .orElse(null);
+
+                        int level = 1;
+                        float blockeableDamage = 0f;
+
+                        if(aegisHolder!=null) {
+                            level = activeItem.getEnchantmentLevel(aegisHolder) + 1;
+                            blockeableDamage = switch (level) {
+                                case 1 -> 0;
+                                case 2 -> 10;
+                                case 3 -> 15;
+                                case 4 -> 30;
+                                case 5 -> 45;
+                                case 6 -> 60;
+                                default -> 0;
+                            };
+                        }
+                        if(blockedDamage >= blockeableDamage) {
+                            player.stopUsingItem();
+                            player.connection.send(new ClientboundSetEntityLinkPacket(player, null));
+                            player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
+                                    SoundEvents.SHIELD_BREAK, player.getSoundSource(), 0.8F, 0.8F + player.level().random.nextFloat() * 0.4F);
+                            player.getCooldowns().addCooldown(shield, SHIELD_COOLDOWN_TICKS / (level));
+                        }
                 }
+
             }
-            player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
-                    SoundEvents.SHIELD_BREAK, player.getSoundSource(), 0.8F, 0.8F + player.level().random.nextFloat() * 0.4F);
 
         }
+    }
+
+    @SubscribeEvent
+    public static void resting(SleepFinishedTimeEvent event){
+
+        if(!ServerConfig.fatigueSystem) return;
+
+        Objects.requireNonNull(event.getLevel().getServer()).getPlayerList().getPlayers().forEach(e->{
+
+            if(e.isSleeping()) {
+                int currentLevel = FatigueManager.getFatigueLevel(e);
+                int currentEx = FatigueManager.getFatigueAmount(e);
+
+                int newLevel = Math.max(currentLevel - 2, 0);
+                int newExh = Math.min(currentEx, getMaxFatigue(newLevel, e));
+
+                FatigueManager.setFatigueLevel(e, newLevel);
+                FatigueManager.setFatigueAmount(e, newExh);
+            }
+
+        });
+    }
+
+    @SubscribeEvent
+    public static void onCooldownAdded(SpellCooldownAddedEvent.Pre event){
+        AbstractSpell spell = event.getSpell();
+        if( event.getEntity() instanceof ServerPlayer serverPlayer
+                && SpellCategoriesGenerator.isInCategory(spell.getSpellId(), "usesSummon")
+                && spell.getRecastCount(1, serverPlayer)==2) {
+
+                int cooldown = event.getEffectiveCooldown();
+                int vitaleLevel = PrinciplesProgressionManager.getCategoryLevel(serverPlayer, Principles.VITALE);
+                cooldown -= (int) (cooldown*Util.getCooldownReduction(vitaleLevel));
+                event.setEffectiveCooldown(cooldown);
+        }
+    }
+
+
+    @SubscribeEvent
+    public static void reverseCurseTechnique(SpellHealEvent event){
+
+        if(!ServerConfig.newHealing) return;
+
+        if(event.getTargetEntity() instanceof ServerPlayer healedEntity &&
+                event.getEntity() instanceof ServerPlayer caster){
+
+            int remediumLevel = PrinciplesProgressionManager.getCategoryLevel(caster, Principles.REMEDIUM);
+            float FOOD_CONSUME = Util.getFoodToCONSUME(remediumLevel);
+
+            float healAmount = event.getHealAmount();
+
+            float healed = healedEntity.getHealth() + healAmount - healedEntity.getMaxHealth();
+            if (healed > 0) { //sobra
+                healAmount -= healed;
+            } //No sobra
+
+            FoodData foodData = healedEntity.getFoodData();
+
+            float totalToConsume = healAmount * FOOD_CONSUME;
+            float remainingToConsume = totalToConsume;
+//            float saturation = foodData.getSaturationLevel();
+//            if (saturation > 0) {
+//                float saturationConsumed = Math.min(saturation, remainingToConsume);
+//                foodData.setSaturation(saturation - saturationConsumed);
+//                remainingToConsume -= saturationConsumed;
+//            }
+            if (remainingToConsume > 0) {
+
+                int currentFood = foodData.getFoodLevel();
+                int foodToConsume = (int) Math.ceil(remainingToConsume);
+                int food = currentFood - foodToConsume;
+                int newFood = Math.max(0, food);
+                foodData.setFoodLevel(newFood);
+
+                if (food < 0) {
+
+                    healAmount += (FOOD_CONSUME * food);
+                    healedEntity.heal(healAmount);
+
+                    healedEntity.addEffect(new MobEffectInstance(
+                            MobEffectRegistry.BLIGHT,
+                            5,
+                            10,
+                            true,
+                            false,
+                            true
+                    ));
+                }
+
+            }
+
+        }
+
     }
 
 
@@ -765,8 +873,11 @@ public class ModEvents {
         if(event.getEntity() instanceof ServerPlayer player){
             player.server.execute(() -> {
                 SyncCategoryLevelsPacket.sendToPlayer(player);
-                player.setData(YpsAttachments.CURRENT_EXHAUSTION, 0);
-                player.setData(YpsAttachments.LEVEL_EXHAUSTION, 0);
+                if(ServerConfig.fatigueSystem) {
+                    FatigueManager.cleanFatigue(player);
+                }
+//                player.setData(YpsAttachments.CURRENT_EXHAUSTION, 0);
+//                player.setData(YpsAttachments.LEVEL_EXHAUSTION, 0);
                 //SyncExhaustionPacket.sendToPlayer(player, player.getData(YpsAttachments.CURRENT_EXHAUSTION));
                 //SyncExhaustionLevelPacket.sendToPlayer(player, player.getData(YpsAttachments.LEVEL_EXHAUSTION));
             });
@@ -821,6 +932,9 @@ public class ModEvents {
 
     @SubscribeEvent
     public static void maxExhaustionSpellbook(CurioAttributeModifierEvent event) {
+
+        if(!ServerConfig.spellbookLevel) return;
+
         ItemStack stack = event.getItemStack();
         if (stack.getItem() instanceof SpellBook) {
             if(stack.has(YpsDataComponents.YP_SPELL_SLOTS)){
@@ -829,11 +943,13 @@ public class ModEvents {
                         stack.get(YpsDataComponents.YP_SPELL_SLOTS)*5,
                         AttributeModifier.Operation.ADD_VALUE
                 );
-                event.addModifier(YpsAttributes.MAX_EXHAUSTION.getDelegate(), modifier);
+                event.addModifier(YpsAttributes.MAX_FATIGUE.getDelegate(), modifier);
             }
 
         }
     }
+
+
 
 
 }

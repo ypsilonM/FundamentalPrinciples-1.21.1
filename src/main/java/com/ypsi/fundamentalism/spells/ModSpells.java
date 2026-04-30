@@ -2,12 +2,15 @@ package com.ypsi.fundamentalism.spells;
 
 
 import com.ypsi.fundamentalism.FundamentalPrinciples;
+import com.ypsi.fundamentalism.spells.blood.LacerationSpell;
 import com.ypsi.fundamentalism.spells.blood.ThornSpell;
 import com.ypsi.fundamentalism.spells.ender.LapsusSpell;
 import com.ypsi.fundamentalism.spells.ender.PullSpell;
 import com.ypsi.fundamentalism.spells.blood.BloodstreamSpell;
+import com.ypsi.fundamentalism.spells.eldritch.StealSummonSpell;
 import com.ypsi.fundamentalism.spells.evocation.TauntSpell;
 import com.ypsi.fundamentalism.spells.fire.BurningSpiritSpell;
+import com.ypsi.fundamentalism.spells.fire.IgniteSpell;
 import com.ypsi.fundamentalism.spells.fire.PyrokinesisSpell;
 import com.ypsi.fundamentalism.spells.fire.SolSpell;
 import com.ypsi.fundamentalism.spells.fundamentalism.RemediumSpell;
@@ -38,10 +41,13 @@ public class ModSpells {
     public static final Supplier<AbstractSpell> FLAME_GRANT_STRENGTH = registerSpell(new BurningSpiritSpell());
     public static final Supplier<AbstractSpell> PYROKINESIS = registerSpell(new PyrokinesisSpell());
     public static final Supplier<AbstractSpell> SOL_SPELL = registerSpell(new SolSpell());
+    public static final Supplier<AbstractSpell> IGNITE_SPELL = registerSpell(new IgniteSpell());
+
     //------------>blood<----------------
     public static final Supplier<AbstractSpell> BLOODSTREAM = registerSpell(new BloodstreamSpell());
     public static final Supplier<AbstractSpell> THORN = registerSpell(new ThornSpell());
-//    public static final Supplier<AbstractSpell> BLOOD_MOON_SPELL = registerSpell(new BloodMoonSpell());
+    public static final Supplier<AbstractSpell> LACERATION = registerSpell(new LacerationSpell());
+
     //------------>holy<----------------
     public static final Supplier<AbstractSpell> HOLY_LIGHTNING = registerSpell(new HolyLightningSpell());
     public static final Supplier<AbstractSpell> SACRED_DISK = registerSpell(new SacredDiskSpell());
@@ -52,14 +58,16 @@ public class ModSpells {
     public static final Supplier<AbstractSpell> LAPSUS = registerSpell(new LapsusSpell());
     //------------>evocation<----------------
     public static final Supplier<AbstractSpell> TAUNT = registerSpell(new TauntSpell());
-//    public static final Supplier<AbstractSpell> STEAL_SUMMON = registerSpell(new StealSummonSpell());
+
     //public static final Supplier<AbstractSpell> COPYCAT = registerSpell(new CopycatSpell());
-//    //------------>eldritch<----------------
+    //------------>eldritch<----------------
+    public static final Supplier<AbstractSpell> STEAL_SUMMON = registerSpell(new StealSummonSpell());
 //    public static final Supplier<AbstractSpell> MIRROR = registerSpell(new VoidMirrorSpell());
 
     //public static final Supplier<AbstractSpell> FUNDAMENTALFIRST = registerSpell(new VoidMirrorSpell());
 
     //FUNDAMENTALISM
     //public static final Supplier<AbstractSpell> PROIECTUM_PRINCIPLE = registerSpell(new ProiectumSpell());
+
     public static final Supplier<AbstractSpell> REMEDIUM_SPELL = registerSpell(new RemediumSpell());
 }

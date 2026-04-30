@@ -50,7 +50,6 @@ public class ImpEntity extends AbstractSpellCastingMob implements Enemy {
     private static final RawAnimation FIREBOLT_ANIM = RawAnimation.begin().thenPlay("animation.imp.firebolt");
     private static final RawAnimation FIREBALL_ANIM = RawAnimation.begin().thenPlay("animation.imp.fireball");
 
-    private int castingTimer = 0;
 
     @Override
     protected void registerGoals() {
@@ -81,61 +80,26 @@ public class ImpEntity extends AbstractSpellCastingMob implements Enemy {
 
     @Override
     public void initiateCastSpell(AbstractSpell spell, int spellLevel) {
+        super.initiateCastSpell(spell, spellLevel);
+
         if (spell == SpellRegistry.FIREBOLT_SPELL.get()) {
-            super.initiateCastSpell(spell, spellLevel);
-            this.castingTimer = 40;
             this.triggerAnim("firebolt_controller","fireboltCast");
-
         }else if(spell == SpellRegistry.FIREBALL_SPELL.get()){
-            super.initiateCastSpell(spell, spellLevel);
-            this.castingTimer = 60;
             this.triggerAnim("fireball_controller","fireballCast");
-
         }else if(spell == ModSpells.TAUNT.get()){
-            super.initiateCastSpell(spell, spellLevel);
-            this.castingTimer = 10;
             this.triggerAnim("fireball_controller","fireballCast");
-
         }
     }
-    private void forceLookAtTarget(LivingEntity target) {
-        if (target != null) {
-            double d0 = target.getX() - this.getX();
-            double d2 = target.getZ() - this.getZ();
-            double d1 = target.getEyeY() - this.getEyeY();
 
-            double d3 = Math.sqrt(d0 * d0 + d2 * d2);
-            float f = (float) (Mth.atan2(d2, d0) * (double) (180F / (float) Math.PI)) - 90.0F;
-            float f1 = (float) (-(Mth.atan2(d1, d3) * (double) (180F / (float) Math.PI)));
-            this.setXRot(f1 % 360);
-            this.setYRot(f % 360);
-        }
-    }
     @Override
     public void tick() {
         super.tick();
-
-        if (this.castingTimer > 0) {
-            this.castingTimer--;
-        }
     }
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder pBuilder) {
         super.defineSynchedData(pBuilder);
     }
-
-//    @Override
-//    protected void customServerAiStep() {
-//        super.customServerAiStep();
-//
-//        LivingEntity target = this.getTarget();
-//        if (target != null && this.distanceTo(target) < 20f) {
-//            this.setAggressive(true);
-//        } else {
-//            this.setAggressive(false);
-//        }
-//    }
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
@@ -145,7 +109,7 @@ public class ImpEntity extends AbstractSpellCastingMob implements Enemy {
     }
 
     private <E extends GeoAnimatable> PlayState movePredicate(AnimationState<E> event) {
-        if (this.castingTimer > 0) {
+        if (isCasting()) {
             return PlayState.STOP;
         }
         if (event.isMoving()) {
@@ -157,7 +121,7 @@ public class ImpEntity extends AbstractSpellCastingMob implements Enemy {
     }
 
     private <E extends GeoAnimatable> PlayState castPredicate(AnimationState<E> event) {
-        return this.castingTimer>0?PlayState.CONTINUE:PlayState.STOP;
+        return isCasting() ? PlayState.CONTINUE:PlayState.STOP;
     }
 
     @Override

@@ -48,7 +48,7 @@ public class ChargeSpellVisuals{
             var spellId = syncedSpellData.getCastingSpellId();
             poseStack.pushPose();
             this.getParentModel().translateToHand(HumanoidArm.RIGHT, poseStack);
-            handleRender(poseStack, bufferSource, pPackedLight, entity, spellId, false);
+            doRender(poseStack, bufferSource, pPackedLight, entity, spellId, false);
             poseStack.popPose();
         }
         private boolean isRenderingInGUI() {
@@ -72,7 +72,7 @@ public class ChargeSpellVisuals{
 
     }
 
-    private static <T extends LivingEntity> void handleRender(PoseStack poseStack, MultiBufferSource bufferSource, int pPackedLight, T entity, String spellId, boolean offhand) {
+    private static <T extends LivingEntity> void doRender(PoseStack poseStack, MultiBufferSource bufferSource, int pPackedLight, T entity, String spellId, boolean offhand) {
         if (spellId.equals(ModSpells.HOLY_LIGHTNING.get().getSpellId())) {
             poseStack.translate((double) ((float) (offhand ? -1 : 1) / 32.0F) - .125, .5, 0);
             poseStack.mulPose(Axis.YP.rotationDegrees(180.0F));
@@ -95,7 +95,7 @@ public class ChargeSpellVisuals{
                 poseStack.pushPose();
                 RenderUtil.translateMatrixToBone(poseStack, bone);
                 RenderUtil.rotateMatrixAroundBone(poseStack, bone);
-                handleRender(poseStack, bufferSource, packedLight, entity, spellId, false);
+                doRender(poseStack, bufferSource, packedLight, entity, spellId, false);
                 poseStack.popPose();
             }
         }

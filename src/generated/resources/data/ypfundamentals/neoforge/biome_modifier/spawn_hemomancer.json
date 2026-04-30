@@ -8,6 +8,6 @@
     "type": "ypfundamentals:hemomancer",
     "maxCount": 1,
     "minCount": 1,
-    "weight": 2
+    "weight": 10
   }
 }

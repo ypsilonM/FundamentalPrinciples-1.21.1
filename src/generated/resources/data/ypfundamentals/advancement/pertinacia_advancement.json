@@ -1,0 +1,29 @@
+{
+  "parent": "ypfundamentals:root_principles",
+  "criteria": {
+    "goalPertinacia": {
+      "conditions": {
+        "category": "addEffects",
+        "level": {
+          "min": 20
+        }
+      },
+      "trigger": "ypfundamentals:principles_trigger_level"
+    }
+  },
+  "display": {
+    "description": "Reach the highest knowledge of Pertinacia Principle",
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:potion"
+    },
+    "title": "Pertinacia"
+  },
+  "requirements": [
+    [
+      "goalPertinacia"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

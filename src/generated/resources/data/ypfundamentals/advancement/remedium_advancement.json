@@ -1,0 +1,29 @@
+{
+  "parent": "ypfundamentals:root_principles",
+  "criteria": {
+    "goalRemedium": {
+      "conditions": {
+        "category": "usesHealing",
+        "level": {
+          "min": 20
+        }
+      },
+      "trigger": "ypfundamentals:principles_trigger_level"
+    }
+  },
+  "display": {
+    "description": "Reach the highest knowledge of Remedium Principle",
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:totem_of_undying"
+    },
+    "title": "Remedium"
+  },
+  "requirements": [
+    [
+      "goalRemedium"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

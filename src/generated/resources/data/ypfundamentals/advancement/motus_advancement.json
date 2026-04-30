@@ -1,0 +1,29 @@
+{
+  "parent": "ypfundamentals:root_principles",
+  "criteria": {
+    "goalMotus": {
+      "conditions": {
+        "category": "usesMobility",
+        "level": {
+          "min": 20
+        }
+      },
+      "trigger": "ypfundamentals:principles_trigger_level"
+    }
+  },
+  "display": {
+    "description": "Reach the highest knowledge of Motus Principle",
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:elytra"
+    },
+    "title": "Motus"
+  },
+  "requirements": [
+    [
+      "goalMotus"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

@@ -1,6 +1,6 @@
 package com.ypsi.fundamentalism.mixins;
 
-import com.ypsi.fundamentalism.Config;
+import com.ypsi.fundamentalism.ServerConfig;
 import com.ypsi.fundamentalism.component.YpsDataComponents;
 import io.redspace.ironsspellbooks.api.spells.ISpellContainer;
 import io.redspace.ironsspellbooks.api.spells.SpellRarity;
@@ -10,8 +10,6 @@ import io.redspace.ironsspellbooks.item.SpellBook;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.fml.config.ModConfig;
-import net.neoforged.neoforge.common.ModConfigSpec;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,14 +23,17 @@ public abstract class InscriptionMixin {
     public abstract Slot getSpellBookSlot();
     @Shadow(remap = false)
     public abstract Slot getScrollSlot();
-
-    @Inject(method = "clickMenuButton", at = @At(value = "INVOKE",
-            target = "Lnet/neoforged/bus/api/IEventBus;post(Lnet/neoforged/bus/api/Event;)Lnet/neoforged/bus/api/Event;",
-            shift = At.Shift.AFTER
-    ), cancellable = true, remap = false)
+    //Lnet/neoforged/bus/api/IEventBus;post(Lnet/neoforged/bus/api/Event;)Lnet/neoforged/bus/api/Event
+    @Inject(method = "clickMenuButton",
+            at = @At(value = "INVOKE",
+                    target = "Lio/redspace/ironsspellbooks/gui/inscription_table/InscriptionTableMenu;doInscription(I)V",
+                    shift = At.Shift.BEFORE
+            ),
+            cancellable = true,
+            remap = false)
     private void ypsi$verifySpellBookTier(Player pPlayer, int pId, CallbackInfoReturnable<Boolean> cir) {
-        if (!Config.restrictedInsc){
-            cir.setReturnValue(true);
+        if (!ServerConfig.restrictedInsc || !ServerConfig.spellbookLevel){
+            return;
         }
         ItemStack spellBookItemStack = getSpellBookSlot().getItem();
         if (spellBookItemStack.getItem() instanceof SpellBook) {

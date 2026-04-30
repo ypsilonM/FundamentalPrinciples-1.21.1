@@ -1,0 +1,29 @@
+{
+  "parent": "ypfundamentals:root_principles",
+  "criteria": {
+    "goalConcentratio": {
+      "conditions": {
+        "category": "createEntity",
+        "level": {
+          "min": 20
+        }
+      },
+      "trigger": "ypfundamentals:principles_trigger_level"
+    }
+  },
+  "display": {
+    "description": "Reach the highest knowledge of Concentratio Principle",
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:water_bucket"
+    },
+    "title": "Concentratio"
+  },
+  "requirements": [
+    [
+      "goalConcentratio"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

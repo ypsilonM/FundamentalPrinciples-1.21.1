@@ -36,9 +36,9 @@ public class ThornSpell extends AbstractSpell {
             .build();
 
     public ThornSpell() {
-        this.manaCostPerLevel = 2;
-        this.baseSpellPower = 4;
-        this.spellPowerPerLevel = 1;
+        this.manaCostPerLevel = 5;
+        this.baseSpellPower = 10;
+        this.spellPowerPerLevel = 5;
         this.castTime = 0;
         this.baseManaCost = 20;
     }
@@ -57,6 +57,8 @@ public class ThornSpell extends AbstractSpell {
     public ResourceLocation getSpellResource() {
         return spellId;
     }
+
+
 
     @Override
     public void onCast(Level world, int spellLevel, LivingEntity entity, CastSource castSource, MagicData playerMagicData) {

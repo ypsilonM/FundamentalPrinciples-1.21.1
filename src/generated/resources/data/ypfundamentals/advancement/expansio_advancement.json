@@ -1,0 +1,29 @@
+{
+  "parent": "ypfundamentals:root_principles",
+  "criteria": {
+    "goalExpansio": {
+      "conditions": {
+        "category": "createsAoeEntities",
+        "level": {
+          "min": 20
+        }
+      },
+      "trigger": "ypfundamentals:principles_trigger_level"
+    }
+  },
+  "display": {
+    "description": "Reach the highest knowledge of Expansio Principle",
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:lingering_potion"
+    },
+    "title": "Expansio"
+  },
+  "requirements": [
+    [
+      "goalExpansio"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

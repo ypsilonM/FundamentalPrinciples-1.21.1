@@ -1,0 +1,29 @@
+{
+  "parent": "ypfundamentals:root_principles",
+  "criteria": {
+    "goalRepetitio": {
+      "conditions": {
+        "category": "hasRecasts",
+        "level": {
+          "min": 20
+        }
+      },
+      "trigger": "ypfundamentals:principles_trigger_level"
+    }
+  },
+  "display": {
+    "description": "Reach the highest knowledge of Repetitio Principle",
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:repeater"
+    },
+    "title": "Repetitio"
+  },
+  "requirements": [
+    [
+      "goalRepetitio"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

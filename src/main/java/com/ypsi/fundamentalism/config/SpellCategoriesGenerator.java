@@ -112,7 +112,7 @@ public class SpellCategoriesGenerator {
 
     private static Visitors.SpellAnalysisVisitor analyzeSpellClass(AbstractSpell spell) throws IOException {
         String className = spell.getClass().getName().replace('.', '/');
-        LOGGER.info("🔍 ASM Analyzing: {}", className);
+        LOGGER.info("🤑 ASM Analyzing: {}", className);
 
         String classResource = className + ".class";
 
@@ -160,7 +160,7 @@ public class SpellCategoriesGenerator {
         CONFIG_FILE.getParentFile().mkdirs();
         try (FileWriter writer = new FileWriter(CONFIG_FILE)) {
             GSON.toJson(config, writer);
-            LOGGER.info("Config saved to: {}", CONFIG_FILE.getAbsolutePath());
+            LOGGER.info("ServerConfig saved to: {}", CONFIG_FILE.getAbsolutePath());
         } catch (IOException e) {
             LOGGER.info("Error saving config: {}", e.getMessage());
         }

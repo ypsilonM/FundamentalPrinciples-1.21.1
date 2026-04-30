@@ -2,6 +2,9 @@ package com.ypsi.fundamentalism.attachments;
 
 import com.mojang.serialization.Codec;
 import com.ypsi.fundamentalism.FundamentalPrinciples;
+import com.ypsi.fundamentalism.attachments.customAtt.AvailableSpellsAttachment;
+import com.ypsi.fundamentalism.attachments.customAtt.EfficiencyAttachment;
+import com.ypsi.fundamentalism.attachments.customAtt.PrinciplesLevelsAttachment;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.IEventBus;
@@ -16,7 +19,7 @@ public class YpsAttachments {
     private static final DeferredRegister<AttachmentType<?>> ATTACHMENTS =
             DeferredRegister.create(NeoForgeRegistries.Keys.ATTACHMENT_TYPES, FundamentalPrinciples.MOD_ID);
 
-    public static final Supplier<AttachmentType<Integer>> CURRENT_EXHAUSTION =
+    public static final Supplier<AttachmentType<Integer>> CURRENT_FATIGUE =
             ATTACHMENTS.register("current_exhaustion", () ->
                     AttachmentType.<Integer>builder(() -> 0)
                             .serialize(Codec.INT)
@@ -27,7 +30,7 @@ public class YpsAttachments {
                             )
                             .build());
 
-    public static final Supplier<AttachmentType<Integer>> LEVEL_EXHAUSTION =
+    public static final Supplier<AttachmentType<Integer>> LEVEL_FATIGUE =
             ATTACHMENTS.register("level_exhaustion", () ->
                     AttachmentType.<Integer>builder(() -> 0)
                             .serialize(Codec.INT)
@@ -38,13 +41,21 @@ public class YpsAttachments {
                             )
                             .build());
 
-    public static final Supplier<AttachmentType<SpellCategoryLevelsAttachment>> SPELL_CATEGORY_LEVELS =
+    public static final Supplier<AttachmentType<PrinciplesLevelsAttachment>> PRINCIPLES_LEVELS =
             ATTACHMENTS.register("spell_category_levels", () ->
-                    AttachmentType.<SpellCategoryLevelsAttachment>builder(SpellCategoryLevelsAttachment::new)
-                            .serialize(SpellCategoryLevelsAttachment.CODEC)
+                    AttachmentType.<PrinciplesLevelsAttachment>builder(PrinciplesLevelsAttachment::new)
+                            .serialize(PrinciplesLevelsAttachment.CODEC)
                             .copyOnDeath()
                             .build()
             );
+
+    public static final Supplier<AttachmentType<EfficiencyAttachment>> CAST_EFFICIENCY =
+            ATTACHMENTS.register("cast_efficiency", () ->
+                    AttachmentType.<EfficiencyAttachment>builder(EfficiencyAttachment::new)
+                            .serialize(EfficiencyAttachment.CODEC)
+                            .copyOnDeath()
+                            .build()
+                    );
 
     public static final Supplier<AttachmentType<AvailableSpellsAttachment>> SPELL_LIST =
             ATTACHMENTS.register("spell_list", () ->

@@ -27,9 +27,11 @@ public class ModCreativeModTabs {
                         output.accept(ModItems.PITCHER_EXTRACT);
                         output.accept(ModItems.FLASK);
                         output.accept(ModItems.TONIC);
+                        output.accept(ModItems.URSIDAE_FUR);
                         output.accept(ModItems.IMP_SPAWN_EGG);
                         output.accept(ModItems.HEMOMANCER_SPAWN_EGG);
                         output.accept(ModItems.VENEMERUS_SPAWN_EGG);
+                        output.accept(ModItems.RUNEAR_SPAWN_EGG);
                     })
                     .build());
 //    public static final Supplier<CreativeModeTab> MANA_BLOCKS_TAB = CREATIVE_MODE_TAB.register("mana_blocks_tab",

@@ -1,0 +1,29 @@
+{
+  "parent": "ypfundamentals:root_principles",
+  "criteria": {
+    "goalLocus": {
+      "conditions": {
+        "category": "usesTargeting",
+        "level": {
+          "min": 20
+        }
+      },
+      "trigger": "ypfundamentals:principles_trigger_level"
+    }
+  },
+  "display": {
+    "description": "Reach the highest knowledge of Locus Principle",
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:target"
+    },
+    "title": "Locus"
+  },
+  "requirements": [
+    [
+      "goalLocus"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

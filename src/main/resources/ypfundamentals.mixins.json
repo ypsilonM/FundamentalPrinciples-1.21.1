@@ -5,24 +5,23 @@
   "compatibilityLevel": "JAVA_21",
   "refmap": "yourmod.refmap.json",
   "client": [
-    "LifeGuiMixin",
-    "ScrollInfoMixin",
-    "SpellWheelOverlayMixin",
-    "ReinforcementMixin"
+    "clientMixins.LifeGuiMixin",
+    "clientMixins.ReinforcementMixin",
+    "clientMixins.ScrollInfoMixin",
+    "clientMixins.SpellWheelOverlayMixin"
   ],
   "mixins": [
     "ArcaneAnvilMixin",
     "InscriptionMixin",
-    "PowerSpellsMixin",
     "SpellBookMixin",
     "SpellBookTooltipMixin",
     "UniqueBookMixin",
-    "principlesMixins.PlayerRecastsMixin",
-    "principlesMixins.CertumManaMixin",
+    "principlesMixins.PowerSpellsMixin",
     "principlesMixins.AoERadiusMixin",
-    "principlesMixins.RaycastMixin",
-
-    "principlesMixins.ProjectilePrecisionMixin"
+    "principlesMixins.CertumManaMixin",
+    "principlesMixins.PlayerRecastsMixin",
+    "principlesMixins.ProjectilePrecisionMixin",
+    "principlesMixins.RaycastBuilderMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -3,11 +3,10 @@ package com.ypsi.fundamentalism.event;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.ypsi.fundamentalism.FundamentalPrinciples;
-import com.ypsi.fundamentalism.attachments.YpsAttachments;
-import com.ypsi.fundamentalism.entity.spells.proiectumProjectile.ProiectumRenderer;
+import com.ypsi.fundamentalism.attachments.FatigueManager;
 import com.ypsi.fundamentalism.entity.spells.sacredDisk.SacredDiskRenderer;
 import com.ypsi.fundamentalism.entity.spells.thorn.ThornRenderer;
-import com.ypsi.fundamentalism.gui.SpellLevelsScreen;
+import com.ypsi.fundamentalism.gui.PrinciplesScreen;
 import com.ypsi.fundamentalism.gui.TierWheelOverlay;
 import com.ypsi.fundamentalism.keybind.KeyState;
 import com.ypsi.fundamentalism.keybind.ModKeyBinds;
@@ -33,7 +32,7 @@ import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.network.PacketDistributor;
 import java.util.ArrayList;
-import static com.ypsi.fundamentalism.util.Util.getMaxExPerLevel;
+import static com.ypsi.fundamentalism.util.Util.getMaxFatigue;
 
 
 public class ClientEvents {
@@ -60,8 +59,8 @@ public class ClientEvents {
                         Minecraft minecraft = Minecraft.getInstance();
                         if (minecraft.player == null || minecraft.options.hideGui) return;
                         Player player = minecraft.player;
-                        int exhaustion = player.getData(YpsAttachments.CURRENT_EXHAUSTION);
-                        int exhaustionLvl = player.getData(YpsAttachments.LEVEL_EXHAUSTION);
+                        int exhaustion = FatigueManager.getFatigueAmount(player);
+                        int exhaustionLvl = FatigueManager.getFatigueLevel(player);
                         if (exhaustion <= 0 && exhaustionLvl == 0) return;
                         int screenWidth = minecraft.getWindow().getGuiScaledWidth();
                         int screenHeight = minecraft.getWindow().getGuiScaledHeight();
@@ -77,7 +76,7 @@ public class ClientEvents {
         }
 
         private static void renderBottleExhaustionBar(GuiGraphics gui, int x, int y, int exhaustion, int exhaustionLvl, Player player) {
-            int maxEx = getMaxExPerLevel(exhaustionLvl, player);
+            int maxEx = getMaxFatigue(exhaustionLvl, player);
             float progress = Math.min(1.0f, exhaustion / (float)maxEx);
 
             ResourceLocation EMPTY_BOTTLE_TEXTURE = ResourceLocation.fromNamespaceAndPath(
@@ -186,7 +185,6 @@ public class ClientEvents {
         public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
             event.registerLayerDefinition(ThornRenderer.MODEL_LAYER_LOCATION, ThornRenderer::createBodyLayer);
             event.registerLayerDefinition(SacredDiskRenderer.MODEL_LAYER_LOCATION, SacredDiskRenderer::createDiskLayer);
-            event.registerLayerDefinition(ProiectumRenderer.MODEL_LAYER_LOCATION, ProiectumRenderer::createBodyLayer);
         }
 
 
@@ -260,7 +258,7 @@ public class ClientEvents {
                 }
                 if(CATEGORIES.wasPressed()){
                     if (minecraft.screen == null) {
-                        minecraft.setScreen(new SpellLevelsScreen());
+                        minecraft.setScreen(new PrinciplesScreen());
                     }
                 }
                 if (SELECTION.wasPressed()) {

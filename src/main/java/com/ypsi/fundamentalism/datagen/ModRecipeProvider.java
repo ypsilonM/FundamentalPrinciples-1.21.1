@@ -1,11 +1,18 @@
 package com.ypsi.fundamentalism.datagen;
 
+import com.ypsi.fundamentalism.FundamentalPrinciples;
+import com.ypsi.fundamentalism.datagen.custom.EnchantingShieldSmithingRecipe;
+import com.ypsi.fundamentalism.enchantment.FundEnchantments;
 import com.ypsi.fundamentalism.item.ModItems;
 import io.redspace.ironsspellbooks.registries.ItemRegistry;
+import mezz.jei.api.IModPlugin;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.ShieldItem;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.neoforge.common.conditions.IConditionBuilder;
 
 import java.util.concurrent.CompletableFuture;
@@ -17,9 +24,6 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
 
     @Override
     protected void buildRecipes(RecipeOutput recipeOutput) {
-//        List<ItemLike> MANA_SMELTABLES = List.of(ModItems.PURE_ORB,
-//                YpsBlocks.MANA_ORE);
-//
 
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.ARCANE_MIXTURE.get())
                 .requires(ItemRegistry.ARCANE_ESSENCE.get())
@@ -57,7 +61,18 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', Items.GLASS_BOTTLE)
                 .define('P', Items.BLAZE_POWDER)
                 .unlockedBy("default_powder", has(Items.BLAZE_POWDER)).save(recipeOutput);
-//
+
+
+        EnchantingShieldSmithingRecipe recipe = new EnchantingShieldSmithingRecipe(
+                ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "shield_upgrade"),
+                Ingredient.of(ItemRegistry.BLANK_RUNE.get()),
+                Ingredient.of(Items.SHIELD),
+                Ingredient.of(ModItems.URSIDAE_FUR),
+                FundEnchantments.AEGIS,
+                1
+        );
+        recipeOutput.accept(recipe.getId(), recipe, null);
+
 //        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.ORB.get(), 9)
 //                .requires(YpsBlocks.MANA_BLOCK)
 //                .unlockedBy("has_mana_block", has(YpsBlocks.MANA_BLOCK)).save(recipeOutput);

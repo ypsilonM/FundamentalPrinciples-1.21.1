@@ -2,7 +2,7 @@ package com.ypsi.fundamentalism.network.packets;
 
 import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.attachments.YpsAttachments;
-import com.ypsi.fundamentalism.attachments.AvailableSpellsAttachment;
+import com.ypsi.fundamentalism.attachments.customAtt.AvailableSpellsAttachment;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;

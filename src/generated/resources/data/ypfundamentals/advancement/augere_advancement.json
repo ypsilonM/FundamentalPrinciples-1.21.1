@@ -1,0 +1,29 @@
+{
+  "parent": "ypfundamentals:root_principles",
+  "criteria": {
+    "goalAugere": {
+      "conditions": {
+        "category": "usesPotentiation",
+        "level": {
+          "min": 20
+        }
+      },
+      "trigger": "ypfundamentals:principles_trigger_level"
+    }
+  },
+  "display": {
+    "description": "Reach the highest knowledge of Augere Principle",
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:golden_sword"
+    },
+    "title": "Augere"
+  },
+  "requirements": [
+    [
+      "goalAugere"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

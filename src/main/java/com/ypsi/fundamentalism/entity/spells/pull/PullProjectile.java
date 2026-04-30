@@ -10,6 +10,7 @@ import io.redspace.ironsspellbooks.entity.mobs.AntiMagicSusceptible;
 import io.redspace.ironsspellbooks.entity.spells.AbstractMagicProjectile;
 import io.redspace.ironsspellbooks.util.ParticleHelper;
 import net.minecraft.core.Holder;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -49,7 +50,9 @@ public class PullProjectile extends AbstractMagicProjectile implements AntiMagic
     List<Entity> trackingEntities = new ArrayList<>();
 
     @Override
-    public void onAntiMagic(MagicData playerMagicData) {}
+    public void onAntiMagic(MagicData playerMagicData) {
+
+    }
 
     public void refreshDimensions() {
         double d0 = this.getX();
@@ -65,17 +68,35 @@ public class PullProjectile extends AbstractMagicProjectile implements AntiMagic
 
     @Override
     public void trailParticles() {
-        for (int i = 0; i < 2; i++) {
-            double speed = .02;
-            double dx = Utils.random.nextDouble() * 2 * speed - speed;
-            double dy = Utils.random.nextDouble() * 2 * speed - speed;
-            double dz = Utils.random.nextDouble() * 2 * speed - speed;
-            double centerY = this.getY() + this.getBbHeight()/2;
+        double radius = this.getRadius()*2;
+        double centerX = this.getX();
+        double centerY = this.getY() + this.getBbHeight() / 2;
+        double centerZ = this.getZ();
 
-            level().addParticle(ParticleHelper.UNSTABLE_ENDER, this.getX() + dx, centerY + dy, this.getZ() + dz, dx, dy, dz);
-            if (tickCount > 1)
-                level().addParticle(ParticleHelper.UNSTABLE_ENDER, this.getX() + dx - getDeltaMovement().x / 2, centerY + dy - getDeltaMovement().y / 2, this.getZ() + dz - getDeltaMovement().z / 2, dx, dy, dz);
+        for (int i = 0; i < 30; i++) {
+            // Generar ángulos aleatorios para una distribución uniforme en la esfera
+            double theta = 2 * Math.PI * Utils.random.nextDouble(); // azimut
+            double phi = Math.acos(2 * Utils.random.nextDouble() - 1); // inclinación (para densidad uniforme)
 
+            // Calcular coordenadas en la superficie
+            double dx = radius * Math.sin(phi) * Math.cos(theta);
+            double dy = radius * Math.sin(phi) * Math.sin(theta);
+            double dz = radius * Math.cos(phi);
+
+            // Agregar partícula en la superficie
+            level().addParticle(ParticleTypes.PORTAL,
+                    centerX + dx, centerY + dy, centerZ + dz,
+                    0, 0, 0); // velocidad cero (o la que quieras)
+
+            // Opcional: partículas de estela (si aún quieres arrastre)
+            if (tickCount > 1) {
+
+                level().addParticle(ParticleTypes.PORTAL,
+                        centerX + dx - getDeltaMovement().x / 2,
+                        centerY + dy - getDeltaMovement().y / 2,
+                        centerZ + dz - getDeltaMovement().z / 2,
+                        0, 0, 0);
+            }
         }
     }
 
@@ -86,7 +107,7 @@ public class PullProjectile extends AbstractMagicProjectile implements AntiMagic
 
     @Override
     public float getSpeed() {
-        return 0.25f;
+        return 0.30f;
     }
 
     @Override
@@ -193,19 +214,14 @@ public class PullProjectile extends AbstractMagicProjectile implements AntiMagic
         if (!level().isClientSide) {
             if (tickCount > 20 * 5) {
                 this.discard();
-                //this.playSound(SoundRegistry.BLACK_HOLE_CAST.get(), getRadius() / 2f, 1);
                 MagicManager.spawnParticles(level(), ParticleHelper.UNSTABLE_ENDER, getX(), getY() + getRadius(), getZ(), 200, 1, 1, 1, 1, true);
-            } else if ((tickCount - 1) % loopSoundDurationInTicks == 0) {
-                //this.playSound(SoundRegistry.BLACK_HOLE_LOOP.get(), getRadius() / 3f, 1);
             }
         }
     }
 
     private void updateTrackingEntities() {
         trackingEntities = level().getEntities(this, this.getBoundingBox().inflate(1));
-    }
-
-    private static final int loopSoundDurationInTicks = 20;
+    };
 
     @Override
     public boolean displayFireAnimation() {

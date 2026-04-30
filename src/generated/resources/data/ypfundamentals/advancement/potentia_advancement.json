@@ -1,0 +1,29 @@
+{
+  "parent": "ypfundamentals:root_principles",
+  "criteria": {
+    "goalPotentia": {
+      "conditions": {
+        "category": "usesShoot",
+        "level": {
+          "min": 20
+        }
+      },
+      "trigger": "ypfundamentals:principles_trigger_level"
+    }
+  },
+  "display": {
+    "description": "Reach the highest knowledge of Potentia Principle",
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:arrow"
+    },
+    "title": "Potentia"
+  },
+  "requirements": [
+    [
+      "goalPotentia"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

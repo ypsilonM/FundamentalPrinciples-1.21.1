@@ -1,5 +1,6 @@
 package com.ypsi.fundamentalism.effect.custom;
 
+import com.ypsi.fundamentalism.effect.UnclearableEffect;
 import com.ypsi.fundamentalism.particle.ModParticles;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.world.effect.MobEffect;
@@ -11,7 +12,7 @@ import net.neoforged.neoforge.common.extensions.IMobEffectExtension;
 
 import java.util.Set;
 
-public class MindfulEffect extends MobEffect implements IMobEffectExtension {
+public class MindfulEffect extends UnclearableEffect {
 
     public MindfulEffect(MobEffectCategory category, int color) {
         super(category, color);
@@ -30,10 +31,5 @@ public class MindfulEffect extends MobEffect implements IMobEffectExtension {
     @Override
     public ParticleOptions createParticleOptions(MobEffectInstance effect) {
         return ModParticles.MINDFUL_PARTICLE.get();
-    }
-
-    @Override
-    public void fillEffectCures(Set<EffectCure> cures, MobEffectInstance effectInstance) {
-
     }
 }

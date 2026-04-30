@@ -3,10 +3,10 @@ package com.ypsi.fundamentalism.entity;
 import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.entity.mobs.hemomancer.HemomancerEntity;
 import com.ypsi.fundamentalism.entity.mobs.imp.ImpEntity;
-import com.ypsi.fundamentalism.entity.mobs.venemerus.VenemerusEntity; 
+import com.ypsi.fundamentalism.entity.mobs.runear.RunearEntity;
+import com.ypsi.fundamentalism.entity.mobs.venemerus.VenemerusEntity;
 import com.ypsi.fundamentalism.entity.spells.chains.ChainsEntity;
 import com.ypsi.fundamentalism.entity.spells.holy_lightning.HolyLightningProjectile;
-import com.ypsi.fundamentalism.entity.spells.proiectumProjectile.ProiectumProjectile;
 import com.ypsi.fundamentalism.entity.spells.pull.PullProjectile;
 import com.ypsi.fundamentalism.entity.spells.sacredDisk.SacredDiskProjectile;
 import com.ypsi.fundamentalism.entity.spells.sol.SolProjectile;
@@ -52,11 +52,6 @@ public class ModEntities {
                     .clientTrackingRange(64)
                     .build(ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "thorn").toString()));
 
-    public static final DeferredHolder<EntityType<?>, EntityType<ProiectumProjectile>> PROIECTUM_PROJECTILE =
-            ENTITY_TYPES.register("proiectum", () -> EntityType.Builder.<ProiectumProjectile>of(ProiectumProjectile::new, MobCategory.MISC)
-                    .sized(.3f, .3f)
-                    .clientTrackingRange(64)
-                    .build(ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "proiectum").toString()));
 
     public static final DeferredHolder<EntityType<?>, EntityType<SacredDiskProjectile>> SACRED_DISK =
             ENTITY_TYPES.register("disk", () -> EntityType.Builder.<SacredDiskProjectile>of(SacredDiskProjectile::new, MobCategory.MISC)
@@ -95,6 +90,14 @@ public class ModEntities {
                             .sized(1.5f, 1f)
                             .clientTrackingRange(10)
                             .build(String.valueOf(ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "venemerus")))
+            );
+
+    public static final DeferredHolder<EntityType<?>, EntityType<RunearEntity>> RUNEAR =
+            ENTITY_TYPES.register("runear", () ->
+                    EntityType.Builder.<RunearEntity>of(RunearEntity::new, MobCategory.CREATURE)
+                            .sized(1.6f, 1.6f)
+                            .clientTrackingRange(20)
+                            .build(String.valueOf(ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "runear")))
             );
 
     //Summons

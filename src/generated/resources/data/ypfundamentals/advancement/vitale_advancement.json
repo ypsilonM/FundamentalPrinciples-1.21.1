@@ -1,0 +1,29 @@
+{
+  "parent": "ypfundamentals:root_principles",
+  "criteria": {
+    "goalVitale": {
+      "conditions": {
+        "category": "usesSummon",
+        "level": {
+          "min": 20
+        }
+      },
+      "trigger": "ypfundamentals:principles_trigger_level"
+    }
+  },
+  "display": {
+    "description": "Reach the highest knowledge of Vitale Principle",
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:bone"
+    },
+    "title": "Vitale"
+  },
+  "requirements": [
+    [
+      "goalVitale"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

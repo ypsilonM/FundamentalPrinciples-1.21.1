@@ -89,8 +89,6 @@ public class PullSpell extends AbstractSpell {
         return getSpellPower(spellLevel, entity);
     }
 
-
-
     private float getRadius(int spellLevel, LivingEntity entity) {
         return (float) ((Math.sqrt(spellLevel)) + (.125f * getSpellPower(spellLevel, entity)));
     }
