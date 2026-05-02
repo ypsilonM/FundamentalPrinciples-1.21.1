@@ -113,6 +113,7 @@ public class ClientEvents {
             Font font = minecraft.font;
 
             String exhaustionText = String.valueOf(exhaustion);
+            exhaustionText+="/"+maxEx;
             int exhaustionX = bottleX + size - 4;
             int exhaustionY = bottleY + 2;
 

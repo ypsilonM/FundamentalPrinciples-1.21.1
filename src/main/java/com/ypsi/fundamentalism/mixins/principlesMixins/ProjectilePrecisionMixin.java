@@ -1,5 +1,6 @@
 package com.ypsi.fundamentalism.mixins.principlesMixins;
 
+import com.ypsi.fundamentalism.ServerConfig;
 import com.ypsi.fundamentalism.attachments.PrinciplesProgressionManager;
 import com.ypsi.fundamentalism.util.Principles;
 import com.ypsi.fundamentalism.util.Util;
@@ -21,7 +22,10 @@ public class ProjectilePrecisionMixin {
     private Vec3 modifyShootDirection(Vec3 original){
         AbstractMagicProjectile magicProjectile = (AbstractMagicProjectile)(Object) this;
         Entity owner = magicProjectile.getOwner();
-        if(owner instanceof ServerPlayer player && !player.level().isClientSide){
+        if(owner instanceof ServerPlayer player && !player.level().isClientSide
+                && ServerConfig.potentiaActive
+                && ServerConfig.principlesSYSTEM)
+        {
             int level = PrinciplesProgressionManager.getCategoryLevel(player, Principles.POTENTIA);
             float accuracy = Util.getAccuracy(level);
             return applyAccuracyVariation(original, accuracy, player.getRandom());

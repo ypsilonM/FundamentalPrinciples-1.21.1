@@ -1,5 +1,6 @@
 package com.ypsi.fundamentalism.mixins.principlesMixins;
 
+import com.ypsi.fundamentalism.ServerConfig;
 import com.ypsi.fundamentalism.attachments.PrinciplesProgressionManager;
 import com.ypsi.fundamentalism.util.Principles;
 import com.ypsi.fundamentalism.util.Util;
@@ -29,12 +30,15 @@ public abstract class RaycastBuilderMixin {
             double originalDistance = start.distanceTo(end);
             // PERCEPTIO
             int perceptioLevel = PrinciplesProgressionManager.getCategoryLevel(player, Principles.PERCEPTIO);
-            float finalRange = Util.getTotalRange(perceptioLevel);
-            float baseDetectionRange = 8f + (float) originalDistance / 5f;
+
+            float finalRange = ServerConfig.perceptioActive && ServerConfig.principlesSYSTEM?
+                    Util.getTotalPerceptioRange(perceptioLevel): 0;
+            float baseDetectionRange = ServerConfig.perceptioActive && ServerConfig.principlesSYSTEM?
+                    8f + (float) originalDistance / 5f : (float) originalDistance;
             finalRange += baseDetectionRange;
 
             // LOCUS
-            if (bbInflation > 0) {
+            if (bbInflation > 0 && ServerConfig.locusActive && ServerConfig.principlesSYSTEM) {
                 int locusLevel = PrinciplesProgressionManager.getCategoryLevel(player, Principles.LOCUS);
                 finalRange = (float) Util.returnLocusDistance(locusLevel, finalRange);
             }

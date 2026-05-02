@@ -1,5 +1,6 @@
 package com.ypsi.fundamentalism.mixins.principlesMixins;
 
+import com.ypsi.fundamentalism.ServerConfig;
 import com.ypsi.fundamentalism.attachments.PrinciplesProgressionManager;
 import com.ypsi.fundamentalism.util.Principles;
 import com.ypsi.fundamentalism.util.Util;
@@ -20,7 +21,7 @@ public class AoERadiusMixin {
 
     @ModifyArg(method = "setRadius", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Mth;clamp(FFF)F"), index = 0, remap = false)
     private float modifyRadius(float value){
-        if(principleModification){
+        if(principleModification || !ServerConfig.expansioActive || !ServerConfig.principlesSYSTEM){
             return value;
         }
 

@@ -1,5 +1,6 @@
 package com.ypsi.fundamentalism.mixins.principlesMixins;
 
+import com.ypsi.fundamentalism.ServerConfig;
 import com.ypsi.fundamentalism.attachments.FatigueManager;
 import com.ypsi.fundamentalism.attachments.PrinciplesProgressionManager;
 import com.ypsi.fundamentalism.config.SpellCategoriesGenerator;
@@ -24,7 +25,10 @@ public abstract class CertumManaMixin {
 
         int originalCost = spell.getManaCost(spellLevel);
 
-        if(SpellCategoriesGenerator.isInCategory(spell.getSpellId(), "immutable")){
+        if(SpellCategoriesGenerator.isInCategory(spell.getSpellId(), "immutable")
+                && ServerConfig.certumActive
+                && ServerConfig.principlesSYSTEM){
+
             int certumLevel = 0;
             if(player!=null) {
                 certumLevel = PrinciplesProgressionManager.getCategoryLevel(player, Principles.CERTUM);

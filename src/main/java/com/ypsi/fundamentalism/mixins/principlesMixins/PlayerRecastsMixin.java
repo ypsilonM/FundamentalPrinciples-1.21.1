@@ -1,5 +1,6 @@
 package com.ypsi.fundamentalism.mixins.principlesMixins;
 
+import com.ypsi.fundamentalism.ServerConfig;
 import com.ypsi.fundamentalism.config.SpellCategoriesGenerator;
 import com.ypsi.fundamentalism.attachments.PrinciplesProgressionManager;
 import com.ypsi.fundamentalism.util.Principles;
@@ -36,7 +37,6 @@ public abstract class PlayerRecastsMixin {
     @Inject(method = "addRecast", at = @At("HEAD"), cancellable = true, remap = false)
     private void onAddRecastWithExtra(RecastInstance recastInstance, MagicData magicData, CallbackInfoReturnable<Boolean> cir) {
         if (serverPlayer != null) {
-
             Player player = serverPlayer;
             String spellId = recastInstance.getSpellId();
             Set<String> categories = SpellCategoriesGenerator.getCategoriesForSpell(spellId);
@@ -47,7 +47,11 @@ public abstract class PlayerRecastsMixin {
                 int categoryLevel = PrinciplesProgressionManager.getCategoryLevel(player, Principles.REPETITIO);
                 probability = Util.getRecastAddChance(categoryLevel);
             }
-            boolean isAdded = serverPlayer.getRandom().nextDouble()< probability;
+            boolean isAdded =
+                    serverPlayer.getRandom().nextDouble()< probability
+                            && ServerConfig.repetitioActive
+                            && ServerConfig.principlesSYSTEM;
+
             if (isAdded && totalRecasts>2) {
                 RecastInstance modifiedRecast = new RecastInstance(
                         recastInstance.getSpellId(),

@@ -10,7 +10,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.fml.config.ModConfig;
 import org.joml.Vector3f;
 
 import java.util.LinkedHashMap;
@@ -88,50 +87,66 @@ public class Util {
     }
 
     //Principles methods
+
+    //CONCENTRATIO
+    public static int getTotalMana(int level) { //20
+        if(ServerConfig.concentratioActive && ServerConfig.principlesSYSTEM) {
+            return level * ServerConfig.manaAdd;
+        }else{
+            return 0;
+        }
+    }
+    //POTENTIA
+    public static float getAccuracy(int level){ //0.40f - 0.03f
+        return Math.clamp((float) (ServerConfig.baseAccuracy + level * ServerConfig.addAccuracy), 0f, 1f);
+    }
+    //VITALE
+    public static double getCooldownReduction(int level){ //0.045
+        return Math.clamp((level * ServerConfig.crdAdd), 0, 1);
+    }
+    //EXPANSIO
+    public static float getVolumeMultiplier(int level){ //0.5f + 0.05f
+        return  Math.max((float)(ServerConfig.aoeBaseRadius + level * ServerConfig.aoeBaseAdd), 0f);
+    }
+    //APPARITIO
     public static double getFailureTPChance(int categoryLevel, int cooldown) {
         if(cooldown==0) cooldown = 1;
         double chance = Math.min(90,((100/(cooldown))*2));
         return chance - (getFailureTPReduction(categoryLevel)*chance);
     }
-    public static float getFailureTPReduction(int categoryLevel) {
-        return (categoryLevel * 0.025f);
+    public static float getFailureTPReduction(int categoryLevel) { //0.025f
+        return (float) Math.clamp((categoryLevel * ServerConfig.successTpAdd),0,1);
     }
-    public static double getRecastAddChance(int categoryLevel) {
-        return categoryLevel * 0.04;
+    //REPETITIO
+    public static double getRecastAddChance(int categoryLevel) { //0.05
+        return Math.clamp(categoryLevel * ServerConfig.addChanceCast, 0, 1);
     }
     public static float getFloatRecastAddChance(int categoryLevel) {
         return (float) (getRecastAddChance(categoryLevel) * 100);
     }
-    public static int getTotalRange(int level){
-        return (int) (level * 1.5);
+    //PERCEPTIO
+    public static int getTotalPerceptioRange(int level){ //1.5
+        return (int) (level * ServerConfig.addRange);
     }
+    //LOCUS
     public static double returnLocusDistance(int level, float distance){
         return getLocusMultiplier(level) * distance;
     }
-    public static double getLocusMultiplier(int level){
-        return 0.40 + (0.02 * level);
+    public static double getLocusMultiplier(int level){ //0.40 + 0.02
+        return Math.clamp(ServerConfig.percentageBaseRange + (ServerConfig.percentageAddRange * level), 0, 10);
     }
-    public static int getTotalMana(int level) {
-        return level * 20;
-    }
+    //CERTUM
     public static double certumManaMultiplier(int level, int catLevel){
         return ServerConfig.fatigueManaAdditionMultipliers.get(level) * (1.00 - manaReduction(catLevel));
     }
-    public static double manaReduction(int level){
-        return (level * 0.02);
+    public static double manaReduction(int level){ // 0.02
+        return (level * ServerConfig.manaDebuffReduction);
     }
-    public static float getAccuracy(int level){
-        return 0.40f + level * 0.03f;
+    //REMEDIUM
+    public static float getFoodToCONSUME(int level){//3F, 0.125f
+        return (float) Math.max(ServerConfig.baseFoodPts - (ServerConfig.subFoodPts * level), 0);
     }
-    public static float getVolumeMultiplier(int level){
-        return 0.50f + level * 0.05f;
-    }
-    public static double getCooldownReduction(int level){
-        return (level * 0.045);
-    }
-    public static float getFoodToCONSUME(int level){
-        return 3F - (0.125f * level);
-    }
+
 
     //Principles SpellPower Modifiers
     public static float getModificator(int level, float base){

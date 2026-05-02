@@ -19,8 +19,6 @@ import net.minecraft.sounds.SoundEvents;
 
 import java.util.*;
 
-import static com.ypsi.fundamentalism.util.Util.getModificator;
-
 public class PrinciplesScreen extends Screen {
     private static final int WINDOW_WIDTH = 500;
     private static final int WINDOW_HEIGHT = 210;
@@ -54,9 +52,11 @@ public class PrinciplesScreen extends Screen {
 
     @Override
     protected void init() {
-        super.init();
-        this.leftPos = (this.width - WINDOW_WIDTH) / 2;
-        this.topPos = (this.height - WINDOW_HEIGHT) / 2;
+        if(ServerConfig.principlesSYSTEM) {
+            super.init();
+            this.leftPos = (this.width - WINDOW_WIDTH) / 2;
+            this.topPos = (this.height - WINDOW_HEIGHT) / 2;
+        }
     }
 
 
@@ -191,62 +191,73 @@ public class PrinciplesScreen extends Screen {
             //"hasRecasts"
             float recastProb = Util.getFloatRecastAddChance(level);
             recastProb = Math.round(recastProb * 100.0f) / 100.0f;
-            tooltip.add(Component.literal("• " + recastProb + "% +1 Recast")
-                    .withStyle(ChatFormatting.DARK_AQUA));
+
+            if(ServerConfig.repetitioActive)
+                tooltip.add(Component.literal("• " + recastProb + "% +1 Recast")
+                        .withStyle(ChatFormatting.DARK_AQUA));
         }
-        if(category.equals(
-                PrinciplesProgressionManager.getTechnicalName(Principles.APPARITIO))){
+        if(category.equals(PrinciplesProgressionManager.getTechnicalName(Principles.APPARITIO))){
             int addProb = (int) (Util.getFailureTPReduction(level) * 100f);
-            tooltip.add(Component.literal("• +" + addProb + "% Chance")
-                    .withColor(0x9E2997));
+
+            if(ServerConfig.apparitioActive)
+                tooltip.add(Component.literal("• +" + addProb + "% Chance")
+                        .withColor(0x9E2997));
         }
-        if(category.equals(
-                PrinciplesProgressionManager.getTechnicalName(Principles.VITALE))){
+        if(category.equals(PrinciplesProgressionManager.getTechnicalName(Principles.VITALE))){
             int cooldown = (int) (Util.getCooldownReduction(level)*100);
-            tooltip.add(Component.literal("• " + cooldown + "% Cooldown Reduction")
-                    .withColor(0x51A326));
+
+            if(ServerConfig.vitaleActive)
+                tooltip.add(Component.literal("• " + cooldown + "% Cooldown Reduction")
+                        .withColor(0x51A326));
         }
-        if(category.equals(
-                PrinciplesProgressionManager.getTechnicalName(Principles.REMEDIUM))){
+        if(category.equals(PrinciplesProgressionManager.getTechnicalName(Principles.REMEDIUM))){
             float food = (Util.getFoodToCONSUME(level));
-            tooltip.add(Component.literal("• " + food + " \uD83C\uDF56 per Heal pt." )
-                    .withColor(0xFFCA29));
+
+            if(ServerConfig.remediumActive)
+                tooltip.add(Component.literal("• " + food + " \uD83C\uDF56 per Heal pt." )
+                        .withColor(0xFFCA29));
         }
-        if(category.equals(
-                PrinciplesProgressionManager.getTechnicalName(Principles.LOCUS))){
+        if(category.equals(PrinciplesProgressionManager.getTechnicalName(Principles.LOCUS))){
             int addRange = (int) (Util.getLocusMultiplier(level)*100);
-            tooltip.add(Component.literal("• " + addRange + "% Target Distance")
-                    .withColor(0xFF1457));
+
+            if(ServerConfig.locusActive)
+                tooltip.add(Component.literal("• " + addRange + "% Target Distance")
+                        .withColor(0xFF1457));
         }
-        if(category.equals(
-                PrinciplesProgressionManager.getTechnicalName(Principles.PERCEPTIO))){
-            int addRange = Util.getTotalRange(level);
-            tooltip.add(Component.literal("• +" + addRange + " Distance")
-                    .withColor(0xFF4714));
+        if(category.equals(PrinciplesProgressionManager.getTechnicalName(Principles.PERCEPTIO))){
+            int addRange = Util.getTotalPerceptioRange(level);
+
+            if(ServerConfig.perceptioActive)
+                tooltip.add(Component.literal("• +" + addRange + " Distance")
+                        .withColor(0xFF4714));
         }
-        if(category.equals(
-                PrinciplesProgressionManager.getTechnicalName(Principles.CONCENTRATIO))){
+        if(category.equals(PrinciplesProgressionManager.getTechnicalName(Principles.CONCENTRATIO))){
             int addMana = Util.getTotalMana(level);
-            tooltip.add(Component.literal("• +" + addMana + " Mana ")
-                    .withColor(0x1B4EC2));
+
+            if(ServerConfig.concentratioActive)
+                tooltip.add(Component.literal("• +" + addMana + " Mana ")
+                        .withColor(0x1B4EC2));
         }
-        if(category.equals(
-                PrinciplesProgressionManager.getTechnicalName(Principles.POTENTIA))){
+        if(category.equals(PrinciplesProgressionManager.getTechnicalName(Principles.POTENTIA))){
             int accuracy = (int) (Util.getAccuracy(level) * 100f);
-            tooltip.add(Component.literal("• " + accuracy + "% Accuracy")
-                    .withColor(0xC2AC1B));
+
+            if(ServerConfig.potentiaActive)
+                tooltip.add(Component.literal("• " + accuracy + "% Accuracy")
+                        .withColor(0xC2AC1B));
         }
-        if(category.equals(
-                PrinciplesProgressionManager.getTechnicalName(Principles.CERTUM))){
+        if(category.equals(PrinciplesProgressionManager.getTechnicalName(Principles.CERTUM))){
             int percentage = (int) (Util.manaReduction(level) * 100);
-            tooltip.add(Component.literal("• -" + percentage + "% Ex. Mana Debuff")
-                    .withColor(0xC2AC1B));
+
+            if(ServerConfig.certumActive && ServerConfig.fatigueSystem)
+                tooltip.add(Component.literal("• -" + percentage + "% Ex. Mana Debuff")
+                        .withColor(0xC2AC1B));
         }
-        if(category.equals(
-                PrinciplesProgressionManager.getTechnicalName(Principles.EXPANSIO))){
+        if(category.equals(PrinciplesProgressionManager.getTechnicalName(Principles.EXPANSIO))){
             int size = (int) (Util.getVolumeMultiplier(level) * 100f);
-            tooltip.add(Component.literal("• " + size + "% Radius")
-                    .withStyle(ChatFormatting.DARK_RED) );
+
+            if(ServerConfig.expansioActive)
+                tooltip.add(Component.literal("• " + size + "% Radius")
+                        .withStyle(ChatFormatting.DARK_RED) );
         }
         if(ServerConfig.fatigueSystem) {
             double additionalFatigue = 5.0 - (0.5 * level);
@@ -305,30 +316,13 @@ public class PrinciplesScreen extends Screen {
 
 
     private double calculatePowerForCategory(String category, int level) {
-        if (category.equals("usesShoot") || category.equals("createsAoeEntities") || category.equals("usesSummon")) {
+        if (category.equals("usesShoot") || category.equals("createsAoeEntities") ||
+            category.equals("usesSummon") || category.equals("usesTargeting")) {
             return Util.getPureSubEntityModificator(level) * 100.0;
         } else {
             return Util.getPureModificator(level) * 100.0;
         }
     }
-
-//    private double getModificator(int level){
-//        double basePercentage = -0.10;
-//        for(int i=0;i<level;i++){
-//            double increment = 0.01;
-//            basePercentage+=increment;
-//        }
-//        return basePercentage;
-//    }
-//    private double getSubEntityModificator(int level){
-//        double basePercentage = -0.05;
-//        for(int i=0;i<level;i++){
-//            double increment = 0.005;
-//            basePercentage+=increment;
-//        }
-//        return basePercentage;
-//    }
-
 
     private void renderProgressBar(GuiGraphics guiGraphics, float progress, int x, int y, int lineIndex) {
         int barWidth = 120;
@@ -363,14 +357,6 @@ public class PrinciplesScreen extends Screen {
 
         // Outline color dorado fijo
         guiGraphics.renderOutline(barX, barY, barWidth, barHeight, 0xFFD700);
-    }
-
-    private void drawAncientGradientBar(GuiGraphics guiGraphics, int x, int y, int width, int height) {
-        if (width <= 0) return;
-
-        int color = 0xFFB89F73;
-
-        guiGraphics.fill(x, y, x + width, y + height, color);
     }
 
     private void renderTooltip(GuiGraphics guiGraphics, String category, int level, float progress, int mouseX, int mouseY) {

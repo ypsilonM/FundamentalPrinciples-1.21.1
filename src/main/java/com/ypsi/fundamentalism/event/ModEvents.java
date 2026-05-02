@@ -20,6 +20,7 @@ import com.ypsi.fundamentalism.attachments.PrinciplesProgressionManager;
 import com.ypsi.fundamentalism.spells.ModSpells;
 import com.ypsi.fundamentalism.util.Principles;
 import com.ypsi.fundamentalism.util.Util;
+import io.redspace.ironsspellbooks.api.config.SpellConfigManager;
 import io.redspace.ironsspellbooks.api.events.*;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.magic.MagicHelper;
@@ -30,6 +31,7 @@ import io.redspace.ironsspellbooks.api.util.CameraShakeData;
 import io.redspace.ironsspellbooks.api.util.CameraShakeManager;
 import io.redspace.ironsspellbooks.api.util.Utils;
 import io.redspace.ironsspellbooks.capabilities.magic.MagicManager;
+import io.redspace.ironsspellbooks.capabilities.magic.SpellContainer;
 import io.redspace.ironsspellbooks.compat.Curios;
 import io.redspace.ironsspellbooks.damage.SpellDamageSource;
 import io.redspace.ironsspellbooks.entity.mobs.abstract_spell_casting_mob.AbstractSpellCastingMob;
@@ -356,13 +358,13 @@ public class ModEvents {
                 return;
             }
 
-            if(cancelDominanSpells(categories, level, caster, spell) ){
-                cancelCast(event, magicData, caster, spell);
-                if (caster instanceof ServerPlayer serverPlayer) {
-                    serverPlayer.displayClientMessage(Component.translatable("Complex spell unable to cast.").withStyle(ChatFormatting.DARK_PURPLE), true);
-                }
-                return;
-            }
+//            if(cancelDominanSpells(categories, level, caster, spell) ){
+//                cancelCast(event, magicData, caster, spell);
+//                if (caster instanceof ServerPlayer serverPlayer) {
+//                    serverPlayer.displayClientMessage(Component.translatable("Complex spell unable to cast.").withStyle(ChatFormatting.DARK_PURPLE), true);
+//                }
+//                return;
+//            }
             if(teleportCanceled(categories,caster,spell,event,magicData)){
                 cancelTeleportSpell(event, magicData, caster, spell);
                 return;
@@ -371,6 +373,8 @@ public class ModEvents {
 
 
     }
+
+
 
     @SubscribeEvent
     public static void onServerTickCancelingCast(ServerTickEvent.Post event){
@@ -395,7 +399,10 @@ public class ModEvents {
             int mana = event.getManaCost();
             int currentExLvl = FatigueManager.getFatigueLevel(p);
             //int currentExLvl = player.getData(YpsAttachments.LEVEL_EXHAUSTION.get());
-            if(ServerConfig.fatigueSystem) {
+            if(ServerConfig.fatigueSystem
+                    && ServerConfig.certumActive
+                    && ServerConfig.principlesSYSTEM)
+            {
                 if (SpellCategoriesGenerator.isInCategory(spellId, "immutable")) {
                     int certumLevel = PrinciplesProgressionManager.getCategoryLevel(player, Principles.CERTUM);
                     event.setManaCost((int) (mana * (1 + Util.certumManaMultiplier(currentExLvl, certumLevel))));
@@ -498,21 +505,23 @@ public class ModEvents {
             vanishCastEffects(caster);
         }
     }
-    public static boolean cancelDominanSpells(Set<String> categories, int level, ServerPlayer serverPlayer, AbstractSpell spell){
-        if(categories.size() >= 4){
-            SpellRarity spellRarity = spell.getRarity(level);
-            int minLevel = getLevelRequiredForRARITY(spellRarity);
-            for (String category : categories){
-                int categoryLevel =  PrinciplesProgressionManager.getCategoryLevel(serverPlayer, category);
-                if (categoryLevel<minLevel){
-                    return true;
-                }
-            }
-            return false;
-        }
-        return false;
-    }
+//    public static boolean cancelDominanSpells(Set<String> categories, int level, ServerPlayer serverPlayer, AbstractSpell spell){
+//        if(categories.size() >= 4){
+//            SpellRarity spellRarity = spell.getRarity(level);
+//            int minLevel = getLevelRequiredForRARITY(spellRarity);
+//            for (String category : categories){
+//                int categoryLevel =  PrinciplesProgressionManager.getCategoryLevel(serverPlayer, category);
+//                if (categoryLevel<minLevel){
+//                    return true;
+//                }
+//            }
+//            return false;
+//        }
+//        return false;
+//    }
     public static boolean teleportCanceled(Set<String> categories, ServerPlayer caster, AbstractSpell spell, SpellPreCastEvent event, MagicData magicData){
+        if(!ServerConfig.apparitioActive || !ServerConfig.principlesSYSTEM) return false;
+
         if(categories.contains("usesTeleport")) {
             double probabilityForFail = 0;
             int categoryLevel = PrinciplesProgressionManager.getCategoryLevel(caster, "usesTeleport");
@@ -796,7 +805,10 @@ public class ModEvents {
     }
 
     @SubscribeEvent
-    public static void onCooldownAdded(SpellCooldownAddedEvent.Pre event){
+    public static void vitaleSummonCooldown(SpellCooldownAddedEvent.Pre event){
+
+        if(!ServerConfig.vitaleActive || !ServerConfig.principlesSYSTEM) return;
+
         AbstractSpell spell = event.getSpell();
         if( event.getEntity() instanceof ServerPlayer serverPlayer
                 && SpellCategoriesGenerator.isInCategory(spell.getSpellId(), "usesSummon")
@@ -813,7 +825,7 @@ public class ModEvents {
     @SubscribeEvent
     public static void reverseCurseTechnique(SpellHealEvent event){
 
-        if(!ServerConfig.newHealing) return;
+        if(!ServerConfig.remediumActive || !ServerConfig.principlesSYSTEM) return;
 
         if(event.getTargetEntity() instanceof ServerPlayer healedEntity &&
                 event.getEntity() instanceof ServerPlayer caster){

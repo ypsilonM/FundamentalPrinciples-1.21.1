@@ -1,5 +1,6 @@
 package com.ypsi.fundamentalism.mixins.clientMixins;
 
+import com.ypsi.fundamentalism.ServerConfig;
 import com.ypsi.fundamentalism.attachments.FatigueManager;
 import com.ypsi.fundamentalism.config.SpellCategoriesGenerator;
 import com.ypsi.fundamentalism.attachments.PrinciplesProgressionManager;
@@ -151,7 +152,9 @@ public class SpellWheelOverlayMixin {
 //        if(SpellCategoriesGenerator.isInCategory(spell.getSpellId(), "immutable")){
 //           originalCost = (int)(originalCost * (1+Util.manaMultiplier( player.getData(YpsAttachments.LEVEL_EXHAUSTION), certumLevel )));
 //        }
-            if (SpellCategoriesGenerator.isInCategory(spell.getSpellId(), "immutable")) {
+            if (SpellCategoriesGenerator.isInCategory(spell.getSpellId(), "immutable")
+                    && ServerConfig.certumActive
+                    && ServerConfig.principlesSYSTEM) {
                 originalCost = (int) (originalCost * (1 + Util.certumManaMultiplier(FatigueManager.getFatigueLevel(player), certumLevel)));
             }
         }

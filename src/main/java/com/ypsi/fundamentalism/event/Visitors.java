@@ -110,6 +110,10 @@ public class Visitors {
                 String category = categoryMapping.get(name);
                 if (category != null && matchesOwner(owner, name)) {
                     detectedCategories.add(category);
+
+                    if(name.equals("preCastTargetHelper"))
+                        detectedCategories.add("usesRaycast");
+                    
                 }
                 if ("getSpellPower".equals(name) || "getEntityPowerMultiplier".equals(name)) {
                     foundGetSpellPower = true;

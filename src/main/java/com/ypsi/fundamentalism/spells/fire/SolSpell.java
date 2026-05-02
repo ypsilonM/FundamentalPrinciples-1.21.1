@@ -135,4 +135,5 @@ public class SolSpell extends AbstractSpell {
         return true;
     }
 
+
 }
