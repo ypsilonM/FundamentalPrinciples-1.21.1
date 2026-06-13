@@ -1,7 +1,7 @@
 package com.ypsi.fundamentalism.mixins.principlesMixins;
 
 import com.ypsi.fundamentalism.ServerConfig;
-import com.ypsi.fundamentalism.config.SpellCategoriesGenerator;
+import com.ypsi.fundamentalism.principleGen.SpellCategoriesGenerator;
 import com.ypsi.fundamentalism.attachments.PrinciplesProgressionManager;
 import com.ypsi.fundamentalism.util.Principles;
 import com.ypsi.fundamentalism.util.Util;
@@ -34,7 +34,12 @@ public abstract class PlayerRecastsMixin {
     @Shadow(remap = false)
     public void syncToPlayer(RecastInstance recastInstance) {}
 
-    @Inject(method = "addRecast", at = @At("HEAD"), cancellable = true, remap = false)
+    @Inject(
+            method = "addRecast",
+            at = @At("HEAD"),
+            cancellable = true,
+            remap = false
+    )
     private void onAddRecastWithExtra(RecastInstance recastInstance, MagicData magicData, CallbackInfoReturnable<Boolean> cir) {
         if (serverPlayer != null) {
             Player player = serverPlayer;

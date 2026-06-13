@@ -36,7 +36,7 @@ public class ClientCategoryLevelsData {
 
         int nextLevel = level+1;
         int exp = getExperience(category);
-        int expNeeded = Util.getExpForLevel(nextLevel);
+        int expNeeded = Util.getExpForPrincipleLevel(nextLevel);
 
         return (float) exp / expNeeded;
     }
@@ -47,7 +47,7 @@ public class ClientCategoryLevelsData {
 
         int nextLevel = level+1;
         int exp = getExperience(principle);
-        int expNeeded = Util.getExpForLevel(nextLevel);
+        int expNeeded = Util.getExpForPrincipleLevel(nextLevel);
 
         return (float) exp / expNeeded;
     }

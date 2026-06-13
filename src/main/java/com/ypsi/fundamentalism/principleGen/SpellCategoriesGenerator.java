@@ -1,4 +1,4 @@
-package com.ypsi.fundamentalism.config;
+package com.ypsi.fundamentalism.principleGen;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -6,15 +6,9 @@ import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.event.Visitors;
 import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
-import net.minecraft.client.telemetry.events.WorldLoadEvent;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
-import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import org.objectweb.asm.ClassReader;
 
 import java.io.File;
@@ -112,7 +106,7 @@ public class SpellCategoriesGenerator {
 
     private static Visitors.SpellAnalysisVisitor analyzeSpellClass(AbstractSpell spell) throws IOException {
         String className = spell.getClass().getName().replace('.', '/');
-        LOGGER.info("🤑 ASM Analyzing: {}", className);
+        LOGGER.info(" ASM Analyzing: {}", className);
 
         String classResource = className + ".class";
 
@@ -122,13 +116,13 @@ public class SpellCategoriesGenerator {
                 return new Visitors.SpellAnalysisVisitor();
             }
             ClassReader classReader = new ClassReader(classStream);
-            LOGGER.info("ClassReader created for: {}", className);
+            //LOGGER.info("ClassReader created for: {}", className);
 
             Visitors.SpellAnalysisVisitor visitor = new Visitors.SpellAnalysisVisitor();
             classReader.accept(visitor, ClassReader.SKIP_DEBUG);
 
-            LOGGER.info("ASM analysis completed for: {}", className);
-            LOGGER.info("-> Detected: {}", visitor.getDetectedCategories());
+            //LOGGER.info("ASM analysis completed for: {}", className);
+            //LOGGER.info("-> Detected: {}", visitor.getDetectedCategories());
 
             return visitor;
         } catch (RuntimeException e) {

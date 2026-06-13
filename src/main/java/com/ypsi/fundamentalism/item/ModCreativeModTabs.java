@@ -28,6 +28,7 @@ public class ModCreativeModTabs {
                         output.accept(ModItems.FLASK);
                         output.accept(ModItems.TONIC);
                         output.accept(ModItems.URSIDAE_FUR);
+                        output.accept(ModItems.NULLIFIER);
                         output.accept(ModItems.IMP_SPAWN_EGG);
                         output.accept(ModItems.HEMOMANCER_SPAWN_EGG);
                         output.accept(ModItems.VENEMERUS_SPAWN_EGG);

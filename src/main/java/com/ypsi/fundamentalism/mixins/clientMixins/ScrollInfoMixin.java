@@ -1,6 +1,6 @@
 package com.ypsi.fundamentalism.mixins.clientMixins;
 
-import com.ypsi.fundamentalism.config.SpellCategoriesGenerator;
+import com.ypsi.fundamentalism.principleGen.SpellCategoriesGenerator;
 import com.ypsi.fundamentalism.attachments.PrinciplesProgressionManager;
 import io.redspace.ironsspellbooks.api.spells.ISpellContainer;
 import io.redspace.ironsspellbooks.item.Scroll;

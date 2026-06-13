@@ -1,4 +1,4 @@
-package com.ypsi.fundamentalism.datagen;
+package com.ypsi.fundamentalism.datagen.providers;
 
 import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.attributes.YpsDamageTypes;
@@ -6,7 +6,6 @@ import com.ypsi.fundamentalism.enchantment.FundEnchantments;
 import com.ypsi.fundamentalism.worldgen.ModBiomeModifiers;
 import com.ypsi.fundamentalism.worldgen.ModConfiguredFeatures;
 import com.ypsi.fundamentalism.worldgen.ModPlacedFeatures;
-import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.Registries;

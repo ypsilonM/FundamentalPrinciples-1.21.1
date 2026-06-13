@@ -16,13 +16,17 @@ public class YpsAttributes {
 
     public static final DeferredHolder<Attribute, Attribute> MAX_FATIGUE =
             YPATTRIBUTES.register("exhaustion.max", () ->
-                    new RangedAttribute("attribute.ypfundamentals.exhaustion.max", 0, 0, 10000)
+                    new RangedAttribute("attribute.ypfundamentals.exhaustion_max", 0, 0, 10000)
                             .setSyncable(true)
             );
-
     public static final DeferredHolder<Attribute, Attribute> FATIGUE_REGEN =
             YPATTRIBUTES.register("exhaustion.regen", () ->
-                    new RangedAttribute("attribute.ypfundamentals.exhaustion.regen", 1, 0, 10)
+                    new RangedAttribute("attribute.ypfundamentals.exhaustion_regen", 1, 0, 10)
+                            .setSyncable(true)
+            );
+    public static final DeferredHolder<Attribute, Attribute> RESONANCE =
+            YPATTRIBUTES.register("resonance", () ->
+                    new RangedAttribute("attribute.ypfundamentals.resonance", 0, -1, +1)
                             .setSyncable(true)
             );
 

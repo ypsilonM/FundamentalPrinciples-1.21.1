@@ -1,10 +1,12 @@
-// 1.21.1	2026-04-24T17:21:14.695972	Item Models: ypfundamentals
+// 1.21.1	2026-06-06T22:30:25.2778537	Item Models: ypfundamentals
+836ff1989ac123042f571b77991e5443d5e43257 assets/ypfundamentals/models/item/ancient_scroll_case.json
 70f8c64eccf2deef2ace4821114d73da3827b5cf assets/ypfundamentals/models/item/arcane_mixture.json
 6c548fb9ca9a4c702547018971e56027b280e4d0 assets/ypfundamentals/models/item/flask.json
 63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/ypfundamentals/models/item/hemomancer_spawn_egg.json
 63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/ypfundamentals/models/item/imp_spawn_egg.json
 6eb1326b5e8fc3cc5837dcb0071007763755dbb6 assets/ypfundamentals/models/item/luminaire_extract.json
 9a1a9fcdcc48dad1c5f6150482b304b06f339d5a assets/ypfundamentals/models/item/mana_fruit.json
+983cdae121b518b38d2fc135847c541ff008f474 assets/ypfundamentals/models/item/nullifier.json
 04e532287cee2b16b0081d87f48d79c1a1326d3b assets/ypfundamentals/models/item/pitcher_extract.json
 63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/ypfundamentals/models/item/runear_spawn_egg.json
 6938fbc99a01b875aa4204e830d8c282e1b02ab9 assets/ypfundamentals/models/item/test_tube.json

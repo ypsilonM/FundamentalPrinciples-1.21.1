@@ -115,10 +115,7 @@ public class SolSpell extends AbstractSpell {
         return (float) ((Math.sqrt(spellLevel)) + (.15f * getSpellPower(spellLevel, entity))*(getTimeBoost(entity)));
     }
 
-    @Override
-    public AnimationHolder getCastStartAnimation() {
-        return Animations.TONATIUH_START;
-    }
+
 
     @Override
     public AnimationHolder getCastFinishAnimation() {

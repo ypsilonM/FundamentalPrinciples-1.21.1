@@ -1,13 +1,18 @@
 package com.ypsi.fundamentalism.attachments;
 
 import com.ypsi.fundamentalism.attachments.customAtt.PrinciplesLevelsAttachment;
+import com.ypsi.fundamentalism.gui.PrincipleLevelUpToast;
 import com.ypsi.fundamentalism.network.packets.SyncCategoryLevelsPacket;
 import com.ypsi.fundamentalism.network.packets.data.ClientCategoryLevelsData;
 import com.ypsi.fundamentalism.util.Principles;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PrinciplesProgressionManager {
 
@@ -34,6 +39,41 @@ public class PrinciplesProgressionManager {
             return getCategoryLevels(player).getLevel(getTechnicalName(principle));
         }
     }
+
+    public static boolean isFullLeveled(Player player){
+        if(player == null){
+            return false;
+        }
+
+        if(getCategoryLevel(player, Principles.CONCENTRATIO)<20)
+            return false;
+        if(getCategoryLevel(player, Principles.POTENTIA)<20)
+            return false;
+        if(getCategoryLevel(player, Principles.VITALE)<20)
+            return false;
+        if(getCategoryLevel(player, Principles.LOCUS)<20)
+            return false;
+        if(getCategoryLevel(player, Principles.REPETITIO)<20)
+            return false;
+        if(getCategoryLevel(player, Principles.APPARITIO)<20)
+            return false;
+        if(getCategoryLevel(player, Principles.PERTINACIA)<20)
+            return false;
+        if(getCategoryLevel(player, Principles.EXPANSIO)<20)
+            return false;
+        if(getCategoryLevel(player, Principles.MOTUS)<20)
+            return false;
+        if(getCategoryLevel(player, Principles.PERCEPTIO)<20)
+            return false;
+        if(getCategoryLevel(player, Principles.REMEDIUM)<20)
+            return false;
+        if(getCategoryLevel(player, Principles.AUGERE)<20)
+            return false;
+        if(getCategoryLevel(player, Principles.CERTUM)<20)
+            return false;
+
+        return true;
+    }
     public static int getCategoryExperience(Player player, String category) {
         if (player == null) {
             return 0;
@@ -53,7 +93,7 @@ public class PrinciplesProgressionManager {
         //if (player.level().isClientSide) return;
         PrinciplesLevelsAttachment levels = getCategoryLevels(player);
         int oldLevel = levels.getLevel(category);
-        levels.addExperience((ServerPlayer) player,category, amount);
+        levels.addExperience( player,category, amount);
 
         if (levels.getLevel(category) > oldLevel) {
             onLevelUp(player, category, levels.getLevel(category));
@@ -72,11 +112,14 @@ public class PrinciplesProgressionManager {
         }
     }
     private static void onLevelUp(Player player, String category, int newLevel) {
-            player.displayClientMessage(
-                    Component.literal(getCategoryDisplayName(category) + " " + newLevel + " ↑ ")
-                            .withStyle(ChatFormatting.GREEN),
-                    true
-            );
+        //if(player.level().isClientSide){
+            Minecraft.getInstance().getToasts().addToast(new PrincipleLevelUpToast(category, newLevel));
+        //}
+//            player.displayClientMessage(
+//                    Component.literal(getCategoryDisplayName(category) + " " + newLevel + " ↑ ")
+//                            .withStyle(ChatFormatting.GREEN),
+//                    true
+//            );
 
     }
 
@@ -95,6 +138,24 @@ public class PrinciplesProgressionManager {
             case "usesHealing" -> "Remedium Principle";
             case "usesPotentiation" -> "Augere Principle";
             case "immutable" -> "Certum Principle";
+            default -> category;
+        };
+    }
+    public static String getShortCategoryDisplayName(String category) {
+        return switch (category) {
+            case "createEntity" -> "Concentratio";
+            case "addEffects" -> "Pertinacia";
+            case "hasRecasts" -> "Repetitio";
+            case "usesShoot" -> "Potentia";
+            case "usesSummon" -> "Vitale";
+            case "usesTeleport" -> "Apparitio";
+            case "createsAoeEntities" -> "Expansio";
+            case "usesMobility" -> "Motus";
+            case "usesRaycast" -> "Perceptio";
+            case "usesTargeting" -> "Locus";
+            case "usesHealing" -> "Remedium";
+            case "usesPotentiation" -> "Augere";
+            case "immutable" -> "Certum";
             default -> category;
         };
     }
@@ -130,9 +191,10 @@ public class PrinciplesProgressionManager {
             case "usesRaycast" -> "☈";
             case "usesTargeting" -> "\uD83C\uDFF9";
             case "usesHealing" -> "⛨";
-            case "usesPotentiation" -> "♢";
+            case "usesPotentiation" -> "\uD83D\uDDE1";
             case "immutable" -> "⌛";
             default -> "";
         };
     }
+    //🗡  ♢
 }

@@ -4,9 +4,16 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.ypsi.fundamentalism.advancements.triggers.YpTriggers;
 import com.ypsi.fundamentalism.attachments.YpsAttributeManager;
+import com.ypsi.fundamentalism.spells.ModSpells;
 import com.ypsi.fundamentalism.util.Util;
+import io.redspace.ironsspellbooks.api.magic.MagicData;
+import io.redspace.ironsspellbooks.api.magic.SpellSelectionManager;
+import io.redspace.ironsspellbooks.api.spells.SpellData;
+import io.redspace.ironsspellbooks.player.ClientMagicData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
+import net.neoforged.neoforge.common.NeoForge;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -69,7 +76,7 @@ public class PrinciplesLevelsAttachment {
         return categoryExperience.getOrDefault(category, 0);
     }
 
-    public void setLevel(ServerPlayer serverPlayer, String category, int level) {
+    public void setLevel(Player player, String category, int level) {
         int oldLevel = getLevel(category);
         level = Mth.clamp(level, 0, 20);
 
@@ -77,12 +84,16 @@ public class PrinciplesLevelsAttachment {
             categoryLevels.put(category, level);
             if (listener != null) {
                 listener.onLevelChanged(category, oldLevel, level);
+
             }
             if (level == 20) {
-                YpTriggers.PRINCIPLES_LEVEL_TRIGGER_SUPPLIER.get().trigger(serverPlayer, category, level);
+                YpTriggers.PRINCIPLES_LEVEL_TRIGGER_SUPPLIER.get().trigger((ServerPlayer) player, category, level);
             }
             if (category.equals("createEntity")) {
-                YpsAttributeManager.MANA.applyModifier(serverPlayer, level);
+                YpsAttributeManager.MANA.applyModifier(player, level);
+            }
+            if(level==10 && category.equals("usesHealing")){
+                MagicData.getPlayerMagicData(player).getSyncedData().learnSpell(ModSpells.REMEDIUM_SPELL.get());
             }
         }
     }
@@ -91,25 +102,31 @@ public class PrinciplesLevelsAttachment {
         categoryExperience.put(category, Math.max(0, experience));
     }
 
-    public void addExperience(ServerPlayer serverPlayer, String category, int amount) {
-        int currentExp = getExperience(category);
+    public void addExperience(Player player, String category, int amount) {
+        ServerPlayer serverPlayer = (ServerPlayer) player;
+        int currentXp = getExperience(category);
         int currentLevel = getLevel(category);
 
         if (currentLevel >= 20) return;
 
-        int newExp = currentExp + amount;
-        int expForNextLevel = getExpForLevel(currentLevel + 1);
+        int totalXp = currentXp + amount;
 
-        if (newExp >= expForNextLevel) {
-            setLevel(serverPlayer, category, currentLevel + 1);
-            setExperience(category, newExp - expForNextLevel);
-        } else {
-            setExperience(category, newExp);
+        while(currentLevel<20){
+            int xp4NextLvl = getExpForLevel(currentLevel + 1);
+            if (totalXp >= xp4NextLvl) {
+                totalXp-=xp4NextLvl;
+                currentLevel++;
+                setLevel(player, category, currentLevel);
+            }else{
+                break;
+            }
         }
+        setExperience(category, totalXp);
+
     }
 
     public int getExpForLevel(int level) {
-        return Util.getExpForLevel(level);
+        return Util.getExpForPrincipleLevel(level);
     }
 
     public float getProgress(String category) {

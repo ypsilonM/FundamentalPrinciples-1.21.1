@@ -1,28 +1,20 @@
-package com.ypsi.fundamentalism.datagen;
+package com.ypsi.fundamentalism.datagen.providers;
 
-import com.ypsi.fundamentalism.enchantment.FundEnchantments;
 import com.ypsi.fundamentalism.entity.ModEntities;
 import com.ypsi.fundamentalism.item.ModItems;
-import io.redspace.ironsspellbooks.IronsSpellbooks;
 import io.redspace.ironsspellbooks.registries.ItemRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.data.loot.EntityLootSubProvider;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.flag.FeatureFlags;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.entries.EmptyLootItem;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.*;
 import net.minecraft.world.level.storage.loot.predicates.LootItemKilledByPlayerCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition;
-import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceWithEnchantedBonusCondition;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 
@@ -31,7 +23,7 @@ import java.util.stream.Stream;
 
 public class ModEntityLootTableProvider extends EntityLootSubProvider {
 
-    protected ModEntityLootTableProvider(HolderLookup.Provider registries) {
+    public ModEntityLootTableProvider(HolderLookup.Provider registries) {
         super(FeatureFlags.REGISTRY.allFlags(), registries);
 
     }

@@ -43,6 +43,7 @@ public class SacredDiskSpell extends AbstractSpell {
         this.baseManaCost = 10;
     }
 
+
     @Override
     public CastType getCastType() {
         return CastType.LONG;

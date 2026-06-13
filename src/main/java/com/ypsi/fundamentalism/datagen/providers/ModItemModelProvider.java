@@ -1,15 +1,12 @@
-package com.ypsi.fundamentalism.datagen;
+package com.ypsi.fundamentalism.datagen.providers;
 
 import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.item.ModItems;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
-import net.neoforged.fml.common.Mod;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.neoforged.neoforge.client.model.generators.ItemModelBuilder;
 import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
-import net.neoforged.neoforge.client.model.generators.ModelFile;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
 public class ModItemModelProvider extends ItemModelProvider {
     public ModItemModelProvider(PackOutput output, ExistingFileHelper existingFileHelper) {
@@ -21,13 +18,11 @@ public class ModItemModelProvider extends ItemModelProvider {
         basicItem(ModItems.MANA_FRUIT.get());
         basicItem(ModItems.ARCANE_MIXTURE.get());
         basicItem(ModItems.TEST_TUBE.get());
-
         basicItem(ModItems.PITCHER_EXTRACT.get());
         basicItem(ModItems.LUMINAIRE_EXTRACT.get());
-
         basicItem(ModItems.FLASK.get());
-
         basicItem(ModItems.URSIDAE_FUR.get());
+        basicItem(ModItems.ANCIENT_SCROLL_CASE.get());
 
         generateTonicModels();
 
@@ -36,7 +31,10 @@ public class ModItemModelProvider extends ItemModelProvider {
         withExistingParent(ModItems.VENEMERUS_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
         withExistingParent(ModItems.RUNEAR_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
 
+        registerCustomSwordModel();
+
     }
+
 
     private void generateTonicModels() {
         String tonicPath = ModItems.TONIC.getId().getPath();
@@ -45,5 +43,21 @@ public class ModItemModelProvider extends ItemModelProvider {
                     .texture("layer0", modLoc("item/tonic/ton_" + charges));
         }
     }
+    private void registerCustomSwordModel() {
+        String swordPath = ModItems.NULLIFIER.getId().getPath();
+        ItemModelBuilder swordModel = withExistingParent(swordPath, mcLoc("item/handheld"))
+                .texture("layer0", modLoc("item/" + swordPath));
 
+        swordModel.transforms()
+                .transform(ItemDisplayContext.THIRD_PERSON_RIGHT_HAND)
+                .rotation(50, 90, 135)
+                .translation(0.5f, -7.5f,4.5f)
+                .scale(1.0f, 1.0f, 1.0f)
+                .end()
+                .transform(ItemDisplayContext.THIRD_PERSON_LEFT_HAND)
+                .rotation(50, -90, -135)
+                .translation(0.5f, -7.5f,4.5f)
+                .scale(1.0f, 1.0f, 1.0f)
+                .end();
+    }
 }

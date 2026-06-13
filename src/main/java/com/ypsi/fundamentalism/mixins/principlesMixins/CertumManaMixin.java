@@ -3,7 +3,7 @@ package com.ypsi.fundamentalism.mixins.principlesMixins;
 import com.ypsi.fundamentalism.ServerConfig;
 import com.ypsi.fundamentalism.attachments.FatigueManager;
 import com.ypsi.fundamentalism.attachments.PrinciplesProgressionManager;
-import com.ypsi.fundamentalism.config.SpellCategoriesGenerator;
+import com.ypsi.fundamentalism.principleGen.SpellCategoriesGenerator;
 import com.ypsi.fundamentalism.util.Principles;
 import com.ypsi.fundamentalism.util.Util;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
@@ -19,7 +19,8 @@ public abstract class CertumManaMixin {
 
     @Redirect(
             method = "canBeCastedBy",
-            at = @At(value = "INVOKE", target = "Lio/redspace/ironsspellbooks/api/spells/AbstractSpell;getManaCost(I)I"), remap = false
+            at = @At(value = "INVOKE", target = "Lio/redspace/ironsspellbooks/api/spells/AbstractSpell;getManaCost(I)I"),
+            remap = false
     )
     private int redirectGetManaCost(AbstractSpell spell, int spellLevel, int originalSpellLevel, CastSource castSource, MagicData playerMagicData, Player player) {
 

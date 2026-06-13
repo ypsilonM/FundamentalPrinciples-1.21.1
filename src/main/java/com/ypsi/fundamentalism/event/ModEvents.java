@@ -3,10 +3,11 @@ package com.ypsi.fundamentalism.event;
 import com.ypsi.fundamentalism.ServerConfig;
 import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.attachments.FatigueManager;
+import com.ypsi.fundamentalism.attachments.YpsAttributeManager;
 import com.ypsi.fundamentalism.attributes.YpsAttributes;
 import com.ypsi.fundamentalism.component.SpellbookLevel.SpellBookComponentHelper;
 import com.ypsi.fundamentalism.component.YpsDataComponents;
-import com.ypsi.fundamentalism.config.SpellCategoriesGenerator;
+import com.ypsi.fundamentalism.principleGen.SpellCategoriesGenerator;
 import com.ypsi.fundamentalism.effect.ModEffects;
 import com.ypsi.fundamentalism.enchantment.FundEnchantments;
 import com.ypsi.fundamentalism.entity.mobs.imp.ImpEntity;
@@ -20,10 +21,10 @@ import com.ypsi.fundamentalism.attachments.PrinciplesProgressionManager;
 import com.ypsi.fundamentalism.spells.ModSpells;
 import com.ypsi.fundamentalism.util.Principles;
 import com.ypsi.fundamentalism.util.Util;
-import io.redspace.ironsspellbooks.api.config.SpellConfigManager;
 import io.redspace.ironsspellbooks.api.events.*;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.magic.MagicHelper;
+import io.redspace.ironsspellbooks.api.magic.SpellSelectionManager;
 import io.redspace.ironsspellbooks.api.registry.AttributeRegistry;
 import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
 import io.redspace.ironsspellbooks.api.spells.*;
@@ -31,7 +32,6 @@ import io.redspace.ironsspellbooks.api.util.CameraShakeData;
 import io.redspace.ironsspellbooks.api.util.CameraShakeManager;
 import io.redspace.ironsspellbooks.api.util.Utils;
 import io.redspace.ironsspellbooks.capabilities.magic.MagicManager;
-import io.redspace.ironsspellbooks.capabilities.magic.SpellContainer;
 import io.redspace.ironsspellbooks.compat.Curios;
 import io.redspace.ironsspellbooks.damage.SpellDamageSource;
 import io.redspace.ironsspellbooks.entity.mobs.abstract_spell_casting_mob.AbstractSpellCastingMob;
@@ -40,6 +40,7 @@ import io.redspace.ironsspellbooks.item.SpellBook;
 import io.redspace.ironsspellbooks.item.weapons.StaffItem;
 import io.redspace.ironsspellbooks.network.SyncManaPacket;
 import io.redspace.ironsspellbooks.network.casting.*;
+import io.redspace.ironsspellbooks.player.ClientMagicData;
 import io.redspace.ironsspellbooks.registries.MobEffectRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
@@ -55,6 +56,8 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
@@ -71,8 +74,10 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
 import net.neoforged.neoforge.event.entity.living.*;
+import net.neoforged.neoforge.event.entity.player.AdvancementEvent;
 import net.neoforged.neoforge.event.entity.player.CriticalHitEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
@@ -130,46 +135,92 @@ public class ModEvents {
 
     }
 
+    @SubscribeEvent
+    public static void mobStarAlignment(LivingDamageEvent.Pre event){
+        if(event.getSource().getEntity() instanceof AbstractSpellCastingMob castingMob
+                && (event.getSource().is(Tags.DamageTypes.IS_PHYSICAL))
+                && !(event.getSource() instanceof SpellDamageSource)
+        ){
+            LivingEntity enemy = event.getEntity();
+            double prob = ServerConfig.mobStarAlignment;
+
+            if (enemy.getRandom().nextDouble() < prob) {
+
+                event.setNewDamage((float) (event.getNewDamage()* (ServerConfig.starAlignmentMultiplier)));
+
+                float knockbackStrength = 2F;
+                float yawRad = castingMob.getYRot() * (float) (Math.PI / 180.0);
+                double knockbackX = Math.sin(yawRad);
+                double knockbackZ = -Math.cos(yawRad);
+                enemy.knockback(knockbackStrength, knockbackX, knockbackZ);
+
+                enemy.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 30 * 20, 0, false, true, true));
+
+                ServerLevel serverLevel = (ServerLevel) enemy.level();
+                serverLevel.sendParticles(ParticleTypes.END_ROD, enemy.getX(), enemy.getY() + enemy.getBbHeight() * 0.5, enemy.getZ(), 30, enemy.getBbWidth() * 1, enemy.getBbHeight() * 0.4, enemy.getBbWidth() * 1, 0.01);
+                serverLevel.sendParticles(new DustParticleOptions(new Vector3f(0.0f, 0.0f, 0.0f), 1.0f), enemy.getX(), enemy.getY() + enemy.getBbHeight() * 0.5, enemy.getZ(), 60, enemy.getBbWidth() * 1, enemy.getBbHeight() * 0.4, enemy.getBbWidth() * 1, 0.01);
+                serverLevel.sendParticles(ModParticles.CONSTELLATION_PARTICLE.get(), enemy.getX(), enemy.getY() + enemy.getBbHeight() * 0.5, enemy.getZ(), 1, 0, 0, 0, 0.01);
+
+                castingMob.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 4 * 20, 1, false, false, true));
+                castingMob.level().playSound(null, enemy.getX(), enemy.getY(), enemy.getZ(), SoundEvents.ZOMBIE_BREAK_WOODEN_DOOR, SoundSource.PLAYERS, 2.0F, 0.8F);
+                CameraShakeManager.addCameraShake(new CameraShakeData(castingMob.level(), 15, enemy.position(), 10));
+
+            }
+
+        }
+    }
+
 
     @SubscribeEvent
-    public static void starAlignment(CriticalHitEvent event){
+    public static void select(SpellSelectionManager.SpellSelectionEvent event){
+        if(event.getEntity() instanceof Player player) {
+            if (PrinciplesProgressionManager.getCategoryLevel(player, Principles.REMEDIUM) >= 10) {
+                event.addSelectionOption(new SpellData(ModSpells.REMEDIUM_SPELL.get(), 1), "remedium_slot", 0);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void playerStarAlignment(CriticalHitEvent event){
         if(event.getTarget() instanceof LivingEntity enemy) {
             if (!event.isCriticalHit()) {
                 return;
             }
             Player player = event.getEntity();
+
             if (!event.getEntity().level().isClientSide()) {
                 double n = 100;
                 int amplifier = 0;
-                //1st Criteria
+
                 if (player.hasEffect(ModEffects.MINDFUL_EFFECT)) {
-                    n -= 20;
+                        n -= 20;
                     int level = player.getEffect(ModEffects.MINDFUL_EFFECT).getAmplifier() + 1;
                     amplifier = Math.clamp(level, 0, 2);
-                    n -= (5) * (level);
+                        n -= (5) * (level);
                 }
-                //2nd Criteria
-                if (player.getHealth() <= player.getMaxHealth() * 0.50) {
-                    n -= 10;
-                }
-                //3rd Criteria
-                if (enemy instanceof AbstractSpellCastingMob){
-                    n -= 10;
-                }
+                if (player.getHealth() <= player.getMaxHealth() * 0.50)
+                        n -= 10;
+                if (enemy instanceof AbstractSpellCastingMob)
+                        n -= 10;
                 if (enemy instanceof Player target){
                     double targetSP = Util.getElementalMaxValue(target);
                     double playerSP = Util.getElementalMaxValue(player);
                     double delta = Math.abs(targetSP-playerSP);
-                    if(delta < playerSP*0.20){
+                    if(delta < playerSP*0.20)
                         n -=20;
-                    }
                 }
 
+                double graceful = player.getAttributeValue(YpsAttributes.RESONANCE);
+                double graceMultiplier = 1.0 / (1.0 + graceful * 0.5);
+                n = n * graceMultiplier;
+
+                n = Math.clamp(n, 10, 200);
+
                 double prob = 1 / n;
-                //if(true){
+
                 if (player.getRandom().nextDouble() < prob) {
 
-                    event.setDamageMultiplier(2f);
+                    event.setDamageMultiplier((float) ServerConfig.starAlignmentMultiplier);
                     float knockbackStrength = 2F;
                     float yawRad = player.getYRot() * (float) (Math.PI / 180.0);
                     double knockbackX = Math.sin(yawRad);
@@ -177,10 +228,6 @@ public class ModEvents {
                     enemy.knockback(knockbackStrength, knockbackX, knockbackZ);
 
                     FatigueManager.cleanFatigue(player);
-//                    player.setData(YpsAttachments.CURRENT_EXHAUSTION, 0);
-//                    player.setData(YpsAttachments.LEVEL_EXHAUSTION, 0);
-                    //SyncExhaustionPacket.sendToPlayer((ServerPlayer) player, player.getData(YpsAttachments.CURRENT_EXHAUSTION));
-                    //SyncExhaustionLevelPacket.sendToPlayer((ServerPlayer) player, player.getData(YpsAttachments.LEVEL_EXHAUSTION));
 
                     enemy.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 30 * 20, 0, false, true, true));
                     var effect = player.getEffect(ModEffects.BURNOUT_EFFECT);
@@ -200,16 +247,20 @@ public class ModEvents {
                     player.level().playSound(null, enemy.getX(), enemy.getY(), enemy.getZ(), SoundEvents.ZOMBIE_BREAK_WOODEN_DOOR, SoundSource.PLAYERS, 2.0F, 0.8F);
                     CameraShakeManager.addCameraShake(new CameraShakeData(player.level(), 15, enemy.position(), 10));
 
+
                 }
             }
         }
     }
 
-//    @SubscribeEvent
-//    public static void mobStarAlignment(LivingDamageEvent.Pre event){
-//
-//
-//    }
+    @SubscribeEvent
+    public static void advancementStar(AdvancementEvent.AdvancementEarnEvent event){
+        if(event.getAdvancement().id().equals
+                (ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "mindful_advancement"))){
+            Player player = event.getEntity();
+            YpsAttributeManager.RESONANCE.applyModifier(player, 1);
+        }
+    }
 
     @SubscribeEvent
     public static void moreMobResistances(FinalizeSpawnEvent event){
@@ -232,17 +283,30 @@ public class ModEvents {
 
     @SubscribeEvent
     public static void onPlayerLoginExSync(PlayerEvent.@NotNull PlayerLoggedInEvent event) {
-        if(!ServerConfig.fatigueSystem) return;
-        if (event.getEntity() instanceof ServerPlayer player) {
-            if (!player.getPersistentData().contains("exhaustionTickCounter")) {
-                player.getPersistentData().putInt("exhaustionTickCounter", 0);
+        if(ServerConfig.fatigueSystem) {
+            if (event.getEntity() instanceof ServerPlayer player) {
+                if (!player.getPersistentData().contains("exhaustionTickCounter")) {
+                    player.getPersistentData().putInt("exhaustionTickCounter", 0);
+                }
+                if (!player.getPersistentData().contains("reduceCounter")) {
+                    player.getPersistentData().putInt("reduceCounter", 0);
+                }
             }
-            if (!player.getPersistentData().contains("reduceCounter")) {
-                player.getPersistentData().putInt("reduceCounter", 0);
+        }else{
+            if(event.getEntity() instanceof ServerPlayer player){
+                FatigueManager.cleanFatigue(player);
+            }
+        }
+        if (event.getEntity() instanceof ServerPlayer player) {
+            SyncCategoryLevelsPacket.sendToPlayer(player);
+
+            if(player.getServer().getAdvancements().get(ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "mindful_advancement")) != null){
+                YpsAttributeManager.RESONANCE.applyModifier(player, 1);
             }
         }
     }
 
+    
 
 
     @SubscribeEvent
@@ -358,13 +422,14 @@ public class ModEvents {
                 return;
             }
 
-//            if(cancelDominanSpells(categories, level, caster, spell) ){
-//                cancelCast(event, magicData, caster, spell);
-//                if (caster instanceof ServerPlayer serverPlayer) {
-//                    serverPlayer.displayClientMessage(Component.translatable("Complex spell unable to cast.").withStyle(ChatFormatting.DARK_PURPLE), true);
-//                }
-//                return;
-//            }
+            if(cancelDominanSpells(categories, level, caster, spell) ){
+                cancelCast(event, magicData, caster, spell);
+                if (caster instanceof ServerPlayer serverPlayer) {
+                    serverPlayer.displayClientMessage(Component.translatable(
+                            "ui.ypfundamentals.dominan_spell_failure").withStyle(ChatFormatting.GOLD), true);
+                }
+                return;
+            }
             if(teleportCanceled(categories,caster,spell,event,magicData)){
                 cancelTeleportSpell(event, magicData, caster, spell);
                 return;
@@ -451,23 +516,22 @@ public class ModEvents {
             if(ServerConfig.fatigueSystem)
                 addExhaustion(player, (int) formulaAdd);
 
-            // -> Leveling up
+            // -> Leveling up Principles
             int levelBonus = calculateXpFromSpell(LEVEL, spell);
-            if (castSource != CastSource.SCROLL) {
+            if (castSource != CastSource.SCROLL && ServerConfig.principlesSYSTEM) {
                 for (String category : categories) {
-                    PrinciplesProgressionManager.addCategoryExperience(player, category, levelBonus);
+                    PrinciplesProgressionManager.addCategoryExperience(player, category, levelBonus * ServerConfig.principlesXPMultiplier);
                 }
             }
 
             // -> Search Equipped Spellbook
-
             if(ServerConfig.spellbookLevel) {
                 CuriosApi.getCuriosInventory(player).ifPresent(inv -> {
                     inv.findCurios(Curios.SPELLBOOK_SLOT).forEach(curio -> {
                         ItemStack spellBook = curio.stack();
                         if (spellBook.getItem() instanceof SpellBook) {
                             int xpGained = calculateXpFromSpell(LEVEL, spell);
-                            SpellBookComponentHelper.addXP(spellBook, xpGained, player);
+                            SpellBookComponentHelper.addXP(spellBook, xpGained * ServerConfig.spellbookXPMultiplier, player);
                         }
                     });
                 });
@@ -505,20 +569,20 @@ public class ModEvents {
             vanishCastEffects(caster);
         }
     }
-//    public static boolean cancelDominanSpells(Set<String> categories, int level, ServerPlayer serverPlayer, AbstractSpell spell){
-//        if(categories.size() >= 4){
-//            SpellRarity spellRarity = spell.getRarity(level);
-//            int minLevel = getLevelRequiredForRARITY(spellRarity);
-//            for (String category : categories){
-//                int categoryLevel =  PrinciplesProgressionManager.getCategoryLevel(serverPlayer, category);
-//                if (categoryLevel<minLevel){
-//                    return true;
-//                }
-//            }
-//            return false;
-//        }
-//        return false;
-//    }
+    public static boolean cancelDominanSpells(Set<String> categories, int level, ServerPlayer serverPlayer, AbstractSpell spell){
+        if(categories.size() >= ServerConfig.dominanPrinciples){
+            SpellRarity spellRarity = spell.getRarity(level);
+            int minLevel = getLevelRequiredForRARITY(spellRarity);
+            for (String category : categories){
+                int categoryLevel =  PrinciplesProgressionManager.getCategoryLevel(serverPlayer, category);
+                if (categoryLevel<minLevel){
+                    return true;
+                }
+            }
+            return false;
+        }
+        return false;
+    }
     public static boolean teleportCanceled(Set<String> categories, ServerPlayer caster, AbstractSpell spell, SpellPreCastEvent event, MagicData magicData){
         if(!ServerConfig.apparitioActive || !ServerConfig.principlesSYSTEM) return false;
 
@@ -713,12 +777,8 @@ public class ModEvents {
         }
     }
 
-    @SubscribeEvent
-    public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player) {
-            SyncCategoryLevelsPacket.sendToPlayer(player);
-        }
-    }
+
+
     @SubscribeEvent
     public static void onDimensionChange(PlayerEvent.PlayerChangedDimensionEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
@@ -803,6 +863,32 @@ public class ModEvents {
 
         });
     }
+
+//    @SubscribeEvent
+//    public static void pertinaciaEffectEvent(MobEffectEvent.Added mobEffectEvent){
+//        if(mobEffectEvent.getEntity() instanceof ServerPlayer player) {
+//
+//            MobEffectInstance effectInstance = mobEffectEvent.getEffectInstance();
+//            if(effectInstance == null) return;
+//
+//            Holder<MobEffect> effectHolder = effectInstance.getEffect();
+//
+//            int originalTime = effectInstance.getDuration();
+//
+//            if(player.hasEffect(effectHolder))
+//                player.removeEffect(effectHolder);
+//
+//            int pertinaciaLvl = PrinciplesProgressionManager.getCategoryLevel(player, Principles.PERTINACIA);
+//
+//            int time = switch (effectHolder.value().getCategory()) {
+//                case MobEffectCategory.BENEFICIAL -> (int)(originalTime * (0.6 + (0.02*pertinaciaLvl)));
+//                case MobEffectCategory.NEUTRAL -> originalTime;
+//                case MobEffectCategory.HARMFUL -> (int)(originalTime * (1.3 - (0.02*pertinaciaLvl)));
+//            };
+//            player.addEffect()
+//
+//        }
+//    }
 
     @SubscribeEvent
     public static void vitaleSummonCooldown(SpellCooldownAddedEvent.Pre event){
@@ -960,8 +1046,6 @@ public class ModEvents {
 
         }
     }
-
-
 
 
 }

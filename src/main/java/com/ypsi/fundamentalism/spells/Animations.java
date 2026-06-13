@@ -23,5 +23,8 @@ public class Animations {
     public static final AnimationHolder TONATIUH_START = new AnimationHolder(
             ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "tonatiuh_charge"), false, true);
 
+    public static final AnimationHolder REMEDIUM = new AnimationHolder(
+            ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "regression_law"), false, false);
+
 
 }

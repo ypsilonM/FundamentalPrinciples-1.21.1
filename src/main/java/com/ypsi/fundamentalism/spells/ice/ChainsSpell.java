@@ -17,7 +17,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -34,7 +36,7 @@ public class ChainsSpell extends AbstractSpell {
     @Override
     public List<MutableComponent> getUniqueInfo(int spellLevel, LivingEntity caster) {
         return List.of(
-                //Component.translatable("ui.irons_spellbooks.effect_length", Utils.timeFromTicks(getCastTime(spellLevel), 1))
+                Component.translatable("ui.irons_spellbooks.effect_length", Utils.timeFromTicks(getDuration(spellLevel, caster), 1))
         );
     }
 
@@ -46,11 +48,15 @@ public class ChainsSpell extends AbstractSpell {
             .build();
 
     public ChainsSpell() {
-        this.manaCostPerLevel = 5;
-        this.baseSpellPower = 5;
-        this.spellPowerPerLevel = 1;
+        this.manaCostPerLevel = 15;
+        this.baseSpellPower = 0;
+        this.spellPowerPerLevel = 0;
         this.castTime = 10 * 20;
-        this.baseManaCost = 20;
+        this.baseManaCost = 65;
+    }
+
+    public int getDuration(int spellLevel, LivingEntity caster) {
+        return getCastTime(spellLevel)+(80*spellLevel);
     }
 
     @Override
@@ -95,13 +101,18 @@ public class ChainsSpell extends AbstractSpell {
                 Vec3 spawn = target.position();
                 ChainsEntity chainEntity = new ChainsEntity(level, entity);
 
-                chainEntity.setDuration(20*10);
+                chainEntity.setDuration(getDuration(spellLevel, entity));
                 target.addEffect(new MobEffectInstance(
-                        ModEffects.CHAINED_EFFECT,
-                        20*10,
-                        0,
-                        false,
-                        true
+                        ModEffects.CHAINED_EFFECT, getDuration(spellLevel, entity),
+                        0, false, true
+                ));
+                target.addEffect(new MobEffectInstance(
+                        MobEffects.MOVEMENT_SLOWDOWN, getDuration(spellLevel, entity),
+                        3, false, true
+                ));
+                target.addEffect(new MobEffectInstance(
+                        MobEffects.WEAKNESS, getDuration(spellLevel, entity),
+                        5, false, true
                 ));
 
                 chainEntity.setTarget(target);

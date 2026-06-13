@@ -24,7 +24,11 @@ public abstract class RaycastBuilderMixin {
     @Shadow (remap = false) private Vec3 end;
     @Shadow (remap = false) private float bbInflation;
 
-    @Inject(method = "performRaycast", at = @At("HEAD"), remap = false)
+    @Inject(
+            method = "performRaycast",
+            at = @At("HEAD"),
+            remap = false
+    )
     private void adjustRaycastRange(CallbackInfoReturnable<HitResult> cir) {
         if (originEntity instanceof ServerPlayer player) {
             double originalDistance = start.distanceTo(end);

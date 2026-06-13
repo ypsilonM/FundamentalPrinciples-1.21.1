@@ -19,7 +19,12 @@ public class AoERadiusMixin {
     @Unique
     private boolean principleModification = false;
 
-    @ModifyArg(method = "setRadius", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Mth;clamp(FFF)F"), index = 0, remap = false)
+    @ModifyArg(
+            method = "setRadius",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Mth;clamp(FFF)F"),
+            index = 0,
+            remap = false
+    )
     private float modifyRadius(float value){
         if(principleModification || !ServerConfig.expansioActive || !ServerConfig.principlesSYSTEM){
             return value;
@@ -38,8 +43,6 @@ public class AoERadiusMixin {
             value*=multiplier;
             principleModification = true;
         }
-
-
 
         return value;
     }

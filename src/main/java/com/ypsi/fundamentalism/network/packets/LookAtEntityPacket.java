@@ -52,9 +52,9 @@ public record LookAtEntityPacket(int casterId, float yRot, float xRot) implement
 
     public static void sendToPlayer(ServerPlayer targetPlayer, Entity caster) {
         AABB aabb = caster.getBoundingBox();
-        Vec3 center = aabb.getCenter(); // Método directo desde 1.17
+        Vec3 center = aabb.getCenter();
 
-        Vec3 playerEyes = targetPlayer.getEyePosition(1.0F); // Más preciso
+        Vec3 playerEyes = targetPlayer.getEyePosition(1.0F);
         Vec3 direction = center.subtract(playerEyes).normalize();
 
         float yRot = (float) Math.toDegrees(Math.atan2(direction.z, direction.x)) - 90.0F;

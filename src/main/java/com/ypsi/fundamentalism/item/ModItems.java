@@ -2,6 +2,8 @@ package com.ypsi.fundamentalism.item;
 
 import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.entity.ModEntities;
+import com.ypsi.fundamentalism.item.custom.AncientScrollCase;
+import com.ypsi.fundamentalism.item.custom.NullifierBlade;
 import com.ypsi.fundamentalism.item.custom.FatigueReducerContainer;
 import com.ypsi.fundamentalism.item.custom.food.ManaFruit;
 import net.minecraft.world.item.*;
@@ -17,6 +19,15 @@ public class ModItems {
     public static final DeferredRegister.Items ITEMS =
             DeferredRegister.createItems(FundamentalPrinciples.MOD_ID);
 
+    public static final DeferredItem<SwordItem> NULLIFIER = ITEMS.register("nullifier",
+            () -> new NullifierBlade(Tiers.NETHERITE,
+                    new Item.Properties()
+                            .rarity(Rarity.EPIC)
+                            .fireResistant()
+                            .attributes(SwordItem.createAttributes(Tiers.NETHERITE, 2, -1.0f))));
+
+    public static final DeferredItem<AncientScrollCase> ANCIENT_SCROLL_CASE = ITEMS.register("ancient_scroll_case",
+            () -> new AncientScrollCase(new Item.Properties().rarity(Rarity.RARE)));
 
 
     public static final DeferredItem<Item> ARCANE_MIXTURE = ITEMS.register("arcane_mixture",

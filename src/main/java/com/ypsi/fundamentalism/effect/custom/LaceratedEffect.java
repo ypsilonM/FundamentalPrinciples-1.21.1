@@ -26,7 +26,7 @@ public class LaceratedEffect extends MagicMobEffect {
                 if(!entity.hasEffect(MobEffectRegistry.BLIGHT))
                     event.setAmount(event.getAmount() * 0.6f);
 
-                event.setAmount(event.getAmount() * 0.9f);
+                event.setAmount(event.getAmount() * 0.8f);
             }
         }
     }

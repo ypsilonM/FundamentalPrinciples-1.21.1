@@ -18,7 +18,12 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 @Mixin(AbstractMagicProjectile.class)
 public class ProjectilePrecisionMixin {
 
-    @ModifyVariable(method = "shoot", at= @At("HEAD"), argsOnly = true, remap = false)
+    @ModifyVariable(
+            method = "shoot",
+            at= @At("HEAD"),
+            argsOnly = true,
+            remap = false
+    )
     private Vec3 modifyShootDirection(Vec3 original){
         AbstractMagicProjectile magicProjectile = (AbstractMagicProjectile)(Object) this;
         Entity owner = magicProjectile.getOwner();

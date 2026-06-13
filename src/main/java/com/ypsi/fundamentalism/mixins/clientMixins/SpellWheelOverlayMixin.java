@@ -1,12 +1,12 @@
 package com.ypsi.fundamentalism.mixins.clientMixins;
 
+import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.ServerConfig;
 import com.ypsi.fundamentalism.attachments.FatigueManager;
-import com.ypsi.fundamentalism.config.SpellCategoriesGenerator;
+import com.ypsi.fundamentalism.principleGen.SpellCategoriesGenerator;
 import com.ypsi.fundamentalism.attachments.PrinciplesProgressionManager;
 import com.ypsi.fundamentalism.util.Principles;
 import com.ypsi.fundamentalism.util.Util;
-import io.redspace.ironsspellbooks.IronsSpellbooks;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import io.redspace.ironsspellbooks.capabilities.magic.MagicManager;
 import io.redspace.ironsspellbooks.gui.overlays.SpellWheelOverlay;
@@ -18,7 +18,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TextColor;
 import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -75,9 +74,7 @@ public class SpellWheelOverlayMixin {
                             .map(PrinciplesProgressionManager::getCategorySymbol)
                             .collect(Collectors.joining(" "));
 
-                    Component symbolsComponent = categories.size()>=4?
-                            Component.literal(symbolsText).withStyle(Style.EMPTY.withColor(TextColor.fromRgb(0xCCFFFF))):
-                            Component.literal(symbolsText).withStyle(ChatFormatting.GOLD);
+                    Component symbolsComponent = Component.literal(symbolsText).withStyle(ChatFormatting.GOLD);
 
 
                     int symbolsWidth = font.width(symbolsComponent);
@@ -86,7 +83,7 @@ public class SpellWheelOverlayMixin {
                     guiGraphics.drawString(font, symbolsComponent,
                             centerX - symbolsWidth / 2, symbolsY, 0xFFFFFF, true);
 
-                    if(categories.contains("usesTeleport")) {
+                    if(categories.contains("usesTeleport") && ServerConfig.principlesSYSTEM && ServerConfig.apparitioActive) {
                         var swsm = ClientMagicData.getSpellSelectionManager();
                         int categoryLevel = PrinciplesProgressionManager.getCategoryLevel(minecraft.player, "usesTeleport");
                         int cooldown = MagicManager.getEffectiveSpellCooldown(selectedSpell.getSpell(), minecraft.player, swsm.getSpellSlot(wheelSelection).getCastSource()) / 20;
@@ -106,7 +103,7 @@ public class SpellWheelOverlayMixin {
                 }
             }
         } catch (Exception e) {
-            IronsSpellbooks.LOGGER.error("Error en SpellWheelOverlayMixin", e);
+            FundamentalPrinciples.LOGGER.error("Error in SpellWheelOverlayMixin", e);
         }
     }
 
@@ -121,10 +118,11 @@ public class SpellWheelOverlayMixin {
     private MutableComponent modifySpellDisplayName(AbstractSpell spell, Player player) {
         MutableComponent originalName = spell.getDisplayName(player);
         Set<String> categories = SpellCategoriesGenerator.getCategoriesForSpell(spell.getSpellId());
-        if (categories.size() >=4){
+        if (categories.size() >= ServerConfig.dominanPrinciples ){
             MutableComponent newTitle = Component.literal("");
             newTitle.append(originalName.copy()
-                    .withStyle(Style.EMPTY.withUnderlined(false).withColor(TextColor.fromRgb(0xCCFFFF))));
+                    .withStyle(ChatFormatting.GOLD).withStyle(Style.EMPTY.withUnderlined(false)));
+
             return newTitle;
         }else{
             return originalName.withStyle(Style.EMPTY.withUnderlined(true));

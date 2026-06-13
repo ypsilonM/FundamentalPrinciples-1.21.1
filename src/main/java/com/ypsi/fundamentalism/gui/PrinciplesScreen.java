@@ -112,6 +112,8 @@ public class PrinciplesScreen extends Screen {
             int level = ClientCategoryLevelsData.getLevel(selectedCategory);
             float progress = ClientCategoryLevelsData.getProgress(selectedCategory);
             renderSelectedCategoryTooltip(guiGraphics, selectedCategory, level, progress, centerX, centerY);
+        }else{
+            renderInfoText(guiGraphics, centerX, centerY);
         }
 
         for (int i = 0; i < CATEGORIES.length; i++) {
@@ -137,6 +139,33 @@ public class PrinciplesScreen extends Screen {
                 renderIcon(guiGraphics, CATEGORIES[i], x, y, mouseX, mouseY, i, true);
                 break;
             }
+        }
+    }
+    private void renderInfoText(GuiGraphics guiGraphics, int centerX, int centerY) {
+        int offsetX = 30;
+        int offsetY = -80;
+        int textX = centerX + offsetX;
+        int textY = centerY + offsetY;
+
+
+
+        List<Component> lines = List.of(
+                Component.literal("Dominan Mastery").withStyle(ChatFormatting.BOLD).withColor(0x4D4942),
+                Component.literal("").withStyle(),
+                Component.literal("Minimum level required").withColor(0x4D4942),
+                Component.literal("in each principle per").withColor(0x4D4942),
+                Component.literal("spell rarity in order").withColor(0x4D4942),
+                Component.literal("to cast dominan spells.").withColor(0x4D4942),
+                Component.literal("").withStyle(),
+                Component.literal("• Legendary: "+ServerConfig.dominanLvls.get(4)).withColor(0x997115),
+                Component.literal("• Epic: "+ServerConfig.dominanLvls.get(3)).withColor(0x64397D),
+                Component.literal("• Rare: "+ServerConfig.dominanLvls.get(2)).withColor(0x397D7D),
+                Component.literal("• Uncommon: "+ServerConfig.dominanLvls.get(1)).withColor(0x528241),
+                Component.literal("• Common: "+ServerConfig.dominanLvls.get(0)).withColor(0x403632)
+        );
+
+        for (int i = 0; i < lines.size(); i++) {
+            guiGraphics.drawString(this.font, lines.get(i), textX, textY + i * 10, 0xFFFFFF, false);
         }
     }
 
@@ -166,7 +195,7 @@ public class PrinciplesScreen extends Screen {
 
             int currentExp = ClientCategoryLevelsData.getExperience(category);
             int nextLevel = level+1;
-            int expNeeded = Util.getExpForLevel(nextLevel);
+            int expNeeded = Util.getExpForPrincipleLevel(nextLevel);
             tooltip.add(Component.literal("XP: " + currentExp + "/" + expNeeded)
                     .withColor(0x4D4942));
             tooltip.add(Component.literal(""));
@@ -259,6 +288,16 @@ public class PrinciplesScreen extends Screen {
                 tooltip.add(Component.literal("• " + size + "% Radius")
                         .withStyle(ChatFormatting.DARK_RED) );
         }
+        if(category.equals(PrinciplesProgressionManager.getTechnicalName(Principles.PERTINACIA))){
+            int beneficialMult = (int) (Util.beneficialPertinaciaMultiplier(level)*100);
+            int harmfulMult = (int) (Util.harmfulPertinaciaMultiplier(level)*100);
+
+            tooltip.add(Component.literal("• " + beneficialMult + "% Beneficial")
+                    .withColor(0x0F55BA));
+            tooltip.add(Component.literal("• " + harmfulMult + "% Harmful")
+                    .withColor(0xBA0F65));
+
+        }
         if(ServerConfig.fatigueSystem) {
             double additionalFatigue = 5.0 - (0.5 * level);
             tooltip.add(Component.literal("• " + (additionalFatigue >= 0 ? "+" : "") + additionalFatigue + "% Fatigue")
@@ -266,6 +305,7 @@ public class PrinciplesScreen extends Screen {
         }
 
         renderLargeIconWithTooltip(guiGraphics, category, level, progress, centerX, centerY, tooltip, isMaxLevel ? -1 : progress);
+
     }
 
     private void renderLargeIconWithTooltip(GuiGraphics guiGraphics, String category, int level, float progress, int centerX, int centerY, List<Component> tooltipLines, float progressValue) {
@@ -369,7 +409,7 @@ public class PrinciplesScreen extends Screen {
         if (level < 20) {
             int currentExp = ClientCategoryLevelsData.getExperience(category);
             int nextLevel = level+1;
-            int expNeeded = Util.getExpForLevel(nextLevel);
+            int expNeeded = Util.getExpForPrincipleLevel(nextLevel);
             tooltip.add(Component.literal("Progress: " + (int)(progress * 100) + "%")
                     .withStyle(ChatFormatting.BLUE).withStyle(ChatFormatting.ITALIC));
             tooltip.add(Component.literal("XP: " + currentExp + "/" + expNeeded)

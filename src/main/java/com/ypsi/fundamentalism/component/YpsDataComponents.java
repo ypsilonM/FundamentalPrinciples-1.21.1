@@ -21,6 +21,11 @@ public class YpsDataComponents {
             objectBuilder -> objectBuilder.persistent(Codec.INT)
                     .networkSynchronized(ByteBufCodecs.INT));
 
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> NOTE_TYPE = register("note_type",
+            enumBuilder -> enumBuilder.persistent(Codec.STRING)
+                    .networkSynchronized(ByteBufCodecs.STRING_UTF8)
+            );
+
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<SpellBookXP>> SPELLBOOK_XP =
             register("spellbook_xp", objectBuilder -> objectBuilder.persistent(SpellBookXP.CODEC)

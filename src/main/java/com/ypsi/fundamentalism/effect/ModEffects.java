@@ -20,10 +20,7 @@ public class ModEffects {
             DeferredRegister.create(BuiltInRegistries.MOB_EFFECT, FundamentalPrinciples.MOD_ID);
 
     public static final Holder<MobEffect> MARKED_EFFECT = MOB_EFFECTS.register("marked",
-            () -> new MagicMobEffect(MobEffectCategory.HARMFUL, 0xA52A2A));
-
-//    public static final Holder<MobEffect> BURNOUT_EFFECT = MOB_EFFECTS.register("burnout",
-//            () -> new BurnoutEffect(MobEffectCategory.HARMFUL, 0xeb0c2d));
+            () -> new MagicMobEffect(MobEffectCategory.HARMFUL, 0x820404));
 
     public static final Holder<MobEffect> BURNOUT_EFFECT = MOB_EFFECTS.register("burnout",
             () -> new UnclearableEffect(MobEffectCategory.HARMFUL, 0xeb0c2d));
@@ -65,13 +62,11 @@ public class ModEffects {
                     .addAttributeModifier(YpsAttributes.FATIGUE_REGEN,
                             ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "soothe"), 1, AttributeModifier.Operation.ADD_VALUE)
         );
-
-    //Change color
     public static final Holder<MobEffect> CHAINED_EFFECT = MOB_EFFECTS.register("chained",
-            () -> new ChainedEffect(MobEffectCategory.HARMFUL, 0xeb0c2d)
+            () -> new ChainedEffect(MobEffectCategory.HARMFUL, 0x8CEEFF)
     );
     public static final Holder<MobEffect> LACERATED_EFFECT = MOB_EFFECTS.register("lacerated",
-            () -> new LaceratedEffect(MobEffectCategory.HARMFUL, 0xeb0c2d)
+            () -> new LaceratedEffect(MobEffectCategory.HARMFUL, 0x8A000E)
     );
 
 

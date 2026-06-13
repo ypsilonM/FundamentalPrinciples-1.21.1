@@ -9,8 +9,10 @@
     "clientMixins.ReinforcementMixin",
     "clientMixins.ScrollInfoMixin",
     "clientMixins.SpellWheelOverlayMixin"
+
   ],
   "mixins": [
+
     "ArcaneAnvilMixin",
     "InscriptionMixin",
     "SpellBookMixin",
@@ -21,7 +23,9 @@
     "principlesMixins.CertumManaMixin",
     "principlesMixins.PlayerRecastsMixin",
     "principlesMixins.ProjectilePrecisionMixin",
-    "principlesMixins.RaycastBuilderMixin"
+    "principlesMixins.RaycastBuilderMixin",
+    "principlesMixins.PertinaciaMixin",
+    "principlesMixins.AugereMixin"
   ],
   "injectors": {
     "defaultRequire": 1

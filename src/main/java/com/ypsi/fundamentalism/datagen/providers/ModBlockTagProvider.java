@@ -1,4 +1,4 @@
-package com.ypsi.fundamentalism.datagen;
+package com.ypsi.fundamentalism.datagen.providers;
 
 import com.ypsi.fundamentalism.FundamentalPrinciples;
 import net.minecraft.core.HolderLookup;

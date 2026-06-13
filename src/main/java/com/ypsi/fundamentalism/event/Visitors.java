@@ -41,15 +41,15 @@ public class Visitors {
 
         public void analyzeChildEntity(String internalClassName) {
             try {
-                System.out.println(" Analyzing Children C: " + internalClassName);
-                LOGGER.info("          Children ASM Analyzing: {}", internalClassName);
+                //System.out.println(" Analyzing Children C: " + internalClassName);
+                //LOGGER.info("          Children ASM Analyzing: {}", internalClassName);
 
                 ClassLoader classLoader = this.getClass().getClassLoader();
                 String resourcePath = internalClassName + ".class";
 
                 try (InputStream classStream = classLoader.getResourceAsStream(resourcePath)) {
                     if (classStream == null) {
-                        LOGGER.error("          Cannot find child class: {} with ClassLoader: {}", resourcePath, classLoader);
+                        //LOGGER.error("          Cannot find child class: {} with ClassLoader: {}", resourcePath, classLoader);
                         return;
                     }
 
@@ -58,7 +58,7 @@ public class Visitors {
                     classReader.accept(childVisitor, ClassReader.SKIP_DEBUG);
 
                     Set<String> childCats = childVisitor.getDetectedCategories();
-                    LOGGER.info("          RESULTs for {}: {}", internalClassName, childCats);
+                    //LOGGER.info("          RESULTs for {}: {}", internalClassName, childCats);
                     detectedCategories.addAll(childCats);
                 }
 

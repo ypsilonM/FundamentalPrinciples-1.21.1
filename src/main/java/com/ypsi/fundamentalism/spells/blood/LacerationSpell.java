@@ -11,6 +11,7 @@ import io.redspace.ironsspellbooks.api.util.AnimationHolder;
 import io.redspace.ironsspellbooks.api.util.Utils;
 import io.redspace.ironsspellbooks.capabilities.magic.MagicManager;
 import io.redspace.ironsspellbooks.damage.DamageSources;
+import io.redspace.ironsspellbooks.effect.BlightEffect;
 import io.redspace.ironsspellbooks.registries.ParticleRegistry;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
@@ -37,7 +38,8 @@ public class LacerationSpell extends AbstractSpell {
     public List<MutableComponent> getUniqueInfo(int spellLevel, LivingEntity caster) {
         return List.of(
                 Component.translatable("ui.irons_spellbooks.damage", getDamageText(spellLevel, caster)),
-                Component.translatable("ui.irons_spellbooks.effect_length",getEffectText(spellLevel, caster), 1)
+                Component.translatable("ui.irons_spellbooks.effect_length",getEffectText(spellLevel, caster), 1),
+                Component.translatable("ui.irons_spellbooks.reduced_healing", 40,2)
         );
 
     }
@@ -94,7 +96,7 @@ public class LacerationSpell extends AbstractSpell {
                         MagicManager.spawnParticles(level,
                                 ParticleRegistry.BLOOD_PARTICLE.get(),
                                 hitLocation.x, hitLocation.y + 0.5, hitLocation.z,
-                                100, 0.05, 0.5, 0.05, 0.1, true);
+                                100, 0.05, 1, 0.05, 0.1, true);
                         if(target instanceof LivingEntity livingEntity)
                             livingEntity.addEffect(
                                     new MobEffectInstance(

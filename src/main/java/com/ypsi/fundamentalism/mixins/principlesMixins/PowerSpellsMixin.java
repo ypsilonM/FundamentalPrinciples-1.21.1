@@ -5,7 +5,7 @@ import com.ypsi.fundamentalism.ServerConfig;
 import com.ypsi.fundamentalism.attachments.customAtt.AvailableSpellsAttachment;
 import com.ypsi.fundamentalism.attachments.FatigueManager;
 import com.ypsi.fundamentalism.attachments.YpsAttachments;
-import com.ypsi.fundamentalism.config.SpellCategoriesGenerator;
+import com.ypsi.fundamentalism.principleGen.SpellCategoriesGenerator;
 import com.ypsi.fundamentalism.attachments.PrinciplesProgressionManager;
 import com.ypsi.fundamentalism.util.Util;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
@@ -27,7 +27,11 @@ public abstract class PowerSpellsMixin {
     @Shadow(remap = false)
     public abstract String getSpellId();
 
-    @ModifyReturnValue(method = "getSpellPower", at = @At("RETURN"), remap = false)
+    @ModifyReturnValue(
+            method = "getSpellPower",
+            at = @At("RETURN"),
+            remap = false
+    )
     private float multiplySpecificSpellPower(float original, int spellLevel, @Nullable Entity sourceEntity) {
         if(sourceEntity instanceof Player player) {
             String id = this.getSpellId();
@@ -61,7 +65,11 @@ public abstract class PowerSpellsMixin {
         return original;
     }
 
-    @ModifyReturnValue(method = "getLevelFor", at = @At("RETURN"), remap = false)
+    @ModifyReturnValue(
+            method = "getLevelFor",
+            at = @At("RETURN"),
+            remap = false
+    )
     private int modifySpellLevel(int original, int level, @Nullable LivingEntity caster) {
         if (caster instanceof Player player) {
             AvailableSpellsAttachment av = player.getData(YpsAttachments.SPELL_LIST);

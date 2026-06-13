@@ -4,6 +4,10 @@ import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.effect.ModEffects;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.registry.AttributeRegistry;
+import io.redspace.ironsspellbooks.api.spells.SpellAnimations;
+import io.redspace.ironsspellbooks.api.util.AnimationHolder;
+import io.redspace.ironsspellbooks.render.animation.AnimationHelper;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -12,9 +16,12 @@ import net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+
+import java.util.UUID;
 
 public record ToggleReinforcementPacket() implements CustomPacketPayload {
 
@@ -32,6 +39,9 @@ public record ToggleReinforcementPacket() implements CustomPacketPayload {
 
     public static void handle(ToggleReinforcementPacket packet, IPayloadContext context) {
         context.enqueueWork(() -> {
+            UUID uuid = context.player().getUUID();
+            var clientPlayer = Minecraft.getInstance().player.level().getPlayerByUUID(uuid);
+
             if (context.player() instanceof ServerPlayer player) {
                 boolean hasEffect = player.hasEffect(ModEffects.REINFORCEMENT_EFFECT);
 
@@ -46,14 +56,16 @@ public record ToggleReinforcementPacket() implements CustomPacketPayload {
                                 true
                         );
                         player.addEffect(effectInstance);
+
                         PacketDistributor.sendToAllPlayers(new SyncReinforcementPacket(player.getId(), true));
                     }
                 } else {
                     player.removeEffect(ModEffects.REINFORCEMENT_EFFECT);
+
                     PacketDistributor.sendToAllPlayers(new SyncReinforcementPacket(player.getId(), false));
                 }
-
             }
+            SpellAnimations.SELF_CAST_ANIMATION.getForPlayer().ifPresent(resourceLocation -> AnimationHelper.animatePlayerStart(clientPlayer, resourceLocation));
         });
     }
 

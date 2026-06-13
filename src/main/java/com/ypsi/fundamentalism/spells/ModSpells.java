@@ -7,13 +7,12 @@ import com.ypsi.fundamentalism.spells.blood.ThornSpell;
 import com.ypsi.fundamentalism.spells.ender.LapsusSpell;
 import com.ypsi.fundamentalism.spells.ender.PullSpell;
 import com.ypsi.fundamentalism.spells.blood.BloodstreamSpell;
-import com.ypsi.fundamentalism.spells.eldritch.StealSummonSpell;
 import com.ypsi.fundamentalism.spells.evocation.TauntSpell;
 import com.ypsi.fundamentalism.spells.fire.BurningSpiritSpell;
 import com.ypsi.fundamentalism.spells.fire.IgniteSpell;
 import com.ypsi.fundamentalism.spells.fire.PyrokinesisSpell;
 import com.ypsi.fundamentalism.spells.fire.SolSpell;
-import com.ypsi.fundamentalism.spells.fundamentalism.RemediumSpell;
+import com.ypsi.fundamentalism.spells.fundamentalism.LawOfRegressionSpell;
 import com.ypsi.fundamentalism.spells.holy.HolyLightningSpell;
 import com.ypsi.fundamentalism.spells.holy.SacredDiskSpell;
 import com.ypsi.fundamentalism.spells.ice.ChainsSpell;
@@ -61,7 +60,7 @@ public class ModSpells {
 
     //public static final Supplier<AbstractSpell> COPYCAT = registerSpell(new CopycatSpell());
     //------------>eldritch<----------------
-    public static final Supplier<AbstractSpell> STEAL_SUMMON = registerSpell(new StealSummonSpell());
+    //public static final Supplier<AbstractSpell> STEAL_SUMMON = registerSpell(new StealSummonSpell());
 //    public static final Supplier<AbstractSpell> MIRROR = registerSpell(new VoidMirrorSpell());
 
     //public static final Supplier<AbstractSpell> FUNDAMENTALFIRST = registerSpell(new VoidMirrorSpell());
@@ -69,5 +68,8 @@ public class ModSpells {
     //FUNDAMENTALISM
     //public static final Supplier<AbstractSpell> PROIECTUM_PRINCIPLE = registerSpell(new ProiectumSpell());
 
-    public static final Supplier<AbstractSpell> REMEDIUM_SPELL = registerSpell(new RemediumSpell());
+    public static final Supplier<AbstractSpell> REMEDIUM_SPELL = registerSpell(new LawOfRegressionSpell());
+
+
+
 }

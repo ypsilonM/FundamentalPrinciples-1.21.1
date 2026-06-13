@@ -8,6 +8,7 @@
   "effect.ypfundamentals.marked": "Marked",
   "effect.ypfundamentals.bloodstream": "Bloodstream",
   "effect.ypfundamentals.soothe": "Soothe",
+  "effect.ypfundamentals.lacerated": "Lacerated",
 
   "enchantment.ypfundamentals.aegis": "Aegis",
 
@@ -21,6 +22,7 @@
   "item.ypfundamentals.venemerus_spawn_egg": "Venemerus Spawn Egg",
   "item.ypfundamentals.runear_spawn_egg": "Runear Spawn Egg",
   "item.ypfundamentals.mana_fruit": "Ancient Fruit",
+  "item.ypfundamentals.ancient_scroll_case": "Ancient Scroll Case",
   "item.ypfundamentals.arcane_mixture": "Arcane Mixture",
   "item.ypfundamentals.test_tube": "Test Tube",
   "item.ypfundamentals.luminaire_extract": "Luminaire Extract",
@@ -28,26 +30,28 @@
   "item.ypfundamentals.tonic": "Tonic",
   "item.ypfundamentals.flask": "Flask",
   "item.ypfundamentals.ursidae_fur": "Ursidae Fur",
+  "item.ypfundamentals.nullifier": "Nullifier Blade",
 
   "attribute.name.technique.exhaustion": "Exhaustion",
 
   "spell.ypfundamentals.grantstrength": "Burning Spirit",
-  "spell.ypfundamentals.bloodstream": "Bloodstream",
   "spell.ypfundamentals.holy_lightning": "Holy Lightning",
   "spell.ypfundamentals.pull_spell": "Pull",
   "spell.ypfundamentals.chains": "Frozen Chains",
   "spell.ypfundamentals.pyrokinesis": "Pyrokinesis",
+  "spell.ypfundamentals.bloodstream": "Bloodstream",
   "spell.ypfundamentals.thorn": "Thorn",
+  "spell.ypfundamentals.laceration": "Laceration",
   "spell.ypfundamentals.taunt": "Taunt",
   "spell.ypfundamentals.lapsus": "Lapsus",
   "spell.ypfundamentals.sol": "Tonatiuh",
-  "spell.ypfundamentals.bloodmoon": "Blood Moon",
   "spell.ypfundamentals.sacred_disk": "Sacred Disk",
   "spell.ypfundamentals.ignite": "Ignite",
+  "spell.ypfundamentals.law_of_regression": "Law Of Regression",
 
   "spell.ypfundamentals.proiectum": "Proiectum Principle",
 
-  "spell.ypfundamentals.chains.guide": "Cast to summon icy chains that immobilize the enemy for a long time.",
+  "spell.ypfundamentals.chains.guide": "Cast to summon icy chains that immobilize the enemy for a long time and give him slowness, weakness and incapability of casting spells.",
   "spell.ypfundamentals.grantstrength.guide": "Fill your soul with fiery determination, expelling bursts of fire that damage surrounding areas repeatedly over time. You also gain the power of flame in your hand, setting anyone you strike ablaze.",
   "spell.ypfundamentals.pyrokinesis.guide": "Control the fire around you, dissipating any burns you may have and deflecting flaming projectiles.",
   "spell.ypfundamentals.sol.guide": "The star closest to our world, burning intensely, the source of the first flame. It summons a smaller version that simulates a fraction of the original celestial power, increasing in power and size the closer it is to noon.",
@@ -58,6 +62,8 @@
   "spell.ypfundamentals.pull_spell.guide": "A mass that simulates a projectile that alters gravity as it passes, attracting everything that comes into contact with it within a certain radius.",
   "spell.ypfundamentals.lapsus.guide": "Save a location that you may or may not return to in a short period of time.",
   "spell.ypfundamentals.taunt.guide": "Attracts an enemy's attention, causing them to shift focus to you. Against other players, it causes them to turn to look at you.",
+  "spell.ypfundamentals.laceration.guide": "Make a front slash and inflicts a laceration that reduces healing for a while.",
+  "spell.ypfundamentals.ignite.guide": "Select an enemy to set on fire. If the enemy is fire immune or already on fire the spell inflicts an amount of damage.",
 
   "key.category.fundamentalism": "Fundamentalism",
   "key.fundamentalism.reinforce": "Mana Reinforcement",
@@ -69,6 +75,10 @@
   "attribute.ypfundamentals.exhaustion.max": "Max Exhaustion",
 
   "ui.ypfundamentals.fire_time": "%d on fire",
-  "ui.ypfundamentals.summon_target_failure": "You must target a summon"
+  "ui.ypfundamentals.summon_target_failure": "You must target a summon",
+  "ui.ypfundamentals.dominan_spell_failure": "Dominan spell unable to be casted.",
+
+  "tooltip.ypfundamentals.scroll_case_description1": "This case contains pieces",
+  "tooltip.ypfundamentals.scroll_case_description2": "of ancient knowledge..."
 
 }

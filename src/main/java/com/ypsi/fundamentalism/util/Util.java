@@ -82,8 +82,12 @@ public class Util {
                 .orElse(1);
     }
     //Principles leveling
-    public static int getExpForLevel(int level) {
+    public static int getExpForPrincipleLevel(int level) {
         return (int) (20+20*(Math.pow(1.3, level)));
+    }
+    //Efficiency leveling
+    public static int getExpForEfficiencyLevel(int level) {
+        return (int) (10+10*(Math.pow(1.3, level)));
     }
 
     //Principles methods
@@ -146,6 +150,21 @@ public class Util {
     public static float getFoodToCONSUME(int level){//3F, 0.125f
         return (float) Math.max(ServerConfig.baseFoodPts - (ServerConfig.subFoodPts * level), 0);
     }
+    //PERTINACIA
+    public static double beneficialPertinaciaMultiplier(int level){
+        return 0.6 + (0.04*level);
+    }
+    public static double harmfulPertinaciaMultiplier(int level){
+        return 1.4 - (0.04*level);
+    }
+    //AUGERE
+//    public static double getAdditionalWeaponDamage(int level){
+//        if(level<=8){
+//            return level;
+//        }else{
+//            return level
+//        }
+//    }
 
 
     //Principles SpellPower Modifiers

@@ -256,9 +256,11 @@ public class ClientEvents {
                 if(REINFORCE.wasPressed()){
                     minecraft.player.playSound(SoundEvents.END_PORTAL_FRAME_FILL, 0.9f, 0.7f);
                     PacketDistributor.sendToServer(new ToggleReinforcementPacket());
+
                 }
                 if(CATEGORIES.wasPressed()){
                     if (minecraft.screen == null) {
+                        minecraft.player.playSound(SoundEvents.BOOK_PAGE_TURN, 1f, 1f);
                         minecraft.setScreen(new PrinciplesScreen());
                     }
                 }
