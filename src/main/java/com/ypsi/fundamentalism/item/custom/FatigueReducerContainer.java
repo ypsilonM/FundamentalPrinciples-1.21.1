@@ -87,7 +87,7 @@ public class FatigueReducerContainer extends Item implements IExhaustionConsumab
 
     static void applyEffect(ServerPlayer player, int reductionPts, int seconds, int amplifier){
         int currentExhaustion = FatigueManager.getFatigueAmount(player);
-        if(ServerConfig.fatigueSystem) {
+        if(ServerConfig.FATIGUE_SYSTEM.get()) {
             FatigueManager.setFatigueAmount(player, Math.max(currentExhaustion - reductionPts, 0));
             player.addEffect(
                     new MobEffectInstance(ModEffects.SOOTHE_EFFECT, (20) * seconds, amplifier, false, true, true)

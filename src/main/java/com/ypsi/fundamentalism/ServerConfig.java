@@ -26,6 +26,7 @@ public class ServerConfig {
 
     //Fatigue System
     public static ModConfigSpec.BooleanValue FATIGUE_SYSTEM;
+    public static ModConfigSpec.ConfigValue<List<? extends Integer>> MAX_FATIGUE_PER_LVL;
     public static ModConfigSpec.DoubleValue FATIGUE_MULTIPLIER;
     public static ModConfigSpec.ConfigValue<List<? extends Double>> FATIGUE_SPELLPOWER;
     public static ModConfigSpec.DoubleValue MANA_REGEN_DEBUFF;
@@ -131,10 +132,19 @@ public class ServerConfig {
 
         BUILDER.push("fatigue");
         {
+
             FATIGUE_SYSTEM = BUILDER
                     .worldRestart()
                     .comment("Whether all the Fatigue System should be active.")
                     .define("fatigueSystem", true);
+
+            MAX_FATIGUE_PER_LVL = BUILDER
+                    .worldRestart()
+                    .comment("Max amount of fatigue pts per fatigue stage.")
+                    .comment("DEFAULT: [0, 5, 8, 12, 15]")
+                    .defineList("maxFatigue",
+                            () -> Arrays.asList(50, 100, 200, 100, 50),
+                            obj -> obj instanceof Integer && (int) obj >= 0 && (int) obj <= 10000000);
 
             FATIGUE_MULTIPLIER = BUILDER
                     .worldRestart()

@@ -1,10 +1,12 @@
 package com.ypsi.fundamentalism.item.custom;
 
 import com.ypsi.fundamentalism.attachments.PrinciplesProgressionManager;
+import com.ypsi.fundamentalism.network.packets.ClientScrollCaseUsePacket;
 import com.ypsi.fundamentalism.util.Principles;
 import com.ypsi.fundamentalism.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -13,6 +15,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,13 +55,7 @@ public class AncientScrollCase extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
         ItemStack stack = player.getItemInHand(usedHand);
-        Minecraft.getInstance().gameRenderer.displayItemActivation(stack);
-        Player clientPlayer = Minecraft.getInstance().player;
-        if (clientPlayer != null){
-            clientPlayer.playSound(
-                    SoundEvents.COPPER_BULB_BREAK, 1, 0.6F
-            );
-        }
+
         if (!level.isClientSide) {
             //Principles principle = Principles.valueOf(stack.get(YpsDataComponents.NOTE_TYPE));
 
@@ -74,7 +71,7 @@ public class AncientScrollCase extends Item {
 
             int xpAmount = currentLvl<15?
                     100:
-                    (int)((Util.getExpForPrincipleLevel(currentLvl+1))*0.10);
+                    (int)((Util.getXpForPrincipleLevel(currentLvl+1))*0.10);
 
             PrinciplesProgressionManager.addCategoryExperience(
                     player, PrinciplesProgressionManager.getTechnicalName(principle),
@@ -83,6 +80,17 @@ public class AncientScrollCase extends Item {
             if(!player.isCreative())
                 stack.shrink(1);
 
+            PacketDistributor.sendToPlayer((ServerPlayer) player, new ClientScrollCaseUsePacket(player.getId()));
+
+        }else{
+            if(Minecraft.getInstance().level != null) {
+                Player clientPlayer = Minecraft.getInstance().player;
+                if (clientPlayer != null) {
+                    clientPlayer.playSound(
+                            SoundEvents.COPPER_BULB_BREAK, 1, 0.6F
+                    );
+                }
+            }
         }
         return InteractionResultHolder.consume(stack);
     }

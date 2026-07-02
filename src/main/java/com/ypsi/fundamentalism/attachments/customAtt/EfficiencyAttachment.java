@@ -3,9 +3,7 @@ package com.ypsi.fundamentalism.attachments.customAtt;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.ypsi.fundamentalism.util.Util;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.player.Player;
 
 public class EfficiencyAttachment {
     private int efficiencyLevel;
@@ -79,7 +77,7 @@ public class EfficiencyAttachment {
     }
 
     public int getExpForLevel(int level) {
-        return Util.getExpForEfficiencyLevel(level);
+        return Util.getXpForEfficiencyLevel(level);
     }
 
     public float getProgress(String category) {

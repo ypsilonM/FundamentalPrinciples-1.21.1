@@ -87,20 +87,20 @@ public class SpellCategoriesGenerator {
 
     private static Map<String, String> createCategoryMapping() {
         Map<String, String> mapping = new HashMap<>();
-        mapping.put("createsEntity", "createEntity");
-        mapping.put("createsProjectile", "usesShoot");
-        mapping.put("usesShoot", "usesShoot");
-        mapping.put("usesSummon", "usesSummon");
-        mapping.put("usesTargeting", "usesTargeting");
-        mapping.put("hasRecasts", "hasRecasts");
-        mapping.put("usesTeleport", "usesTeleport");
-        mapping.put("usesAddEffect", "addEffects");
-        mapping.put("createsAoeEntity", "createsAoeEntities");
-        mapping.put("usesImpulseCastData", "usesMobility");
-        mapping.put("usesRaycast", "usesRaycast");
-        mapping.put("usesHealing", "usesHealing");
-        mapping.put("usesPotentiation", "usesPotentiation");
-        mapping.put("immutable", "immutable");
+        mapping.put("createsEntity",        "createEntity");
+        mapping.put("createsProjectile",    "usesShoot");
+        mapping.put("usesShoot",            "usesShoot");
+        mapping.put("usesSummon",           "usesSummon");
+        mapping.put("usesTargeting",        "usesTargeting");
+        mapping.put("hasRecasts",           "hasRecasts");
+        mapping.put("usesTeleport",         "usesTeleport");
+        mapping.put("usesAddEffect",        "addEffects");
+        mapping.put("createsAoeEntity",     "createsAoeEntities");
+        mapping.put("usesImpulseCastData",  "usesMobility");
+        mapping.put("usesRaycast",          "usesRaycast");
+        mapping.put("usesHealing",          "usesHealing");
+        mapping.put("usesPotentiation",     "usesPotentiation");
+        mapping.put("immutable",            "immutable");
         return mapping;
     }
 

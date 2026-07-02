@@ -52,7 +52,7 @@ public class PrinciplesScreen extends Screen {
 
     @Override
     protected void init() {
-        if(ServerConfig.principlesSYSTEM) {
+        if(ServerConfig.PRINCIPLES_SYSTEM.get()) {
             super.init();
             this.leftPos = (this.width - WINDOW_WIDTH) / 2;
             this.topPos = (this.height - WINDOW_HEIGHT) / 2;
@@ -147,7 +147,7 @@ public class PrinciplesScreen extends Screen {
         int textX = centerX + offsetX;
         int textY = centerY + offsetY;
 
-
+        List<Integer> dominanLvls = (List<Integer>) ServerConfig.DOMINAN_LEVELS.get();
 
         List<Component> lines = List.of(
                 Component.literal("Dominan Mastery").withStyle(ChatFormatting.BOLD).withColor(0x4D4942),
@@ -157,11 +157,11 @@ public class PrinciplesScreen extends Screen {
                 Component.literal("spell rarity in order").withColor(0x4D4942),
                 Component.literal("to cast dominan spells.").withColor(0x4D4942),
                 Component.literal("").withStyle(),
-                Component.literal("• Legendary: "+ServerConfig.dominanLvls.get(4)).withColor(0x997115),
-                Component.literal("• Epic: "+ServerConfig.dominanLvls.get(3)).withColor(0x64397D),
-                Component.literal("• Rare: "+ServerConfig.dominanLvls.get(2)).withColor(0x397D7D),
-                Component.literal("• Uncommon: "+ServerConfig.dominanLvls.get(1)).withColor(0x528241),
-                Component.literal("• Common: "+ServerConfig.dominanLvls.get(0)).withColor(0x403632)
+                Component.literal("• Legendary: "+dominanLvls.get(4)).withColor(0x997115),
+                Component.literal("• Epic: "+dominanLvls.get(3)).withColor(0x64397D),
+                Component.literal("• Rare: "+dominanLvls.get(2)).withColor(0x397D7D),
+                Component.literal("• Uncommon: "+dominanLvls.get(1)).withColor(0x528241),
+                Component.literal("• Common: "+dominanLvls.get(0)).withColor(0x403632)
         );
 
         for (int i = 0; i < lines.size(); i++) {
@@ -195,7 +195,7 @@ public class PrinciplesScreen extends Screen {
 
             int currentExp = ClientCategoryLevelsData.getExperience(category);
             int nextLevel = level+1;
-            int expNeeded = Util.getExpForPrincipleLevel(nextLevel);
+            int expNeeded = Util.getXpForPrincipleLevel(nextLevel);
             tooltip.add(Component.literal("XP: " + currentExp + "/" + expNeeded)
                     .withColor(0x4D4942));
             tooltip.add(Component.literal(""));
@@ -221,70 +221,70 @@ public class PrinciplesScreen extends Screen {
             float recastProb = Util.getFloatRecastAddChance(level);
             recastProb = Math.round(recastProb * 100.0f) / 100.0f;
 
-            if(ServerConfig.repetitioActive)
+            if(ServerConfig.ACTIVE_REPETITIO.get())
                 tooltip.add(Component.literal("• " + recastProb + "% +1 Recast")
                         .withStyle(ChatFormatting.DARK_AQUA));
         }
         if(category.equals(PrinciplesProgressionManager.getTechnicalName(Principles.APPARITIO))){
             int addProb = (int) (Util.getFailureTPReduction(level) * 100f);
 
-            if(ServerConfig.apparitioActive)
+            if(ServerConfig.ACTIVE_APPARITIO.get())
                 tooltip.add(Component.literal("• +" + addProb + "% Chance")
                         .withColor(0x9E2997));
         }
         if(category.equals(PrinciplesProgressionManager.getTechnicalName(Principles.VITALE))){
-            int cooldown = (int) (Util.getCooldownReduction(level)*100);
+            int cooldown = (int) (Util.getCDR(level)*100);
 
-            if(ServerConfig.vitaleActive)
+            if(ServerConfig.ACTIVE_VITALE.get())
                 tooltip.add(Component.literal("• " + cooldown + "% Cooldown Reduction")
                         .withColor(0x51A326));
         }
         if(category.equals(PrinciplesProgressionManager.getTechnicalName(Principles.REMEDIUM))){
             float food = (Util.getFoodToCONSUME(level));
 
-            if(ServerConfig.remediumActive)
+            if(ServerConfig.ACTIVE_REMEDIUM.get())
                 tooltip.add(Component.literal("• " + food + " \uD83C\uDF56 per Heal pt." )
                         .withColor(0xFFCA29));
         }
         if(category.equals(PrinciplesProgressionManager.getTechnicalName(Principles.LOCUS))){
             int addRange = (int) (Util.getLocusMultiplier(level)*100);
 
-            if(ServerConfig.locusActive)
+            if(ServerConfig.ACTIVE_LOCUS.get())
                 tooltip.add(Component.literal("• " + addRange + "% Target Distance")
                         .withColor(0xFF1457));
         }
         if(category.equals(PrinciplesProgressionManager.getTechnicalName(Principles.PERCEPTIO))){
             int addRange = Util.getTotalPerceptioRange(level);
 
-            if(ServerConfig.perceptioActive)
+            if(ServerConfig.ACTIVE_PERCEPTIO.get())
                 tooltip.add(Component.literal("• +" + addRange + " Distance")
                         .withColor(0xFF4714));
         }
         if(category.equals(PrinciplesProgressionManager.getTechnicalName(Principles.CONCENTRATIO))){
             int addMana = Util.getTotalMana(level);
 
-            if(ServerConfig.concentratioActive)
+            if(ServerConfig.ACTIVE_CONCENTRATIO.get())
                 tooltip.add(Component.literal("• +" + addMana + " Mana ")
                         .withColor(0x1B4EC2));
         }
         if(category.equals(PrinciplesProgressionManager.getTechnicalName(Principles.POTENTIA))){
             int accuracy = (int) (Util.getAccuracy(level) * 100f);
 
-            if(ServerConfig.potentiaActive)
+            if(ServerConfig.ACTIVE_POTENTIA.get())
                 tooltip.add(Component.literal("• " + accuracy + "% Accuracy")
                         .withColor(0xC2AC1B));
         }
         if(category.equals(PrinciplesProgressionManager.getTechnicalName(Principles.CERTUM))){
             int percentage = (int) (Util.manaReduction(level) * 100);
 
-            if(ServerConfig.certumActive && ServerConfig.fatigueSystem)
+            if(ServerConfig.ACTIVE_CERTUM.get() && ServerConfig.FATIGUE_SYSTEM.get())
                 tooltip.add(Component.literal("• -" + percentage + "% Ex. Mana Debuff")
                         .withColor(0xC2AC1B));
         }
         if(category.equals(PrinciplesProgressionManager.getTechnicalName(Principles.EXPANSIO))){
             int size = (int) (Util.getVolumeMultiplier(level) * 100f);
 
-            if(ServerConfig.expansioActive)
+            if(ServerConfig.ACTIVE_EXPANSIO.get())
                 tooltip.add(Component.literal("• " + size + "% Radius")
                         .withStyle(ChatFormatting.DARK_RED) );
         }
@@ -296,9 +296,19 @@ public class PrinciplesScreen extends Screen {
                     .withColor(0x0F55BA));
             tooltip.add(Component.literal("• " + harmfulMult + "% Harmful")
                     .withColor(0xBA0F65));
-
         }
-        if(ServerConfig.fatigueSystem) {
+        if(category.equals(PrinciplesProgressionManager.getTechnicalName(Principles.AUGERE))){
+            float additionalDamage = Util.getAdditionalWeaponDamage(level);
+            tooltip.add(Component.literal("• +" + additionalDamage + " Damage " )
+                    .withColor(0x7C39FA));
+        }
+        if(category.equals(PrinciplesProgressionManager.getTechnicalName(Principles.MOTUS))){
+            float addMovSpeed = Util.getAdditionalCastingMovespeed(level);
+            tooltip.add(Component.literal("• +" + addMovSpeed + " Casting Movespeed " )
+                    .withColor(0xE58040));
+        }
+
+        if(ServerConfig.FATIGUE_SYSTEM.get()) {
             double additionalFatigue = 5.0 - (0.5 * level);
             tooltip.add(Component.literal("• " + (additionalFatigue >= 0 ? "+" : "") + additionalFatigue + "% Fatigue")
                     .withStyle((additionalFatigue >= 0 ? ChatFormatting.RED : ChatFormatting.BLUE)));
@@ -409,7 +419,7 @@ public class PrinciplesScreen extends Screen {
         if (level < 20) {
             int currentExp = ClientCategoryLevelsData.getExperience(category);
             int nextLevel = level+1;
-            int expNeeded = Util.getExpForPrincipleLevel(nextLevel);
+            int expNeeded = Util.getXpForPrincipleLevel(nextLevel);
             tooltip.add(Component.literal("Progress: " + (int)(progress * 100) + "%")
                     .withStyle(ChatFormatting.BLUE).withStyle(ChatFormatting.ITALIC));
             tooltip.add(Component.literal("XP: " + currentExp + "/" + expNeeded)

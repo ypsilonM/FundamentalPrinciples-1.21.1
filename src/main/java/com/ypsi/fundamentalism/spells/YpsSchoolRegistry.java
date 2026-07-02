@@ -35,7 +35,7 @@ public class YpsSchoolRegistry extends SchoolRegistry {
     }
 
     public static final Supplier<SchoolType> FUNDAMENTALISM = registerSchool(new SchoolType(
-        FUNDAMENTAL_RESOURCE,
+            FUNDAMENTAL_RESOURCE,
             ModTags.SCHOOL_FOCUS,
             Component.translatable("school.ypfundamentals.fundamentalism").withStyle(ChatFormatting.GOLD),
             YpsAttributes.FUNDAMENTALISM_SPELL_POWER,

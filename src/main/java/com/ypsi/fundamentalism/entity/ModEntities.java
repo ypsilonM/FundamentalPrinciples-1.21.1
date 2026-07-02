@@ -5,23 +5,20 @@ import com.ypsi.fundamentalism.entity.mobs.hemomancer.HemomancerEntity;
 import com.ypsi.fundamentalism.entity.mobs.imp.ImpEntity;
 import com.ypsi.fundamentalism.entity.mobs.runear.RunearEntity;
 import com.ypsi.fundamentalism.entity.mobs.venemerus.VenemerusEntity;
+import com.ypsi.fundamentalism.entity.spells.domain.DomainEntity;
 import com.ypsi.fundamentalism.entity.spells.chains.ChainsEntity;
 import com.ypsi.fundamentalism.entity.spells.holy_lightning.HolyLightningProjectile;
 import com.ypsi.fundamentalism.entity.spells.pull.PullProjectile;
 import com.ypsi.fundamentalism.entity.spells.sacredDisk.SacredDiskProjectile;
 import com.ypsi.fundamentalism.entity.spells.sol.SolProjectile;
 import com.ypsi.fundamentalism.entity.spells.thorn.ThornProjectile;
-import io.redspace.ironsspellbooks.entity.spells.root.RootEntity;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.entity.projectile.LargeFireball;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
-
-import javax.swing.*;
 
 public class ModEntities {
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES =
@@ -98,6 +95,15 @@ public class ModEntities {
                             .sized(1.6f, 1.6f)
                             .clientTrackingRange(20)
                             .build(String.valueOf(ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "runear")))
+            );
+
+
+    public static final DeferredHolder<EntityType<?>, EntityType<DomainEntity>> DOMAIN_ENTITY =
+            ENTITY_TYPES.register("domain", () ->
+                    EntityType.Builder.<DomainEntity>of(DomainEntity::new, MobCategory.MISC)
+                            .sized(1f, 1f)
+                            .clientTrackingRange(128)
+                            .build(String.valueOf(ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "domain")))
             );
 
     //Summons

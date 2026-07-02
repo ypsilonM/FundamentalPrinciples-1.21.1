@@ -2,6 +2,7 @@ package com.ypsi.fundamentalism.mixins.principlesMixins;
 
 import com.ypsi.fundamentalism.attachments.PrinciplesProgressionManager;
 import com.ypsi.fundamentalism.util.Principles;
+import com.ypsi.fundamentalism.util.Util;
 import io.redspace.ironsspellbooks.api.util.Utils;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
@@ -19,7 +20,7 @@ public abstract class AugereMixin {
         float original = cir.getReturnValue();
         if(original > 0 && entity instanceof Player player){
             int augereLvl = PrinciplesProgressionManager.getCategoryLevel(player, Principles.AUGERE);
-            cir.setReturnValue(original + (2f * augereLvl));
+            cir.setReturnValue(original + Util.getAdditionalWeaponDamage(augereLvl));
         }
     }
 }

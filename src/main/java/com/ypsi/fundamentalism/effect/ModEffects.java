@@ -13,7 +13,10 @@ import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
+
+import java.awt.*;
 
 public class ModEffects {
     public static final DeferredRegister<MobEffect> MOB_EFFECTS =
@@ -50,12 +53,42 @@ public class ModEffects {
 
     public static final Holder<MobEffect> REINFORCEMENT_EFFECT = MOB_EFFECTS.register("reinforcement",
             () -> new ReinforcementEffect(MobEffectCategory.BENEFICIAL, 0x28DDFA)
-                    .addAttributeModifier(AttributeRegistry.SPELL_RESIST,
-                            ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "reinforcement"), 0.2, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
-                    .addAttributeModifier(AttributeRegistry.SPELL_POWER,
-                            ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "reinforcement"), -0.2, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                    .addAttributeModifier(Attributes.ARMOR_TOUGHNESS,
-                            ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "reinforcement"), 4, AttributeModifier.Operation.ADD_VALUE)
+                    .addAttributeModifier(
+                            AttributeRegistry.SPELL_RESIST,
+                            ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "reinforcement"),
+                            AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL,
+                            amplifier -> switch (amplifier) {
+                                case 0 -> ReinforcementEffect.BASE_SPELL_RESISTANCE;
+                                case 1 -> ReinforcementEffect.BASE_SPELL_RESISTANCE + 0.05f;
+                                case 2 -> ReinforcementEffect.BASE_SPELL_RESISTANCE + 0.10f;
+                                case 3 -> ReinforcementEffect.BASE_SPELL_RESISTANCE + 0.15f;
+                                default -> ReinforcementEffect.BASE_SPELL_RESISTANCE + 0.20f;
+                            }
+                    )
+                    .addAttributeModifier(
+                            AttributeRegistry.SPELL_POWER,
+                            ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "reinforcement"),
+                            AttributeModifier.Operation.ADD_MULTIPLIED_BASE,
+                            amplifier -> switch (amplifier) {
+                                case 0 -> ReinforcementEffect.SPELL_POWER_REDUCTION;
+                                case 1 -> ReinforcementEffect.SPELL_POWER_REDUCTION + 0.05f;
+                                case 2 -> ReinforcementEffect.SPELL_POWER_REDUCTION + 0.10f;
+                                case 3 -> ReinforcementEffect.SPELL_POWER_REDUCTION + 0.15f;
+                                default -> ReinforcementEffect.SPELL_POWER_REDUCTION + 0.25f;
+                            }
+                    )
+                    .addAttributeModifier(
+                            Attributes.ARMOR_TOUGHNESS,
+                            ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "reinforcement"),
+                            AttributeModifier.Operation.ADD_VALUE,
+                            amplifier -> switch (amplifier) {
+                                case 0 -> ReinforcementEffect.ARMOUR_TOUGHNESS;
+                                case 1 -> ReinforcementEffect.ARMOUR_TOUGHNESS + 1f;
+                                case 2 -> ReinforcementEffect.ARMOUR_TOUGHNESS + 3f;
+                                case 3 -> ReinforcementEffect.ARMOUR_TOUGHNESS + 4f;
+                                default -> ReinforcementEffect.ARMOUR_TOUGHNESS + 6f;
+                            }
+                    )
         );
     public static final Holder<MobEffect> SOOTHE_EFFECT = MOB_EFFECTS.register("soothe",
             () -> new UnclearableEffect(MobEffectCategory.BENEFICIAL, 0x5cd3db)
@@ -67,6 +100,22 @@ public class ModEffects {
     );
     public static final Holder<MobEffect> LACERATED_EFFECT = MOB_EFFECTS.register("lacerated",
             () -> new LaceratedEffect(MobEffectCategory.HARMFUL, 0x8A000E)
+    );
+
+    public static final Holder<MobEffect> SHOCK_EFFECT = MOB_EFFECTS.register("shock",
+            () -> new ShockEffect(MobEffectCategory.NEUTRAL, Color.CYAN.getRGB())
+                    .addAttributeModifier(
+                            Attributes.MOVEMENT_SPEED, ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "shock"),
+                            -1, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
+                    .addAttributeModifier(
+                            Attributes.JUMP_STRENGTH, ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "shock"),
+                            -1, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
+                    .addAttributeModifier(
+                            Attributes.GRAVITY, ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "shock"),
+                            -1, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
+                    .addAttributeModifier(
+                            Attributes.FLYING_SPEED, ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "shock"),
+                            -1, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
     );
 
 

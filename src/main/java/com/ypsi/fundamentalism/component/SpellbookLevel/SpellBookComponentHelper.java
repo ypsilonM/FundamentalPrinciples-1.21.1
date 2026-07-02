@@ -60,7 +60,7 @@ public class SpellBookComponentHelper {
         return 0;
     }
     public static void addXP(ItemStack stack, int xpToAdd, Player player) {
-        if (stack.getItem() instanceof SpellBook && ServerConfig.spellbookLevel) {
+        if (stack.getItem() instanceof SpellBook && ServerConfig.SPELLBOOK_LEVELS.get()) {
             ensureSpellBookComponents(stack);
 
             int currentXP = getXP(stack);
@@ -114,7 +114,7 @@ public class SpellBookComponentHelper {
     }
 
     public static void setLevel(ItemStack stack, int newLevel, Player player) {
-        if (stack.getItem() instanceof SpellBook && ServerConfig.spellbookLevel) {
+        if (stack.getItem() instanceof SpellBook && ServerConfig.SPELLBOOK_LEVELS.get()) {
             ensureSpellBookComponents(stack);
             int currentLevel = getLevel(stack);
 

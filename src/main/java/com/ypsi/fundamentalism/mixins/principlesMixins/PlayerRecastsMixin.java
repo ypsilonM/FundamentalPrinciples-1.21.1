@@ -54,8 +54,8 @@ public abstract class PlayerRecastsMixin {
             }
             boolean isAdded =
                     serverPlayer.getRandom().nextDouble()< probability
-                            && ServerConfig.repetitioActive
-                            && ServerConfig.principlesSYSTEM;
+                            && ServerConfig.ACTIVE_REPETITIO.get()
+                            && ServerConfig.PRINCIPLES_SYSTEM.get();
 
             if (isAdded && totalRecasts>2) {
                 RecastInstance modifiedRecast = new RecastInstance(

@@ -8,12 +8,16 @@ import com.ypsi.fundamentalism.entity.spells.sacredDisk.SacredDiskRenderer;
 import com.ypsi.fundamentalism.entity.spells.thorn.ThornRenderer;
 import com.ypsi.fundamentalism.gui.PrinciplesScreen;
 import com.ypsi.fundamentalism.gui.TierWheelOverlay;
+import com.ypsi.fundamentalism.item.ModFluids;
 import com.ypsi.fundamentalism.keybind.KeyState;
 import com.ypsi.fundamentalism.keybind.ModKeyBinds;
 import com.ypsi.fundamentalism.network.packets.ToggleReinforcementPacket;
 import com.ypsi.fundamentalism.render.ChargeSpellVisuals;
 import com.ypsi.fundamentalism.render.ReinforcementLayer;
+import io.redspace.ironsspellbooks.api.spells.SpellAnimations;
+import io.redspace.ironsspellbooks.fluids.SimpleClientFluidType;
 import io.redspace.ironsspellbooks.player.ClientSpellCastHelper;
+import io.redspace.ironsspellbooks.render.animation.AnimationHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -29,6 +33,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.*;
+import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.network.PacketDistributor;
 import java.util.ArrayList;
@@ -39,14 +44,6 @@ public class ClientEvents {
     @EventBusSubscriber(modid = FundamentalPrinciples.MOD_ID, value = Dist.CLIENT)
     public static class Registration {
         //Eventos MOD
-
-//        @SubscribeEvent
-//        public static void onSpellBookLevelUp(SpellBookLevelUpEvent event) {
-//            Minecraft mc = Minecraft.getInstance();
-//            if (mc.player != null && mc.player.equals(event.getPlayer())) {
-//                mc.player.playSound(SoundEvents.ENCHANTMENT_TABLE_USE, 1, 1);
-//            }
-//        }
 
         @SubscribeEvent
         public static void registerOverlays(RegisterGuiLayersEvent event) {
@@ -255,6 +252,8 @@ public class ClientEvents {
                handleRightClickSuppression(button, action);
                 if(REINFORCE.wasPressed()){
                     minecraft.player.playSound(SoundEvents.END_PORTAL_FRAME_FILL, 0.9f, 0.7f);
+                    SpellAnimations.SELF_CAST_ANIMATION.getForPlayer()
+                            .ifPresent(resourceLocation -> AnimationHelper.animatePlayerStart(minecraft.player, resourceLocation));
                     PacketDistributor.sendToServer(new ToggleReinforcementPacket());
 
                 }

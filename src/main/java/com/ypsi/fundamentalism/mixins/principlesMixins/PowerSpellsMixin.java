@@ -38,12 +38,12 @@ public abstract class PowerSpellsMixin {
             Set<String> categories = SpellCategoriesGenerator.getCategoriesForSpell(id);
             float modifier = 0f;
 
-            if(ServerConfig.principlesSYSTEM) {
+            if(ServerConfig.PRINCIPLES_SYSTEM.get()) {
                 for (String category : categories) {
                     int levelCat = PrinciplesProgressionManager.getCategoryLevel(player, category);
                     //Subcategories
                     if ((category.contains("usesShoot") || category.contains("createsAoeEntities") ||
-                            category.contains("usesSummon") || category.contains("usesTargeting")) && ServerConfig.subcategories) {
+                            category.contains("usesSummon") || category.contains("usesTargeting")) && ServerConfig.SUBCATEGORIES_HALF.get()) {
                         modifier += Util.getSubEntityModificator(levelCat, original);
                     } else {
                         modifier += Util.getModificator(levelCat, original);
@@ -54,10 +54,10 @@ public abstract class PowerSpellsMixin {
             int exLvl = FatigueManager.getFatigueLevel(player);
             //int exLvl = player.getData(YpsAttachments.LEVEL_EXHAUSTION.get());
 
-            List<Double> fatiguePenalties = ServerConfig.fatigueSpellpowerMultipliers;
+            List<Double> fatiguePenalties = (List<Double>) ServerConfig.FATIGUE_SPELLPOWER.get();
             float ratio = 1;
 
-            if(ServerConfig.fatigueSystem)
+            if(ServerConfig.FATIGUE_SYSTEM.get())
                 ratio = (float) (double) fatiguePenalties.get(exLvl);
 
             return (original + modifier) * ratio;

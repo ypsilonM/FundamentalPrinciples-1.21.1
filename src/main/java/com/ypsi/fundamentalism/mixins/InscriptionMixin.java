@@ -32,7 +32,7 @@ public abstract class InscriptionMixin {
             cancellable = true,
             remap = false)
     private void ypsi$verifySpellBookTier(Player pPlayer, int pId, CallbackInfoReturnable<Boolean> cir) {
-        if (!ServerConfig.restrictedInsc || !ServerConfig.spellbookLevel){
+        if (!ServerConfig.RESTRICTED_INSCRIPTION.get() || !ServerConfig.SPELLBOOK_LEVELS.get()){
             return;
         }
         ItemStack spellBookItemStack = getSpellBookSlot().getItem();

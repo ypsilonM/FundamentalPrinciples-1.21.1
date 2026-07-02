@@ -20,7 +20,7 @@ public abstract class ArcaneAnvilMixin {
             remap = false
     )
     private int addLevel5Requirement(ISpellContainer container) {
-        if(!ServerConfig.spellbookLevel){
+        if(!ServerConfig.SPELLBOOK_LEVELS.get()){
             return container.getMaxSpellCount();
         }
         ArcaneAnvilMenu menu = (ArcaneAnvilMenu)(Object)this;

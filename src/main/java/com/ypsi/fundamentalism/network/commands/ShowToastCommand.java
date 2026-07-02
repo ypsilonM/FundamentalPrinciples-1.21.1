@@ -1,21 +1,11 @@
-package com.ypsi.fundamentalism.network;
+package com.ypsi.fundamentalism.network.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.ypsi.fundamentalism.attachments.FatigueManager;
-import com.ypsi.fundamentalism.attributes.YpsAttributes;
 import com.ypsi.fundamentalism.gui.PrincipleLevelUpToast;
-import com.ypsi.fundamentalism.util.Principles;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.commands.arguments.EntityArgument;
-import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.Mth;
-import net.minecraft.world.entity.player.Player;
-
-import java.util.Collection;
 
 public class ShowToastCommand {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {

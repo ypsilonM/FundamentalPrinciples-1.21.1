@@ -3,6 +3,7 @@ package com.ypsi.fundamentalism.event;
 import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.attachments.*;
 import com.ypsi.fundamentalism.attachments.customAtt.PrinciplesLevelsAttachment;
+import com.ypsi.fundamentalism.util.Principles;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -46,17 +47,22 @@ public class YpsAttributesHandler {
     public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         YpsAttributeManager.MANA.cleanup(event.getEntity());
         YpsAttributeManager.FATIGUE.cleanup(event.getEntity());
+
+        YpsAttributeManager.CASTING_MOVESPEED.cleanup(event.getEntity());
+
     }
 
     private static void initializeAttributes(ServerPlayer player) {
 
-        PrinciplesLevelsAttachment levels = player.getData(YpsAttachments.PRINCIPLES_LEVELS.get());
-        int entityLevel = (levels != null) ? levels.getLevel("createEntity") : 0;
+        int entityLevel = PrinciplesProgressionManager.getCategoryLevel(player, Principles.CONCENTRATIO);
         YpsAttributeManager.MANA.applyModifier(player, entityLevel);
 
         int mana_fatigue = FatigueManager.getFatigueLevel(player);
         //int mana_fatigue = player.getData(YpsAttachments.LEVEL_EXHAUSTION.get());
         YpsAttributeManager.FATIGUE.applyModifier(player, mana_fatigue);
+
+        int speedLevel = PrinciplesProgressionManager.getCategoryLevel(player, Principles.MOTUS);
+        YpsAttributeManager.CASTING_MOVESPEED.applyModifier(player, speedLevel);
 
     }
 }

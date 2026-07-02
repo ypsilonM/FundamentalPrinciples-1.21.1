@@ -3,17 +3,29 @@ package com.ypsi.fundamentalism.datagen.providers;
 import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.datagen.custom.EnchantingShieldSmithingRecipe;
 import com.ypsi.fundamentalism.enchantment.FundEnchantments;
+import com.ypsi.fundamentalism.item.ModFluids;
 import com.ypsi.fundamentalism.item.ModItems;
+import io.redspace.ironsspellbooks.recipe_types.alchemist_cauldron.BrewAlchemistCauldronRecipe;
+import io.redspace.ironsspellbooks.registries.FluidRegistry;
 import io.redspace.ironsspellbooks.registries.ItemRegistry;
+import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.conditions.IConditionBuilder;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.concurrent.CompletableFuture;
+
+import static io.redspace.ironsspellbooks.datagen.IronRecipeProvider.cauldronTwoWayInteraction;
 
 public class ModRecipeProvider extends RecipeProvider implements IConditionBuilder {
     public ModRecipeProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
@@ -84,6 +96,22 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
 
 
 
+        BrewAlchemistCauldronRecipe.builder()
+                .withInput(new FluidStack(Fluids.WATER, 1000))
+                .withReagent(ModItems.ARCANE_MIXTURE.get())
+                .withResult(ModFluids.ARCANE_MIXTURE, 1000)
+                .save(recipeOutput);
+
+        BrewAlchemistCauldronRecipe.builder()
+                .withInput(new FluidStack(Fluids.WATER, 1000))
+                .withReagent(Items.PITCHER_PLANT)
+                .withResult(ModFluids.PITCHER_EXTRACT, 1000)
+                .save(recipeOutput);
+
+        cauldronRecipientInteraction(recipeOutput, ModItems.LUMINAIRE_EXTRACT, ModFluids.ARCANE_MIXTURE);
+        cauldronRecipientInteraction(recipeOutput, ModItems.PITCHER_EXTRACT, ModFluids.PITCHER_EXTRACT);
+
+
 //        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.ORB.get(), 9)
 //                .requires(YpsBlocks.MANA_BLOCK)
 //                .unlockedBy("has_mana_block", has(YpsBlocks.MANA_BLOCK)).save(recipeOutput);
@@ -95,5 +123,9 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
 //
 //        oreSmelting(recipeOutput,MANA_SMELTABLES, RecipeCategory.MISC, ModItems.ORB.get(), 0.25f,200, "mana");
 //        oreBlasting(recipeOutput,MANA_SMELTABLES, RecipeCategory.MISC, ModItems.ORB.get(), 0.25f,100, "mana");
+    }
+
+    public static void cauldronRecipientInteraction(RecipeOutput output, Holder<Item> item, Holder<Fluid> fluid) {
+        cauldronTwoWayInteraction(output, item, Holder.direct(ModItems.TEST_TUBE.get()), fluid, 250);
     }
 }

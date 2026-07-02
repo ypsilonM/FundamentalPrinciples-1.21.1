@@ -35,14 +35,14 @@ public abstract class RaycastBuilderMixin {
             // PERCEPTIO
             int perceptioLevel = PrinciplesProgressionManager.getCategoryLevel(player, Principles.PERCEPTIO);
 
-            float finalRange = ServerConfig.perceptioActive && ServerConfig.principlesSYSTEM?
+            float finalRange = ServerConfig.ACTIVE_PERCEPTIO.get() && ServerConfig.PRINCIPLES_SYSTEM.get()?
                     Util.getTotalPerceptioRange(perceptioLevel): 0;
-            float baseDetectionRange = ServerConfig.perceptioActive && ServerConfig.principlesSYSTEM?
+            float baseDetectionRange = ServerConfig.ACTIVE_PERCEPTIO.get() && ServerConfig.PRINCIPLES_SYSTEM.get()?
                     8f + (float) originalDistance / 5f : (float) originalDistance;
             finalRange += baseDetectionRange;
 
             // LOCUS
-            if (bbInflation > 0 && ServerConfig.locusActive && ServerConfig.principlesSYSTEM) {
+            if (bbInflation > 0 && ServerConfig.ACTIVE_LOCUS.get() && ServerConfig.PRINCIPLES_SYSTEM.get()) {
                 int locusLevel = PrinciplesProgressionManager.getCategoryLevel(player, Principles.LOCUS);
                 finalRange = (float) Util.returnLocusDistance(locusLevel, finalRange);
             }

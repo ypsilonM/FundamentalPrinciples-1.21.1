@@ -14,12 +14,13 @@ import com.klikli_dev.modonomicon.datagen.book.demo.FeaturesCategory;
 import com.klikli_dev.modonomicon.datagen.book.demo.FormattingCategory;
 import com.klikli_dev.modonomicon.datagen.book.demo.IndexModeCategory;
 import com.klikli_dev.modonomicon.datagen.book.demo.features.ConditionRootEntry;
+import com.ypsi.fundamentalism.datagen.book.demo.ExhaustionCategory;
 import com.ypsi.fundamentalism.datagen.book.demo.MyTestCategory;
 import net.minecraft.resources.ResourceLocation;
 
 public class DemoBook extends SingleBookSubProvider {
 
-    public static final String ID = "demo";
+    public static final String ID = "fundamental_principles_book";
 
     public DemoBook(String modid, ModonomiconLanguageProvider lang) {
         super(ID, modid, lang);
@@ -61,6 +62,8 @@ public class DemoBook extends SingleBookSubProvider {
         //for the two big categories we use the category provider
         var featuresCategory = this.add(new FeaturesCategory(this).generate());
 
+        var exhaustionCategory = this.add(new ExhaustionCategory(this).generate());
+
         var formattingCategory = this.add(new MyTestCategory(this).generate());
 
         var conditionalCategory = this.add(new ConditionalCategory(this).generate())
@@ -71,11 +74,11 @@ public class DemoBook extends SingleBookSubProvider {
 
     @Override
     protected String bookName() {
-        return "Demo Book";
+        return "Principia";
     }
 
     @Override
     protected String bookTooltip() {
-        return "A book to showcase & test Modonomicon features.";
+        return "A book that contains all the knowledge about magical principles.";
     }
 }

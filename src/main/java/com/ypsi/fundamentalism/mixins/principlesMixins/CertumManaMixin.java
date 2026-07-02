@@ -27,8 +27,8 @@ public abstract class CertumManaMixin {
         int originalCost = spell.getManaCost(spellLevel);
 
         if(SpellCategoriesGenerator.isInCategory(spell.getSpellId(), "immutable")
-                && ServerConfig.certumActive
-                && ServerConfig.principlesSYSTEM){
+                && ServerConfig.ACTIVE_CERTUM.get()
+                && ServerConfig.PRINCIPLES_SYSTEM.get()){
 
             int certumLevel = 0;
             if(player!=null) {

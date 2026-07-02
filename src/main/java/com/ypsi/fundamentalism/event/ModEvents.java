@@ -19,6 +19,7 @@ import com.ypsi.fundamentalism.network.packets.SyncReinforcementPacket;
 import com.ypsi.fundamentalism.particle.ModParticles;
 import com.ypsi.fundamentalism.attachments.PrinciplesProgressionManager;
 import com.ypsi.fundamentalism.spells.ModSpells;
+import com.ypsi.fundamentalism.spells.YpsSchoolRegistry;
 import com.ypsi.fundamentalism.util.Principles;
 import com.ypsi.fundamentalism.util.Util;
 import io.redspace.ironsspellbooks.api.events.*;
@@ -40,7 +41,6 @@ import io.redspace.ironsspellbooks.item.SpellBook;
 import io.redspace.ironsspellbooks.item.weapons.StaffItem;
 import io.redspace.ironsspellbooks.network.SyncManaPacket;
 import io.redspace.ironsspellbooks.network.casting.*;
-import io.redspace.ironsspellbooks.player.ClientMagicData;
 import io.redspace.ironsspellbooks.registries.MobEffectRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
@@ -56,8 +56,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
@@ -120,6 +118,7 @@ public class ModEvents {
             }
         }
     }
+
     @SubscribeEvent
     public static void registerBrewingRecipeRegister(RegisterBrewingRecipesEvent event){
         PotionBrewing.Builder builder = event.getBuilder();
@@ -172,10 +171,23 @@ public class ModEvents {
 
 
     @SubscribeEvent
-    public static void select(SpellSelectionManager.SpellSelectionEvent event){
+    public static void selectionManager(SpellSelectionManager.SpellSelectionEvent event){
         if(event.getEntity() instanceof Player player) {
-            if (PrinciplesProgressionManager.getCategoryLevel(player, Principles.REMEDIUM) >= 10) {
-                event.addSelectionOption(new SpellData(ModSpells.REMEDIUM_SPELL.get(), 1), "remedium_slot", 0);
+            int remediumLvl = PrinciplesProgressionManager.getCategoryLevel(player, Principles.REMEDIUM);
+            if (remediumLvl >= 5) {
+                switch (remediumLvl){
+                    case 5,6,7,8,9:
+                        event.addSelectionOption(new SpellData(ModSpells.REMEDIUM_SPELL.get(), 1), "remedium_slot", 0);
+                        break;
+                    case 10,11,12,13:
+                        event.addSelectionOption(new SpellData(ModSpells.REMEDIUM_SPELL.get(), 2), "remedium_slot", 0);
+                        break;
+                    case 14,15,16,18,19:
+                        event.addSelectionOption(new SpellData(ModSpells.REMEDIUM_SPELL.get(), 3), "remedium_slot", 0);
+                        break;
+                    case 20:
+                        event.addSelectionOption(new SpellData(ModSpells.REMEDIUM_SPELL.get(), 4), "remedium_slot", 0);
+                }
             }
         }
     }
@@ -189,6 +201,7 @@ public class ModEvents {
             Player player = event.getEntity();
 
             if (!event.getEntity().level().isClientSide()) {
+
                 double n = 100;
                 int amplifier = 0;
 
@@ -502,6 +515,7 @@ public class ModEvents {
             Set<String> categories = SpellCategoriesGenerator.getCategoriesForSpell(spellId);
 
             float formulaAdd = 0;
+
             if (notElementalPower) {
                 formulaAdd = 1;
             } else {
@@ -511,6 +525,12 @@ public class ModEvents {
                             / (spellPower * entitySchoolPowerModifier) * staffReduction * rarityRatio * principleFatigueRatio(categories, player)
                             ) * ServerConfig.fatigueMultiplier) , 1f);
 
+            }
+            if(MagicData.getPlayerMagicData(player).getPlayerRecasts().hasRecastForSpell(spell)){
+                if(categories.contains("usesSummon"))
+                    formulaAdd=0;
+                if(categories.contains("hasRecasts"))
+                    formulaAdd/=4;
             }
 
             if(ServerConfig.fatigueSystem)
@@ -525,7 +545,7 @@ public class ModEvents {
             }
 
             // -> Search Equipped Spellbook
-            if(ServerConfig.spellbookLevel) {
+            if(ServerConfig.SPELLBOOK_LEVELS.get()) {
                 CuriosApi.getCuriosInventory(player).ifPresent(inv -> {
                     inv.findCurios(Curios.SPELLBOOK_SLOT).forEach(curio -> {
                         ItemStack spellBook = curio.stack();
@@ -902,7 +922,7 @@ public class ModEvents {
 
                 int cooldown = event.getEffectiveCooldown();
                 int vitaleLevel = PrinciplesProgressionManager.getCategoryLevel(serverPlayer, Principles.VITALE);
-                cooldown -= (int) (cooldown*Util.getCooldownReduction(vitaleLevel));
+                cooldown -= (int) (cooldown*Util.getCDR(vitaleLevel));
                 event.setEffectiveCooldown(cooldown);
         }
     }
@@ -912,6 +932,8 @@ public class ModEvents {
     public static void reverseCurseTechnique(SpellHealEvent event){
 
         if(!ServerConfig.remediumActive || !ServerConfig.principlesSYSTEM) return;
+
+        if(event.getSchoolType().equals(YpsSchoolRegistry.FUNDAMENTALISM.get())) return;
 
         if(event.getTargetEntity() instanceof ServerPlayer healedEntity &&
                 event.getEntity() instanceof ServerPlayer caster){
@@ -982,7 +1004,6 @@ public class ModEvents {
         }
     }
 
-    ///FUCKING SHIT
     //Unlock Tonatiu Spell
     @SubscribeEvent
     public static void onFireBossDeath(LivingDeathEvent event) {
@@ -1031,7 +1052,7 @@ public class ModEvents {
     @SubscribeEvent
     public static void maxExhaustionSpellbook(CurioAttributeModifierEvent event) {
 
-        if(!ServerConfig.spellbookLevel) return;
+        if(!ServerConfig.SPELLBOOK_LEVELS.get()) return;
 
         ItemStack stack = event.getItemStack();
         if (stack.getItem() instanceof SpellBook) {

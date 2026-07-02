@@ -26,7 +26,7 @@ public class AoERadiusMixin {
             remap = false
     )
     private float modifyRadius(float value){
-        if(principleModification || !ServerConfig.expansioActive || !ServerConfig.principlesSYSTEM){
+        if(principleModification || !ServerConfig.ACTIVE_EXPANSIO.get() || !ServerConfig.PRINCIPLES_SYSTEM.get()){
             return value;
         }
 

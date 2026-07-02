@@ -48,6 +48,7 @@
   "spell.ypfundamentals.sacred_disk": "Sacred Disk",
   "spell.ypfundamentals.ignite": "Ignite",
   "spell.ypfundamentals.law_of_regression": "Law Of Regression",
+  "spell.ypfundamentals.ultimatum": "Ultimatum",
 
   "spell.ypfundamentals.proiectum": "Proiectum Principle",
 
@@ -72,13 +73,16 @@
 
   "school.ypfundamentals.fundamentalism": "Fundamentalism",
 
-  "attribute.ypfundamentals.exhaustion.max": "Max Exhaustion",
+  "attribute.ypfundamentals.exhaustion_max": "Max Exhaustion",
 
   "ui.ypfundamentals.fire_time": "%d on fire",
   "ui.ypfundamentals.summon_target_failure": "You must target a summon",
   "ui.ypfundamentals.dominan_spell_failure": "Dominan spell unable to be casted.",
 
   "tooltip.ypfundamentals.scroll_case_description1": "This case contains pieces",
-  "tooltip.ypfundamentals.scroll_case_description2": "of ancient knowledge..."
+  "tooltip.ypfundamentals.scroll_case_description2": "of ancient knowledge...",
+
+  "fluid_type.ypfundamentals.pitcher_extract": "Pitcher Extract",
+  "fluid_type.ypfundamentals.arcane_mixture": "Arcane Mixture"
 
 }

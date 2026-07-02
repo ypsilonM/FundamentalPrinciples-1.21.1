@@ -17,6 +17,13 @@ public class YpsAttributeManager {
             Util::getTotalMana
     );
 
+    public static final AttributeModifierManager CASTING_MOVESPEED = new AttributeModifierManager(
+            ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "cast_movespeed"),
+            AttributeRegistry.CASTING_MOVESPEED,
+            AttributeModifier.Operation.ADD_VALUE,
+            Util::getAdditionalCastingMovespeed
+    );
+
     public static final AttributeModifierManager FATIGUE = new AttributeModifierManager(
             ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "fatigue_mana"),
             AttributeRegistry.MANA_REGEN,

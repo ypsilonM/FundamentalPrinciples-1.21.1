@@ -2,6 +2,8 @@ package com.ypsi.fundamentalism;
 import com.ypsi.fundamentalism.advancements.triggers.YpTriggers;
 import com.ypsi.fundamentalism.attributes.YpsAttributes;
 import com.ypsi.fundamentalism.block.YpsBlocks;
+import com.ypsi.fundamentalism.block.YpsEntityBlocks;
+import com.ypsi.fundamentalism.block.custom.DomainBlockEntityRenderer;
 import com.ypsi.fundamentalism.component.YpsDataComponents;
 import com.ypsi.fundamentalism.datagen.RecipeSerializers;
 import com.ypsi.fundamentalism.datagen.providers.ModLootProvider;
@@ -12,6 +14,7 @@ import com.ypsi.fundamentalism.entity.mobs.imp.ImpRenderer;
 import com.ypsi.fundamentalism.entity.mobs.runear.RunearRenderer;
 import com.ypsi.fundamentalism.entity.mobs.venemerus.VenemerusRenderer;
 import com.ypsi.fundamentalism.entity.spells.chains.ChainsRenderer;
+import com.ypsi.fundamentalism.entity.spells.domain.DomainRenderer;
 import com.ypsi.fundamentalism.entity.spells.pull.PullRenderer;
 import com.ypsi.fundamentalism.entity.spells.holy_lightning.HolyLightningRenderer;
 import com.ypsi.fundamentalism.attachments.YpsAttachments;
@@ -19,17 +22,25 @@ import com.ypsi.fundamentalism.entity.spells.sacredDisk.SacredDiskRenderer;
 import com.ypsi.fundamentalism.entity.spells.sol.SolRenderer;
 import com.ypsi.fundamentalism.entity.spells.thorn.ThornRenderer;
 import com.ypsi.fundamentalism.item.ModCreativeModTabs;
+import com.ypsi.fundamentalism.item.ModFluids;
 import com.ypsi.fundamentalism.item.ModItems;
 import com.ypsi.fundamentalism.keybind.ModKeyBinds;
 import com.ypsi.fundamentalism.network.*;
+import com.ypsi.fundamentalism.network.commands.ExhaustionCommand;
+import com.ypsi.fundamentalism.network.commands.ShowToastCommand;
+import com.ypsi.fundamentalism.network.commands.SpellCategoriesCommand;
+import com.ypsi.fundamentalism.network.commands.SpellbookLevelCommand;
 import com.ypsi.fundamentalism.particle.*;
 import com.ypsi.fundamentalism.sound.ModSounds;
 import com.ypsi.fundamentalism.spells.ModSpells;
 import com.ypsi.fundamentalism.spells.YpsSchoolRegistry;
+import io.redspace.ironsspellbooks.fluids.SimpleClientFluidType;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
+import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import org.slf4j.Logger;
 
@@ -64,6 +75,9 @@ public class FundamentalPrinciples {
         ModCreativeModTabs.register(modEventBus);
         ModItems.register(modEventBus);
         YpsBlocks.register(modEventBus);
+        YpsEntityBlocks.register(modEventBus);
+
+        ModFluids.register(modEventBus);
 
         ModLootProvider.register(modEventBus);
 
@@ -100,7 +114,7 @@ public class FundamentalPrinciples {
 
     @SubscribeEvent
     public void registerCommands(RegisterCommandsEvent event) {
-        ExhaustionCommand.register(event.getDispatcher());
+        ExhaustionCommand.registerSet(event.getDispatcher());
         SpellCategoriesCommand.register(event.getDispatcher());
         SpellbookLevelCommand.register(event.getDispatcher());
 
@@ -150,6 +164,14 @@ public class FundamentalPrinciples {
             event.registerEntityRenderer(ModEntities.THORN_PROJECTILE.get(), ThornRenderer::new);
             event.registerEntityRenderer(ModEntities.SACRED_DISK.get(), SacredDiskRenderer::new);
 
+            event.registerEntityRenderer(ModEntities.DOMAIN_ENTITY.get(), DomainRenderer::new);
+
+            event.registerBlockEntityRenderer(
+                    YpsEntityBlocks.DOMAIN_BLOCK_ENTITY.get(),
+                    DomainBlockEntityRenderer::new
+            );
+
+
         }
         @SubscribeEvent
         public static void registerParticleFactories(RegisterParticleProvidersEvent event) {
@@ -158,6 +180,15 @@ public class FundamentalPrinciples {
 
             event.registerSpriteSet(ModParticles.MINDFUL_PARTICLE.get(), MindfulParticle.Provider::new);
             //event.registerSpriteSet(ModParticles.SOL_PARTICLE.get(), SolAppearanceParticle.Provider::new);
+        }
+        @SubscribeEvent
+        public static void registerClient(RegisterClientExtensionsEvent event){
+            event.registerFluidType(new SimpleClientFluidType(
+                    ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "block/arcane_mixture")),
+                    ModFluids.ARCANE_MIXTURE_TYPE);
+            event.registerFluidType(new SimpleClientFluidType(
+                            ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "block/pitcher_extract")),
+                    ModFluids.PITCHER_EXTRACT_TYPE);
         }
 
 

@@ -1,8 +1,4 @@
-// SPDX-FileCopyrightText: 2024 klikli-dev
-//
-// SPDX-License-Identifier: MIT
-
-package com.ypsi.fundamentalism.datagen.book.demo.mytestcategory;
+package com.ypsi.fundamentalism.datagen.book.demo.mytestcategory.exhaustion;
 
 import com.klikli_dev.modonomicon.api.datagen.CategoryProvider;
 import com.klikli_dev.modonomicon.api.datagen.EntryBackground;
@@ -10,12 +6,13 @@ import com.klikli_dev.modonomicon.api.datagen.EntryProvider;
 import com.klikli_dev.modonomicon.api.datagen.book.BookIconModel;
 import com.klikli_dev.modonomicon.api.datagen.book.page.BookTextPageModel;
 import com.mojang.datafixers.util.Pair;
+import io.redspace.ironsspellbooks.registries.ItemRegistry;
 import net.minecraft.world.item.Items;
 
-public class MyTestEntry extends EntryProvider {
-    public static final String ID = "basic";
+public class CastingEntry extends EntryProvider {
+    public static final String ID = "casting_exhaustion";
 
-    public MyTestEntry(CategoryProvider parent) {
+    public CastingEntry(CategoryProvider parent) {
         super(parent);
     }
 
@@ -26,34 +23,37 @@ public class MyTestEntry extends EntryProvider {
                 .withText(this.context().pageText())
         );
 
-        this.pageTitle("Basic Formatting");
-        // \s tells java to keep the spaces at the end of the line. Otherwise it will remove.
-        // Due to markdown using multiple spaces to indicate a line break, we need to keep the spaces.
+        this.pageTitle("Casting Source");
         this.pageText("""
-                **So basically this is text**    \s 
-                *Alvaro es una gran persona*    \s
-                ++Gio es una putita++
+                Casting spells will accumulate an specific amount of exhaustion points to the player's max exhaustion.\s
                 """);
 
         this.page("page2", () -> BookTextPageModel.create()
                 .withText(this.context().pageText())
         );
-        this.pageText("""
-                ~~This is stricken through~~   \s
-                {0}
-                """,
-                this.color("Colorful Text!", 0x55FF55)
-        );
+
+        this.pageText(""" 
+                \n
+                \n
+                The amount of points will be determined by several factors as: \n
+                - Mana wasted
+                - User's spell power
+                - User's school spell power
+                - Spell rarity
+                - Cast type
+                - Spell's number of principles
+                - Cast source. \s
+                """);
     }
 
     @Override
     protected String entryName() {
-        return "Basic Formatting Entry";
+        return "Exhaustion Modifiers";
     }
 
     @Override
     protected String entryDescription() {
-        return "An entry showcasing entity pages.";
+        return "How does the body accumulates exhaustion?";
     }
 
     @Override
@@ -63,7 +63,7 @@ public class MyTestEntry extends EntryProvider {
 
     @Override
     protected BookIconModel entryIcon() {
-        return BookIconModel.create(Items.PAPER);
+        return BookIconModel.create(ItemRegistry.SCROLL.get());
     }
 
     @Override

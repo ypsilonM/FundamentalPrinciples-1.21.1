@@ -15,6 +15,18 @@ public class ModNetwork {
         final PayloadRegistrar registrar = event.registrar(FundamentalPrinciples.MOD_ID)
                 .versioned("1.0");
 
+        registrar.playToClient(
+                ClientScrollCaseUsePacket.TYPE,
+                ClientScrollCaseUsePacket.STREAM_CODEC,
+                ClientScrollCaseUsePacket::handle
+        );
+
+        registrar.playToClient(
+                ClientToastPacket.TYPE,
+                ClientToastPacket.STREAM_CODEC,
+                ClientToastPacket::handle
+        );
+
         //Spell Categories
         registrar.playToClient(
                 SyncCategoryLevelsPacket.TYPE,

@@ -2,6 +2,8 @@ package com.ypsi.fundamentalism.network.packets;
 
 import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.effect.ModEffects;
+import io.redspace.ironsspellbooks.api.spells.SpellAnimations;
+import io.redspace.ironsspellbooks.render.animation.AnimationHelper;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -49,6 +51,8 @@ public record SyncReinforcementPacket(int playerId, boolean hasEffect) implement
                 } else {
                     targetPlayer.removeEffect(ModEffects.REINFORCEMENT_EFFECT);
                 }
+                SpellAnimations.SELF_CAST_ANIMATION.getForPlayer()
+                        .ifPresent(resourceLocation -> AnimationHelper.animatePlayerStart(targetPlayer, resourceLocation));
             }
         });
     }

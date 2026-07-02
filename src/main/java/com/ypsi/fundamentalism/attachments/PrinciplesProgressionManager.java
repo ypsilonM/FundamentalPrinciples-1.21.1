@@ -2,6 +2,7 @@ package com.ypsi.fundamentalism.attachments;
 
 import com.ypsi.fundamentalism.attachments.customAtt.PrinciplesLevelsAttachment;
 import com.ypsi.fundamentalism.gui.PrincipleLevelUpToast;
+import com.ypsi.fundamentalism.network.packets.ClientToastPacket;
 import com.ypsi.fundamentalism.network.packets.SyncCategoryLevelsPacket;
 import com.ypsi.fundamentalism.network.packets.data.ClientCategoryLevelsData;
 import com.ypsi.fundamentalism.util.Principles;
@@ -10,6 +11,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -112,9 +114,9 @@ public class PrinciplesProgressionManager {
         }
     }
     private static void onLevelUp(Player player, String category, int newLevel) {
-        //if(player.level().isClientSide){
-            Minecraft.getInstance().getToasts().addToast(new PrincipleLevelUpToast(category, newLevel));
-        //}
+        if(!player.level().isClientSide){
+            PacketDistributor.sendToPlayer((ServerPlayer)player, new ClientToastPacket(player.getId(), category, newLevel));
+        }
 //            player.displayClientMessage(
 //                    Component.literal(getCategoryDisplayName(category) + " " + newLevel + " ↑ ")
 //                            .withStyle(ChatFormatting.GREEN),

@@ -23,7 +23,7 @@ public class ManaFruit extends Item {
     @Override
     public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity livingEntity) {
         if(!level.isClientSide && livingEntity instanceof ServerPlayer player){
-            if(ServerConfig.fatigueSystem) {
+            if(ServerConfig.FATIGUE_SYSTEM.get()) {
                 int currentExhaustion = FatigueManager.getFatigueAmount(player);
                 FatigueManager.setFatigueAmount(player, Math.max(currentExhaustion - 50, 0));
             }

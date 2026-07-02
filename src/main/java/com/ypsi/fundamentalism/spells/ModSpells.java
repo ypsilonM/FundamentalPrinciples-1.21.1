@@ -13,6 +13,7 @@ import com.ypsi.fundamentalism.spells.fire.IgniteSpell;
 import com.ypsi.fundamentalism.spells.fire.PyrokinesisSpell;
 import com.ypsi.fundamentalism.spells.fire.SolSpell;
 import com.ypsi.fundamentalism.spells.fundamentalism.LawOfRegressionSpell;
+import com.ypsi.fundamentalism.spells.fundamentalism.UltimatumSpell;
 import com.ypsi.fundamentalism.spells.holy.HolyLightningSpell;
 import com.ypsi.fundamentalism.spells.holy.SacredDiskSpell;
 import com.ypsi.fundamentalism.spells.ice.ChainsSpell;
@@ -69,6 +70,8 @@ public class ModSpells {
     //public static final Supplier<AbstractSpell> PROIECTUM_PRINCIPLE = registerSpell(new ProiectumSpell());
 
     public static final Supplier<AbstractSpell> REMEDIUM_SPELL = registerSpell(new LawOfRegressionSpell());
+    public static final Supplier<AbstractSpell> DOMAIN_SPELL = registerSpell(new UltimatumSpell());
+
 
 
 

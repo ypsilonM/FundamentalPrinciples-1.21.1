@@ -1,11 +1,14 @@
 package com.ypsi.fundamentalism.network.packets;
 
 import com.ypsi.fundamentalism.FundamentalPrinciples;
+import com.ypsi.fundamentalism.attachments.PrinciplesProgressionManager;
 import com.ypsi.fundamentalism.effect.ModEffects;
+import com.ypsi.fundamentalism.util.Principles;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.registry.AttributeRegistry;
 import io.redspace.ironsspellbooks.api.spells.SpellAnimations;
 import io.redspace.ironsspellbooks.api.util.AnimationHolder;
+import io.redspace.ironsspellbooks.network.SyncAnimationPacket;
 import io.redspace.ironsspellbooks.render.animation.AnimationHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
@@ -20,6 +23,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
@@ -39,34 +43,44 @@ public record ToggleReinforcementPacket() implements CustomPacketPayload {
 
     public static void handle(ToggleReinforcementPacket packet, IPayloadContext context) {
         context.enqueueWork(() -> {
-            UUID uuid = context.player().getUUID();
-            var clientPlayer = Minecraft.getInstance().player.level().getPlayerByUUID(uuid);
 
             if (context.player() instanceof ServerPlayer player) {
                 boolean hasEffect = player.hasEffect(ModEffects.REINFORCEMENT_EFFECT);
 
                 if (!hasEffect) {
                     if (hasEnoughMana(player)) {
-                        MobEffectInstance effectInstance = new MobEffectInstance(
-                                ModEffects.REINFORCEMENT_EFFECT,
-                                -1,
-                                0,
-                                true,
-                                true,
-                                true
-                        );
-                        player.addEffect(effectInstance);
-
-                        PacketDistributor.sendToAllPlayers(new SyncReinforcementPacket(player.getId(), true));
+                        int augereLvl = PrinciplesProgressionManager.getCategoryLevel(player, Principles.AUGERE);
+                        MobEffectInstance effectInstance = getMobEffectInstance(augereLvl);
+                        if(augereLvl>=3) {
+                            player.addEffect(effectInstance);
+                            PacketDistributor.sendToAllPlayers(new SyncReinforcementPacket(player.getId(), true));
+                        }
                     }
                 } else {
                     player.removeEffect(ModEffects.REINFORCEMENT_EFFECT);
-
                     PacketDistributor.sendToAllPlayers(new SyncReinforcementPacket(player.getId(), false));
                 }
+                //PacketDistributor.sendToPlayer(player, new PlayPlayerAnimationPacket(player.getUUID(), animationId));
+
             }
-            SpellAnimations.SELF_CAST_ANIMATION.getForPlayer().ifPresent(resourceLocation -> AnimationHelper.animatePlayerStart(clientPlayer, resourceLocation));
+
+
         });
+    }
+
+    private static @NotNull MobEffectInstance getMobEffectInstance(int augereLvl) {
+        int amplifier = switch (augereLvl) {
+            case 3,4,5,6 -> 0;
+            case 7,8,9,10 -> 1;
+            case 11,12,13,14,15 -> 2;
+            case 16,17,18,19 -> 3;
+            case 20 -> 4;
+            default -> 0;
+        };
+        MobEffectInstance effectInstance = new MobEffectInstance(
+                ModEffects.REINFORCEMENT_EFFECT, -1, amplifier, true, true, true
+        );
+        return effectInstance;
     }
 
     private static boolean hasEnoughMana(ServerPlayer player) {

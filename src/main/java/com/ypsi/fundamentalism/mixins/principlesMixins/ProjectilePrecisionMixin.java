@@ -28,8 +28,8 @@ public class ProjectilePrecisionMixin {
         AbstractMagicProjectile magicProjectile = (AbstractMagicProjectile)(Object) this;
         Entity owner = magicProjectile.getOwner();
         if(owner instanceof ServerPlayer player && !player.level().isClientSide
-                && ServerConfig.potentiaActive
-                && ServerConfig.principlesSYSTEM)
+                && ServerConfig.ACTIVE_POTENTIA.get()
+                && ServerConfig.PRINCIPLES_SYSTEM.get())
         {
             int level = PrinciplesProgressionManager.getCategoryLevel(player, Principles.POTENTIA);
             float accuracy = Util.getAccuracy(level);

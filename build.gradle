@@ -23,6 +23,7 @@ repositories {
     maven {
         url = "https://www.cursemaven.com"
     }
+
     maven {
         name = "redspace"
         url = uri("https://code.redspace.io/releases")
@@ -178,6 +179,8 @@ dependencies {
     runtimeOnly("mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}")
 
     implementation ("com.klikli_dev:modonomicon-${minecraft_version}-neoforge:${modonomicon_version}"){transitive=false}
+
+    implementation "curse.maven:aces_spell_utils-1299492:8079666"
 
 }
 

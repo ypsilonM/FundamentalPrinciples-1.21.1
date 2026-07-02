@@ -1,4 +1,4 @@
-package com.ypsi.fundamentalism.network;
+package com.ypsi.fundamentalism.network.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;

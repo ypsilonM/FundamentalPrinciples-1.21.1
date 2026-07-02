@@ -29,29 +29,55 @@ public class FatigueManager {
 
     public static void addFatigue(Player player, int amountToAdd){
         int currentLevel = getFatigueLevel(player);
-        int currentEx = getFatigueAmount(player);
+        int currentFatigue = getFatigueAmount(player);
         int remainingToAdd = amountToAdd;
 
         while (remainingToAdd > 0 && currentLevel <= 4) {
             int maxExPts = getMaxFatigue(currentLevel, player);
-            int remainingSpace = maxExPts - currentEx;
+            int remainingSpace = maxExPts - currentFatigue;
 
             if (remainingToAdd <= remainingSpace) {
-                currentEx += remainingToAdd;
+                currentFatigue += remainingToAdd;
                 remainingToAdd = 0;
             } else {
-                currentEx = maxExPts;
+                currentFatigue = maxExPts;
                 remainingToAdd -= remainingSpace;
 
                 if (currentLevel < 4) {
                     currentLevel++;
-                    currentEx = 0;
+                    currentFatigue = 0;
                 } else {
                     remainingToAdd = 0;
                 }
             }
         }
+
         FatigueManager.setFatigueLevel(player, currentLevel);
-        FatigueManager.setFatigueAmount(player, currentEx);
+        FatigueManager.setFatigueAmount(player, currentFatigue);
+    }
+    public static void subtractFatigue(Player player, int amountToSubtract) {
+        int currentLevel = getFatigueLevel(player);
+        int currentFatigue = getFatigueAmount(player);
+        int remainingToSubtract = amountToSubtract;
+
+        while (remainingToSubtract > 0 && currentLevel >= 0) {
+            if (remainingToSubtract <= currentFatigue) {
+                currentFatigue -= remainingToSubtract;
+                remainingToSubtract = 0;
+            } else {
+                remainingToSubtract -= currentFatigue;
+
+                if (currentLevel > 0) {
+                    currentLevel--;
+                    currentFatigue = getMaxFatigue(currentLevel, player);
+                } else {
+                    currentFatigue = 0;
+                    remainingToSubtract = 0;
+                }
+            }
+        }
+
+        FatigueManager.setFatigueLevel(player, currentLevel);
+        FatigueManager.setFatigueAmount(player, currentFatigue);
     }
 }

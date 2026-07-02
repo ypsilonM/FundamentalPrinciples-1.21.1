@@ -83,7 +83,7 @@ public class SpellWheelOverlayMixin {
                     guiGraphics.drawString(font, symbolsComponent,
                             centerX - symbolsWidth / 2, symbolsY, 0xFFFFFF, true);
 
-                    if(categories.contains("usesTeleport") && ServerConfig.principlesSYSTEM && ServerConfig.apparitioActive) {
+                    if(categories.contains("usesTeleport") && ServerConfig.PRINCIPLES_SYSTEM.get() && ServerConfig.ACTIVE_APPARITIO.get()) {
                         var swsm = ClientMagicData.getSpellSelectionManager();
                         int categoryLevel = PrinciplesProgressionManager.getCategoryLevel(minecraft.player, "usesTeleport");
                         int cooldown = MagicManager.getEffectiveSpellCooldown(selectedSpell.getSpell(), minecraft.player, swsm.getSpellSlot(wheelSelection).getCastSource()) / 20;
@@ -118,7 +118,7 @@ public class SpellWheelOverlayMixin {
     private MutableComponent modifySpellDisplayName(AbstractSpell spell, Player player) {
         MutableComponent originalName = spell.getDisplayName(player);
         Set<String> categories = SpellCategoriesGenerator.getCategoriesForSpell(spell.getSpellId());
-        if (categories.size() >= ServerConfig.dominanPrinciples ){
+        if (categories.size() >= ServerConfig.DOMINAN_PRINCIPLES.get() ){
             MutableComponent newTitle = Component.literal("");
             newTitle.append(originalName.copy()
                     .withStyle(ChatFormatting.GOLD).withStyle(Style.EMPTY.withUnderlined(false)));
@@ -151,8 +151,8 @@ public class SpellWheelOverlayMixin {
 //           originalCost = (int)(originalCost * (1+Util.manaMultiplier( player.getData(YpsAttachments.LEVEL_EXHAUSTION), certumLevel )));
 //        }
             if (SpellCategoriesGenerator.isInCategory(spell.getSpellId(), "immutable")
-                    && ServerConfig.certumActive
-                    && ServerConfig.principlesSYSTEM) {
+                    && ServerConfig.ACTIVE_CERTUM.get()
+                    && ServerConfig.PRINCIPLES_SYSTEM.get()) {
                 originalCost = (int) (originalCost * (1 + Util.certumManaMultiplier(FatigueManager.getFatigueLevel(player), certumLevel)));
             }
         }

@@ -7,13 +7,9 @@ import com.ypsi.fundamentalism.attachments.YpsAttributeManager;
 import com.ypsi.fundamentalism.spells.ModSpells;
 import com.ypsi.fundamentalism.util.Util;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
-import io.redspace.ironsspellbooks.api.magic.SpellSelectionManager;
-import io.redspace.ironsspellbooks.api.spells.SpellData;
-import io.redspace.ironsspellbooks.player.ClientMagicData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.common.NeoForge;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -82,6 +78,7 @@ public class PrinciplesLevelsAttachment {
 
         if (oldLevel != level) {
             categoryLevels.put(category, level);
+
             if (listener != null) {
                 listener.onLevelChanged(category, oldLevel, level);
 
@@ -89,10 +86,15 @@ public class PrinciplesLevelsAttachment {
             if (level == 20) {
                 YpTriggers.PRINCIPLES_LEVEL_TRIGGER_SUPPLIER.get().trigger((ServerPlayer) player, category, level);
             }
+
             if (category.equals("createEntity")) {
                 YpsAttributeManager.MANA.applyModifier(player, level);
             }
-            if(level==10 && category.equals("usesHealing")){
+            if(category.equals("usesMobility")) {
+                YpsAttributeManager.CASTING_MOVESPEED.applyModifier(player, level);
+            }
+
+            if(level>=5 && category.equals("usesHealing")){
                 MagicData.getPlayerMagicData(player).getSyncedData().learnSpell(ModSpells.REMEDIUM_SPELL.get());
             }
         }
@@ -126,7 +128,7 @@ public class PrinciplesLevelsAttachment {
     }
 
     public int getExpForLevel(int level) {
-        return Util.getExpForPrincipleLevel(level);
+        return Util.getXpForPrincipleLevel(level);
     }
 
     public float getProgress(String category) {
