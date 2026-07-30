@@ -62,6 +62,9 @@ public class ModItems {
     public static final DeferredItem<Item> RUNEAR_SPAWN_EGG = ITEMS.register("runear_spawn_egg",
             () -> new DeferredSpawnEggItem(ModEntities.RUNEAR, 0x221E26, 0x2a252f,
                     new Item.Properties()));
+    public static final DeferredItem<Item> CHERRY_BIRD_SPAWN_EGG = ITEMS.register("cherry_bird_spawn_egg",
+            () -> new DeferredSpawnEggItem(ModEntities.CHERRY_BIRD, 0x3b1924, 0xe78fc2,
+                    new Item.Properties()));
 
 
     public static final DeferredItem<Item> FUNDAMENTALISM_SCROLL = ITEMS.register("scroll_fundamentalism",

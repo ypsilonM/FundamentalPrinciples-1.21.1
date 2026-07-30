@@ -1,6 +1,7 @@
 package com.ypsi.fundamentalism.spells.fundamentalism;
 
 import com.ypsi.fundamentalism.FundamentalPrinciples;
+import com.ypsi.fundamentalism.particle.ModParticles;
 import com.ypsi.fundamentalism.spells.Animations;
 import com.ypsi.fundamentalism.spells.YpsSchoolRegistry;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
@@ -122,11 +123,12 @@ public class LawOfRegressionSpell extends AbstractSpell {
 
                 ServerLevel serverLevel = (ServerLevel) level;
                 serverLevel.sendParticles(
-                        new DustParticleOptions(new Vector3f(0.98f,0.81f,0.22f),0.8f),
+                        ModParticles.REGRESSION_PARTICLE.get(),
+                        //new DustParticleOptions(new Vector3f(0.98f,0.81f,0.22f),0.8f),
                         entity.getX(),
                         entity.getY()+ entity.getBbHeight()/2,
                         entity.getZ(),
-                        10,0.1,0.0, 0.1,0.01
+                        2,0.05,0.0, 0.05,0.01
                 );
 
             }
@@ -153,8 +155,9 @@ public class LawOfRegressionSpell extends AbstractSpell {
     }
 
     @Override
-    public Optional<SoundEvent> getCastStartSound() {
-        return Optional.of(SoundEvents.CANDLE_EXTINGUISH);
+    public void playSound(Optional<SoundEvent> sound, Entity entity) {
+        super.playSound(
+                Optional.of(SoundEvents.FIRE_EXTINGUISH), entity);
     }
 
     @Override
@@ -162,8 +165,4 @@ public class LawOfRegressionSpell extends AbstractSpell {
         return super.getSpellPower(spellLevel, sourceEntity);
     }
 
-    @Override
-    public void playSound(Optional<SoundEvent> sound, Entity entity) {
-        super.playSound(sound, entity);
-    }
 }

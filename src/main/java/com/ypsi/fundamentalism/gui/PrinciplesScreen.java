@@ -292,20 +292,26 @@ public class PrinciplesScreen extends Screen {
             int beneficialMult = (int) (Util.beneficialPertinaciaMultiplier(level)*100);
             int harmfulMult = (int) (Util.harmfulPertinaciaMultiplier(level)*100);
 
-            tooltip.add(Component.literal("• " + beneficialMult + "% Beneficial")
-                    .withColor(0x0F55BA));
-            tooltip.add(Component.literal("• " + harmfulMult + "% Harmful")
-                    .withColor(0xBA0F65));
+            if(ServerConfig.ACTIVE_PERTINACIA.get()) {
+                tooltip.add(Component.literal("• " + beneficialMult + "% Beneficial")
+                        .withColor(0x0F55BA));
+                tooltip.add(Component.literal("• " + harmfulMult + "% Harmful")
+                        .withColor(0xBA0F65));
+            }
         }
         if(category.equals(PrinciplesProgressionManager.getTechnicalName(Principles.AUGERE))){
             float additionalDamage = Util.getAdditionalWeaponDamage(level);
-            tooltip.add(Component.literal("• +" + additionalDamage + " Damage " )
-                    .withColor(0x7C39FA));
+
+            if(ServerConfig.ACTIVE_AUGERE.get())
+                tooltip.add(Component.literal("• +" + additionalDamage + " Damage " )
+                        .withColor(0x7C39FA));
         }
         if(category.equals(PrinciplesProgressionManager.getTechnicalName(Principles.MOTUS))){
             float addMovSpeed = Util.getAdditionalCastingMovespeed(level);
-            tooltip.add(Component.literal("• +" + addMovSpeed + " Casting Movespeed " )
-                    .withColor(0xE58040));
+
+            if(ServerConfig.ACTIVE_MOTUS.get())
+                tooltip.add(Component.literal("• +" + addMovSpeed + " Casting Movespeed " )
+                        .withColor(0xE58040));
         }
 
         if(ServerConfig.FATIGUE_SYSTEM.get()) {

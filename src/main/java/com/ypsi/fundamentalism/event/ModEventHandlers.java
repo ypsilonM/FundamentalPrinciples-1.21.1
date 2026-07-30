@@ -3,6 +3,7 @@ package com.ypsi.fundamentalism.event;
 import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.attributes.YpsAttributes;
 import com.ypsi.fundamentalism.entity.ModEntities;
+import com.ypsi.fundamentalism.entity.mobs.cherry_bird.CherryBirdEntity;
 import com.ypsi.fundamentalism.entity.mobs.hemomancer.HemomancerEntity;
 import com.ypsi.fundamentalism.entity.mobs.imp.ImpEntity;
 import com.ypsi.fundamentalism.entity.mobs.runear.RunearEntity;
@@ -27,6 +28,8 @@ public class ModEventHandlers {
         event.put(ModEntities.HEMOMANCER.get(), HemomancerEntity.createAttributes().build());
         event.put(ModEntities.VENEMERUS.get(), VenemerusEntity.createAttributes().build());
         event.put(ModEntities.RUNEAR.get(), RunearEntity.createAttributes().build());
+        event.put(ModEntities.CHERRY_BIRD.get(), CherryBirdEntity.createAttributes().build());
+
     }
     @SubscribeEvent
     public static void onAttributeCreate(EntityAttributeModificationEvent event) {
@@ -48,6 +51,8 @@ public class ModEventHandlers {
                 AbstractSpellCastingMob::checkMobSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
 
         event.register(ModEntities.RUNEAR.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.WORLD_SURFACE,
+                AbstractSpellCastingMob::checkMobSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
+        event.register(ModEntities.CHERRY_BIRD.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.WORLD_SURFACE,
                 AbstractSpellCastingMob::checkMobSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
 
     }

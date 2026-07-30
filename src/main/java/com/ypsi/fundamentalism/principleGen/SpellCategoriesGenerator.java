@@ -3,7 +3,9 @@ package com.ypsi.fundamentalism.principleGen;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.ypsi.fundamentalism.FundamentalPrinciples;
+import com.ypsi.fundamentalism.attachments.PrinciplesProgressionManager;
 import com.ypsi.fundamentalism.event.Visitors;
+import com.ypsi.fundamentalism.util.Principles;
 import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -178,6 +180,10 @@ public class SpellCategoriesGenerator {
     public static boolean isInCategory(String spellId, String category) {
         if (loadedConfig == null) return false;
         return loadedConfig.spellCategories.getOrDefault(category, Collections.emptyList()).contains(spellId);
+    }
+    public static boolean isInPrinciple(String spellId, Principles principle) {
+        if (loadedConfig == null) return false;
+        return loadedConfig.spellCategories.getOrDefault(PrinciplesProgressionManager.getTechnicalName(principle), Collections.emptyList()).contains(spellId);
     }
 
     public static List<String> getSpellsInCategory(String category) {

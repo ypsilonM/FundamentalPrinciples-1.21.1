@@ -54,6 +54,14 @@ public class ExhaustionCommand {
                                 )
                         )
                 )
+                .then(Commands.literal("clean")
+                        .then(Commands.argument("target", EntityArgument.players())
+                                .executes(context -> cleanFatigue(
+                                        context.getSource(),
+                                        EntityArgument.getPlayers(context, "target")
+                                ))
+                        )
+                )
         );
     }
 
@@ -120,6 +128,28 @@ public class ExhaustionCommand {
 
         return targets.size();
     }
+
+    private static int cleanFatigue(CommandSourceStack source, Collection<ServerPlayer> targets) {
+        for (ServerPlayer player : targets) {
+            FatigueManager.cleanFatigue(player);
+            player.getPersistentData().putInt("exhaustionTickCounter", 0);
+            player.getPersistentData().putInt("reduceCounter", 0);
+        }
+        if (targets.size() == 1) {
+            ServerPlayer player = targets.iterator().next();
+            source.sendSuccess(() -> Component.literal(
+                    "Reset fatigue for " + player.getDisplayName().getString()
+            ), true);
+        } else {
+            source.sendSuccess(() -> Component.literal(
+                    "Reset fatigue for " + targets.size() + " players"
+            ), true);
+        }
+
+        return targets.size();
+    }
+
+
 
     public static int getMaxExPerLevel(int level, Player player){
         return (int) ((switch (level){

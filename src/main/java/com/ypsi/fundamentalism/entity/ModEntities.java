@@ -1,6 +1,7 @@
 package com.ypsi.fundamentalism.entity;
 
 import com.ypsi.fundamentalism.FundamentalPrinciples;
+import com.ypsi.fundamentalism.entity.mobs.cherry_bird.CherryBirdEntity;
 import com.ypsi.fundamentalism.entity.mobs.hemomancer.HemomancerEntity;
 import com.ypsi.fundamentalism.entity.mobs.imp.ImpEntity;
 import com.ypsi.fundamentalism.entity.mobs.runear.RunearEntity;
@@ -95,6 +96,13 @@ public class ModEntities {
                             .sized(1.6f, 1.6f)
                             .clientTrackingRange(20)
                             .build(String.valueOf(ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "runear")))
+            );
+    public static final DeferredHolder<EntityType<?>, EntityType<CherryBirdEntity>> CHERRY_BIRD =
+            ENTITY_TYPES.register("cherry_bird", () ->
+                    EntityType.Builder.<CherryBirdEntity>of(CherryBirdEntity::new, MobCategory.CREATURE)
+                            .sized(0.5f, 1f)
+                            .clientTrackingRange(20)
+                            .build(String.valueOf(ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "cherry_bird")))
             );
 
 

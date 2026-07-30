@@ -1,25 +1,19 @@
 package com.ypsi.fundamentalism.entity.mobs.hemomancer;
 
-import com.ypsi.fundamentalism.spells.ModSpells;
-import io.redspace.ironsspellbooks.api.entity.IMagicEntity;
 import io.redspace.ironsspellbooks.api.registry.AttributeRegistry;
 import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import io.redspace.ironsspellbooks.entity.mobs.abstract_spell_casting_mob.AbstractSpellCastingMob;
 import io.redspace.ironsspellbooks.entity.mobs.goals.PatrolNearLocationGoal;
 import io.redspace.ironsspellbooks.entity.mobs.goals.WarlockAttackGoal;
-import io.redspace.ironsspellbooks.entity.mobs.goals.WizardAttackGoal;
+import net.acetheeldritchking.aces_spell_utils.entity.mobs.UniqueAbstractMeleeCastingMob;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
@@ -31,37 +25,22 @@ import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import software.bernie.geckolib.animatable.GeoAnimatable;
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.*;
-import software.bernie.geckolib.util.GeckoLibUtil;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 
-public class HemomancerEntity extends AbstractSpellCastingMob implements Enemy {
+public class HemomancerEntity extends UniqueAbstractMeleeCastingMob implements Enemy {
 
     public HemomancerEntity(EntityType<? extends AbstractSpellCastingMob> entityType, Level level) {
         super(entityType, level);
         xpReward = 30;
     }
 
-    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
-
-    private static final RawAnimation WALK_ANIM = RawAnimation.begin().thenLoop("walk");
-    private static final RawAnimation IDLE_ANIM = RawAnimation.begin().thenLoop("idle");
-    private static final RawAnimation SPELL_ANIM = RawAnimation.begin().thenPlay("cast");
-    private static final RawAnimation ATTACK_1 = RawAnimation.begin().thenPlay("attack");
-    private static final RawAnimation ATTACK_2 = RawAnimation.begin().thenPlay("attack2");
-
-    private int meleeTimer = 0;
     private double originalMovementSpeed = -1;
     private boolean wasRooted = false;
 
     @Override
     protected void registerGoals() {
-//        super.registerGoals();
         this.goalSelector.addGoal(1, new FloatGoal(this));
         this.goalSelector.addGoal(2, new WarlockAttackGoal(this, 1.25, 80, 160)
                 .setSpells(
@@ -71,7 +50,7 @@ public class HemomancerEntity extends AbstractSpellCastingMob implements Enemy {
                         List.of()
                 )
                         .setMeleeBias(1, 1)
-                .setSingleUseSpell(SpellRegistry.BLOOD_SLASH_SPELL.get(), 200, 300, 1, 1 )
+                .setSingleUseSpell(SpellRegistry.BLOOD_SLASH_SPELL.get(), 200, 300, 1, 3 )
                 .setMeleeAttackInverval(30, 40)
         );
         this.goalSelector.addGoal(3, new PatrolNearLocationGoal(this, 30, .75f));
@@ -94,105 +73,24 @@ public class HemomancerEntity extends AbstractSpellCastingMob implements Enemy {
     }
 
     @Override
-    public boolean isInvertedHealAndHarm() {
-        return true;
-    }
-
-    @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "move_controller", 0, this::movePredicate));
-        controllers.add(new AnimationController<>(this, "devour_controller", 0, this::castPredicate).triggerableAnim("cast", SPELL_ANIM));
-        controllers.add(new AnimationController<>(this, "slash_controller", 0, this::castPredicate).triggerableAnim("cast", SPELL_ANIM));
-        controllers.add(new AnimationController<>(this, "melee_controller", 0, this::meleePredicate)
-                .triggerableAnim("attack", ATTACK_1)
-                .triggerableAnim("attack2",ATTACK_2));
-
-    }
-
-    private <E extends GeoAnimatable> PlayState movePredicate(AnimationState<E> event) {
-        boolean isCastingRootSpell = false;
-        if (isCasting()) {
-            AbstractSpell castingSpell = getMagicData().getCastingSpell() != null
-                    ? getMagicData().getCastingSpell().getSpell() : null;
-
-            isCastingRootSpell =
-                    (castingSpell == SpellRegistry.DEVOUR_SPELL.get() ||
-                    castingSpell == SpellRegistry.BLOOD_SLASH_SPELL.get() ||
-                    castingSpell == SpellRegistry.ACUPUNCTURE_SPELL.get());
-        }
-
-        if (isCastingRootSpell || this.meleeTimer > 0) {
-            return PlayState.STOP;
-        }
-        if (event.isMoving()) {
-            event.getController().setAnimation(WALK_ANIM);
-        } else {
-            event.getController().setAnimation(IDLE_ANIM);
-        }
-        return PlayState.CONTINUE;
-    }
-
-    private <E extends GeoAnimatable> PlayState castPredicate(AnimationState<E> event) {
-        return isCasting()?PlayState.CONTINUE:PlayState.STOP;
-    }
-
-    private <E extends GeoAnimatable> PlayState meleePredicate(AnimationState<E> event) {
-        return this.meleeTimer > 0 ? PlayState.CONTINUE : PlayState.STOP;
-    }
-
-    @Override
-    public void initiateCastSpell(AbstractSpell spell, int spellLevel) {
-        List<AbstractSpell> castSpells = new ArrayList<>();
-        castSpells.add(SpellRegistry.DEVOUR_SPELL.get());
-        castSpells.add(SpellRegistry.BLOOD_SLASH_SPELL.get());
-        castSpells.add(SpellRegistry.ACUPUNCTURE_SPELL.get());
-
-        super.initiateCastSpell(spell, spellLevel);
-
-        if (castSpells.contains(spell)) {
-            this.triggerAnim("devour_controller", "cast");
-        }
-
-    }
-
-    public void triggerMeleeAttack(){
-        this.meleeTimer = 10;
-        if(this.random.nextBoolean()){
-            this.triggerAnim("melee_controller", "attack");
-        }else{
-            this.triggerAnim("melee_controller", "attack2");
-        }
-    }
-
-    @Override
     public void tick() {
         super.tick();
 
-        if (this.meleeTimer > 0) {
-            this.meleeTimer--;
-        }
-
         boolean shouldBeRooted = false;
         if (isCasting()) {
-            AbstractSpell castingSpell = getMagicData().getCastingSpell() != null
+            AbstractSpell spell = getMagicData().getCastingSpell() != null
                     ? getMagicData().getCastingSpell().getSpell()
                     : null;
-            if (castingSpell == SpellRegistry.DEVOUR_SPELL.get() ||
-                    castingSpell == SpellRegistry.BLOOD_SLASH_SPELL.get() ||
-                    castingSpell == SpellRegistry.ACUPUNCTURE_SPELL.get()) {
-                shouldBeRooted = true;
-            }
+            shouldBeRooted = spell == SpellRegistry.DEVOUR_SPELL.get()
+                    || spell == SpellRegistry.BLOOD_SLASH_SPELL.get()
+                    || spell == SpellRegistry.ACUPUNCTURE_SPELL.get();
         }
-
         if (shouldBeRooted && !wasRooted) {
-            // Entering rooted state: store original speed and immobilise
             originalMovementSpeed = this.getAttributeBaseValue(Attributes.MOVEMENT_SPEED);
             this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0);
             this.setNoGravity(true);
             wasRooted = true;
-        }
-        else if (!shouldBeRooted && wasRooted) {
-            // Exiting rooted state: restore speed and gravity
+        } else if (!shouldBeRooted && wasRooted) {
             if (originalMovementSpeed != -1) {
                 this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(originalMovementSpeed);
             }
@@ -203,19 +101,63 @@ public class HemomancerEntity extends AbstractSpellCastingMob implements Enemy {
     }
 
     @Override
+    public boolean isInvertedHealAndHarm() {
+        return true;
+    }
+
+
+    private static final RawAnimation WALK_ANIM = RawAnimation.begin().thenLoop("walk");
+    private static final RawAnimation IDLE_ANIM = RawAnimation.begin().thenLoop("idle");
+    private static final RawAnimation SPELL_ANIM = RawAnimation.begin().thenPlay("cast");
+
+    @Override
+    protected PlayState predicate(AnimationState event) {
+        if (isAnimating()) {
+            return PlayState.STOP;
+        }
+        if (event.isMoving()) {
+            event.getController().setAnimation(WALK_ANIM);
+        } else {
+            event.getController().setAnimation(IDLE_ANIM);
+        }
+        return PlayState.CONTINUE;
+    }
+
+    @Override
     public void swing(InteractionHand hand) {
         super.swing(hand);
-        this.triggerMeleeAttack();
+        if (this.random.nextBoolean()) {
+            this.playAnimation("attack");
+        } else {
+            this.playAnimation("attack2");
+        }
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder pBuilder) {
-        super.defineSynchedData(pBuilder);
-    }
-
-    @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return this.cache;
+    protected void setStartAnimationFromSpell(AnimationController controller, AbstractSpell spell) {
+        if (spell == SpellRegistry.DEVOUR_SPELL.get()) {
+            controller.forceAnimationReset();
+            controller.setAnimation(SPELL_ANIM);
+            lastCastSpellType = spell;
+            cancelCastAnimation = false;
+            animatingLegs = false;
+            return;
+        } else if (spell == SpellRegistry.BLOOD_SLASH_SPELL.get()) {
+            controller.forceAnimationReset();
+            controller.setAnimation(SPELL_ANIM);
+            lastCastSpellType = spell;
+            cancelCastAnimation = false;
+            animatingLegs = false;
+            return;
+        } else if (spell == SpellRegistry.ACUPUNCTURE_SPELL.get()) {
+            controller.forceAnimationReset();
+            controller.setAnimation(SPELL_ANIM);
+            lastCastSpellType = spell;
+            cancelCastAnimation = false;
+            animatingLegs = false;
+            return;
+        }
+        super.setStartAnimationFromSpell(controller, spell);
     }
 
     @Override

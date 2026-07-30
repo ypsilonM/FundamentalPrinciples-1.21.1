@@ -1,7 +1,9 @@
 package com.ypsi.fundamentalism.network.packets;
 
 import com.ypsi.fundamentalism.FundamentalPrinciples;
+import com.ypsi.fundamentalism.attachments.PrinciplesProgressionManager;
 import com.ypsi.fundamentalism.effect.ModEffects;
+import com.ypsi.fundamentalism.util.Principles;
 import io.redspace.ironsspellbooks.api.spells.SpellAnimations;
 import io.redspace.ironsspellbooks.render.animation.AnimationHelper;
 import net.minecraft.network.FriendlyByteBuf;
@@ -11,6 +13,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+import org.jetbrains.annotations.NotNull;
 
 
 public record SyncReinforcementPacket(int playerId, boolean hasEffect) implements CustomPacketPayload {
@@ -43,7 +46,7 @@ public record SyncReinforcementPacket(int playerId, boolean hasEffect) implement
                             new MobEffectInstance(
                                     ModEffects.REINFORCEMENT_EFFECT,
                                     -1,
-                                    0,
+                                    getAmp(PrinciplesProgressionManager.getCategoryLevel(targetPlayer, Principles.AUGERE)),
                                     true, true, true
                             ),
                             null
@@ -55,5 +58,16 @@ public record SyncReinforcementPacket(int playerId, boolean hasEffect) implement
                         .ifPresent(resourceLocation -> AnimationHelper.animatePlayerStart(targetPlayer, resourceLocation));
             }
         });
+    }
+
+    private static int getAmp(int augereLvl) {
+        return switch (augereLvl) {
+            case 3,4,5,6 -> 0;
+            case 7,8,9,10 -> 1;
+            case 11,12,13,14,15 -> 2;
+            case 16,17,18,19 -> 3;
+            case 20 -> 4;
+            default -> 0;
+        };
     }
 }

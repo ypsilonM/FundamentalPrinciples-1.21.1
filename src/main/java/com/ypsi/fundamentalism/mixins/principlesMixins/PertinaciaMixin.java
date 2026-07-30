@@ -1,5 +1,6 @@
 package com.ypsi.fundamentalism.mixins.principlesMixins;
 
+import com.ypsi.fundamentalism.ServerConfig;
 import com.ypsi.fundamentalism.attachments.PrinciplesProgressionManager;
 import com.ypsi.fundamentalism.util.Principles;
 import com.ypsi.fundamentalism.util.Util;
@@ -22,7 +23,11 @@ public abstract class PertinaciaMixin {
             remap = false
     )
     private MobEffectInstance modifyEffectDuration(MobEffectInstance effectInstance) {
+
+        if(!ServerConfig.ACTIVE_PERTINACIA.get() || !ServerConfig.PRINCIPLES_SYSTEM.get()) return effectInstance;
+
         LivingEntity entity = (LivingEntity) (Object) this;
+
         if (entity instanceof ServerPlayer player && effectInstance.getEffect().value() instanceof MagicMobEffect) {
             int originalDuration = effectInstance.getDuration();
             if(originalDuration == -1) return effectInstance;

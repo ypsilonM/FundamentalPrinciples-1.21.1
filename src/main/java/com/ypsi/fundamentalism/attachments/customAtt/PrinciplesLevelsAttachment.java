@@ -2,17 +2,30 @@ package com.ypsi.fundamentalism.attachments.customAtt;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.ypsi.fundamentalism.FundamentalPrinciples;
+import com.ypsi.fundamentalism.ServerConfig;
+import com.ypsi.fundamentalism.advancements.ModAdvancementProvider;
 import com.ypsi.fundamentalism.advancements.triggers.YpTriggers;
+import com.ypsi.fundamentalism.attachments.PrinciplesProgressionManager;
 import com.ypsi.fundamentalism.attachments.YpsAttributeManager;
 import com.ypsi.fundamentalism.spells.ModSpells;
+import com.ypsi.fundamentalism.util.Principles;
+import com.ypsi.fundamentalism.util.Techniques;
 import com.ypsi.fundamentalism.util.Util;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
+import io.redspace.ironsspellbooks.api.spells.SpellData;
+import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementHolder;
+import net.minecraft.advancements.AdvancementProgress;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.commands.AdvancementCommands;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class PrinciplesLevelsAttachment {
     private final Map<String, Integer> categoryLevels;
@@ -87,15 +100,57 @@ public class PrinciplesLevelsAttachment {
                 YpTriggers.PRINCIPLES_LEVEL_TRIGGER_SUPPLIER.get().trigger((ServerPlayer) player, category, level);
             }
 
-            if (category.equals("createEntity")) {
+            if (category.equals(PrinciplesProgressionManager.getTechnicalName(Principles.CONCENTRATIO))) {
                 YpsAttributeManager.MANA.applyModifier(player, level);
             }
-            if(category.equals("usesMobility")) {
+            if (category.equals(PrinciplesProgressionManager.getTechnicalName(Principles.MOTUS))) {
                 YpsAttributeManager.CASTING_MOVESPEED.applyModifier(player, level);
             }
+            if (category.equals(PrinciplesProgressionManager.getTechnicalName(Principles.AUGERE)) && level>=3){
+                switch (level) {
+                    case 3,4,5,6:
+                            YpTriggers.TECHNIQUES_TRIGGER_SUPPLIER.get().trigger((ServerPlayer) player, Techniques.REINFORCEMENT.name(), 1);
+                            break;
+                    case 7,8,9,10:
+                            YpTriggers.TECHNIQUES_TRIGGER_SUPPLIER.get().trigger((ServerPlayer) player, Techniques.REINFORCEMENT.name(), 2);
+                            break;
+                    case 11,12,13,14,15:
+                            YpTriggers.TECHNIQUES_TRIGGER_SUPPLIER.get().trigger((ServerPlayer) player, Techniques.REINFORCEMENT.name(), 3);
+                            break;
+                    case 16,17,18,19:
+                            YpTriggers.TECHNIQUES_TRIGGER_SUPPLIER.get().trigger((ServerPlayer) player, Techniques.REINFORCEMENT.name(), 4);
+                            break;
+                    case 20:
+                            YpTriggers.TECHNIQUES_TRIGGER_SUPPLIER.get().trigger((ServerPlayer) player, Techniques.REINFORCEMENT.name(), 5);
+                            break;
+                    default: break;
+                }
+            }
 
-            if(level>=5 && category.equals("usesHealing")){
-                MagicData.getPlayerMagicData(player).getSyncedData().learnSpell(ModSpells.REMEDIUM_SPELL.get());
+            if (category.equals(PrinciplesProgressionManager.getTechnicalName(Principles.REMEDIUM)) && level >= 5) {
+                MagicData.getPlayerMagicData(player).getSyncedData().learnSpell(ModSpells.LAW_OF_REGRESSION_SPELL.get());
+
+                switch (level){
+                    case 5,6,7,8,9:
+                        YpTriggers.TECHNIQUES_TRIGGER_SUPPLIER.get().trigger((ServerPlayer) player, Techniques.REGRESSION.name(), 1);
+                        break;
+                    case 10,11,12,13:
+                        YpTriggers.TECHNIQUES_TRIGGER_SUPPLIER.get().trigger((ServerPlayer) player, Techniques.REGRESSION.name(), 2);
+                        break;
+                    case 14,15,16,18,19:
+                        YpTriggers.TECHNIQUES_TRIGGER_SUPPLIER.get().trigger((ServerPlayer) player, Techniques.REGRESSION.name(), 3);
+                        break;
+                    case 20:
+                        YpTriggers.TECHNIQUES_TRIGGER_SUPPLIER.get().trigger((ServerPlayer) player, Techniques.REGRESSION.name(), 4);
+                }
+            }
+
+            if (PrinciplesProgressionManager.getCategoryLevel(player, Principles.CONCENTRATIO) >= 12 &&
+                    PrinciplesProgressionManager.getCategoryLevel(player, Principles.LOCUS) >= 10 &&
+                    PrinciplesProgressionManager.getCategoryLevel(player, Principles.PERCEPTIO) >= 12 &&
+                    PrinciplesProgressionManager.getCategoryLevel(player, Principles.APPARITIO) >= 10) {
+                MagicData.getPlayerMagicData(player).getSyncedData().learnSpell(ModSpells.SAEPTUM_PELL.get());
+                YpTriggers.TECHNIQUES_TRIGGER_SUPPLIER.get().trigger((ServerPlayer) player, Techniques.SAEPTUM.name(), 1);
             }
         }
     }

@@ -3,15 +3,19 @@ package com.ypsi.fundamentalism.network;
 import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.network.packets.*;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
+@EventBusSubscriber(modid = FundamentalPrinciples.MOD_ID)
 public class ModNetwork {
-    public static void register(IEventBus modEventBus) {
-        modEventBus.addListener(ModNetwork::onRegisterPayloads);
-    }
+//    public static void register(IEventBus modEventBus) {
+//        modEventBus.addListener(ModNetwork::onRegisterPayloads);
+//    }
 
-    private static void onRegisterPayloads(final RegisterPayloadHandlersEvent event) {
+    @SubscribeEvent
+    private static void register(final RegisterPayloadHandlersEvent event) {
         final PayloadRegistrar registrar = event.registrar(FundamentalPrinciples.MOD_ID)
                 .versioned("1.0");
 

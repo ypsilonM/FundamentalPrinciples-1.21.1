@@ -13,7 +13,6 @@ import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.awt.*;
@@ -102,21 +101,26 @@ public class ModEffects {
             () -> new LaceratedEffect(MobEffectCategory.HARMFUL, 0x8A000E)
     );
 
-    public static final Holder<MobEffect> SHOCK_EFFECT = MOB_EFFECTS.register("shock",
-            () -> new ShockEffect(MobEffectCategory.NEUTRAL, Color.CYAN.getRGB())
+    public static final Holder<MobEffect> TRAPPED_EFFECT = MOB_EFFECTS.register("trapped",
+            () -> new TrappedEffect(MobEffectCategory.NEUTRAL, Color.CYAN.getRGB())
                     .addAttributeModifier(
-                            Attributes.MOVEMENT_SPEED, ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "shock"),
+                            Attributes.MOVEMENT_SPEED, ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "trapped"),
                             -1, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
                     .addAttributeModifier(
-                            Attributes.JUMP_STRENGTH, ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "shock"),
+                            Attributes.JUMP_STRENGTH, ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "trapped"),
                             -1, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
                     .addAttributeModifier(
-                            Attributes.GRAVITY, ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "shock"),
+                            Attributes.GRAVITY, ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "trapped"),
                             -1, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
                     .addAttributeModifier(
-                            Attributes.FLYING_SPEED, ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "shock"),
+                            Attributes.FLYING_SPEED, ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "trapped"),
                             -1, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
     );
+    public static final Holder<MobEffect> SPATIAL_DISRUPTION = MOB_EFFECTS.register("spatial_disruption",
+            () -> new SpatialDisruption(MobEffectCategory.NEUTRAL, Color.BLACK.getRGB())
+    );
+
+
 
 
 //    public static final Holder<MobEffect>

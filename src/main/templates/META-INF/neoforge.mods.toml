@@ -114,7 +114,7 @@ config="${mod_id}.mixins.json"
 
 [[dependencies.${mod_id}]]
     modId="aces_spell_utils"
-    type="optional"
+    type="required"
     versionRange="[1.2.6.1-1.21.1,)"
     ordering="NONE"
     side="BOTH"

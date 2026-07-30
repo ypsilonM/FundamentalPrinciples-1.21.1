@@ -82,15 +82,6 @@ public class AncientScrollCase extends Item {
 
             PacketDistributor.sendToPlayer((ServerPlayer) player, new ClientScrollCaseUsePacket(player.getId()));
 
-        }else{
-            if(Minecraft.getInstance().level != null) {
-                Player clientPlayer = Minecraft.getInstance().player;
-                if (clientPlayer != null) {
-                    clientPlayer.playSound(
-                            SoundEvents.COPPER_BULB_BREAK, 1, 0.6F
-                    );
-                }
-            }
         }
         return InteractionResultHolder.consume(stack);
     }

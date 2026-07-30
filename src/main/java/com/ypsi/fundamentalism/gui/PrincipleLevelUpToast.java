@@ -15,9 +15,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import oshi.jna.platform.mac.SystemB;
 
-
+@OnlyIn(Dist.CLIENT)
 public class PrincipleLevelUpToast implements Toast {
 
     private final Component title;

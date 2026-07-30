@@ -18,7 +18,8 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.TicketType;
-import net.minecraft.util.RandomSource;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -26,7 +27,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -46,7 +46,7 @@ public class DomainEntity extends AbstractDomainEntity implements GeoEntity {
     private final AnimationController<DomainEntity> animationController =
             new AnimationController<>(this, "controller", 0, this::predicate);
 
-    private int durationTicks = 20*30;
+    private int durationTicks = 20 * 60;
 
     private final Map<BlockPos, BlockState> originalBlocks = new HashMap<>();
     private final Map<LivingEntity, Vec3> entityPositions = new HashMap<>();
@@ -61,11 +61,11 @@ public class DomainEntity extends AbstractDomainEntity implements GeoEntity {
 
     private record BuildTask(List<BlockPos> positions, boolean placeBarrier) {}
 
-    public DomainEntity(Level pLevel, Vector3f schoolColor, SchoolType schoolType) {
+    public DomainEntity(Level pLevel, Vector3f schoolColor, SchoolType schoolType, int refinement) {
         super(ModEntities.DOMAIN_ENTITY.get(), pLevel);
         this.schoolType = schoolType;
         setRadius(20);
-        setRefinement(10);
+        setRefinement(refinement);
         setOpen(false);
         setSpawnAnimTime(40);
         setColor(Utils.packRGB(schoolColor));
@@ -134,9 +134,9 @@ public class DomainEntity extends AbstractDomainEntity implements GeoEntity {
 
                 for (Entity e : targets) {
                     if (e instanceof LivingEntity target) {
-                        target.addEffect(new MobEffectInstance(ModEffects.SHOCK_EFFECT, 20 * 10, 0, false, false));
+                        target.addEffect(new MobEffectInstance(ModEffects.TRAPPED_EFFECT, 20 * 10, 0, false, false));
                         affectedEntities.add(target);
-
+                        entityPositions.put(target, getPos(target));
                     }
                 }
                 livingOwner.setDeltaMovement(0,0,0);
@@ -159,35 +159,68 @@ public class DomainEntity extends AbstractDomainEntity implements GeoEntity {
                             building = false;
                             buildTasks.clear();
 
-                            if(oldestDomain instanceof DomainEntity domainEntity){
+                            if(oldestDomain instanceof DomainEntity domainEntity) {
                                 domainEntity.getAffectedEntities().addAll(this.getAffectedEntities());
                                 domainEntity.getEntityPositions().putAll(this.getEntityPositions());
-                            }
-                            for (LivingEntity target : affectedEntities) {
-                                Vec3 offset = target.position().subtract(oldPos);
-                                target.moveTo(newPos.add(offset));
-                            }
 
-                        } else { //This is the oldest
-                            //tp all from the list to this
-                            Vec3 thisPos = getPos(this);
-                            getClashingWith().forEach(domain -> {
-                                Vec3 oldDomainPos = domain.position();
-                                domain.moveTo(thisPos);
-
-                                if (domain instanceof DomainEntity domainEntity) {
-                                    domainEntity.building = false;
-                                    for (LivingEntity target : domainEntity.affectedEntities) {
-                                        Vec3 offset = target.position().subtract(oldDomainPos);
-                                        target.moveTo(thisPos.add(offset));
+                                for (LivingEntity target : affectedEntities) {
+                                    Vec3 offset = target.position().subtract(oldPos);
+                                    Vec3 semiFinalPos = newPos.add(offset);
+                                    if(semiFinalPos.y <= newPos.y) {
+                                        semiFinalPos.subtract(0, semiFinalPos.y, 0);
+                                        semiFinalPos.add(0, newPos.y+1, 0);
                                     }
-                                    this.getAffectedEntities().addAll(domainEntity.getAffectedEntities());
-                                    this.getEntityPositions().putAll(domainEntity.getEntityPositions());
-
+                                    target.moveTo(semiFinalPos);
+                                    if (!domainEntity.building)
+                                        target.removeEffect(ModEffects.TRAPPED_EFFECT);
                                 }
-                            });
+                            }
 
-                        }
+                        } else if(oldestDomain.getSpawnTime().equals(this.getSpawnTime())){ // SAME TICK
+                                if(this.getId() < oldestDomain.getId()){ //EL OTRO ES EL DOMINANTE, TEPEARSE A ÉL
+                                    Vec3 oldPos = this.position();
+                                    Vec3 newPos = getPos(oldestDomain);
+                                    this.moveTo(getPos(oldestDomain));
+                                    building = false;
+                                    buildTasks.clear();
+
+                                    if(oldestDomain instanceof DomainEntity domainEntity) {
+                                        domainEntity.getAffectedEntities().addAll(this.getAffectedEntities());
+                                        domainEntity.getEntityPositions().putAll(this.getEntityPositions());
+
+                                        for (LivingEntity target : affectedEntities) {
+                                            Vec3 offset = target.position().subtract(oldPos);
+                                            Vec3 semiFinalPos = newPos.add(offset);
+                                            if(semiFinalPos.y <= newPos.y) {
+                                                semiFinalPos.subtract(0, semiFinalPos.y, 0);
+                                                semiFinalPos.add(0, newPos.y+1, 0);
+                                            }
+                                            target.moveTo(semiFinalPos);
+                                            if (!domainEntity.building)
+                                                target.removeEffect(ModEffects.TRAPPED_EFFECT);
+                                        }
+                                    }
+                                }
+                            }
+                            //This is the oldest
+                            //tp all from the list to this
+//                            Vec3 thisPos = getPos(this);
+//                            getClashingWith().forEach(domain -> {
+//                                Vec3 oldDomainPos = domain.position();
+//                                domain.moveTo(thisPos);
+//
+//                                if (domain instanceof DomainEntity domainEntity) {
+//                                    domainEntity.building = false;
+//                                    for (LivingEntity target : domainEntity.affectedEntities) {
+//                                        Vec3 offset = target.position().subtract(oldDomainPos);
+//                                        target.moveTo(thisPos.add(offset));
+//                                    }
+//                                    this.getAffectedEntities().addAll(domainEntity.getAffectedEntities());
+//                                    this.getEntityPositions().putAll(domainEntity.getEntityPositions());
+//
+//                                }
+//                            });
+
                     }
                 }
 
@@ -268,20 +301,7 @@ public class DomainEntity extends AbstractDomainEntity implements GeoEntity {
     @Override
     public void handleTransportation() {
         if(building) return;
-        Entity owner = this.getOwner();
-        if(!owner.level().isClientSide) {
-            if(owner instanceof LivingEntity) {
-
-                for (int i = 0; i < affectedEntities.size(); i++) {
-                    if (affectedEntities.get(i) instanceof LivingEntity target) {
-                        entityPositions.put(target, getPos(target));
-                        target.removeEffect(ModEffects.SHOCK_EFFECT);
-                    }
-                }
-                super.handleTransportation();
-            }
-        }
-
+        super.handleTransportation();
     }
 
     private Vec3 getPos(Entity entity) {
@@ -296,10 +316,20 @@ public class DomainEntity extends AbstractDomainEntity implements GeoEntity {
         building = false;
         if (!level().isClientSide && level() instanceof ServerLevel serverLevel) {
             if(!this.isClashing()) {
-                if (!buildTasks.isEmpty())
+                if (!buildTasks.isEmpty()) {
                     clearBarrierBlocks(serverLevel);
-                if (!buildTasks.isEmpty())
                     teleportToOriginalPlaces(serverLevel);
+
+                    serverLevel.playSound(null,
+                            this.getX(),
+                            this.getY(),
+                            this.getZ(),
+                            SoundEvents.GLASS_BREAK,
+                            SoundSource.BLOCKS,
+                            10f,
+                            0.5f
+                            );
+                }
             }else{
                 //pass info to other domains
                 Optional<AbstractDomainEntity> oldestDomains = getClashingWith()
@@ -321,6 +351,8 @@ public class DomainEntity extends AbstractDomainEntity implements GeoEntity {
                     }
                 }
             }
+            if(this.getOwner() instanceof LivingEntity owner)
+                owner.addEffect(new MobEffectInstance(ModEffects.BURNOUT_EFFECT, 20*160, 0,false, true));
         }
         super.destroyDomain();
     }
@@ -341,29 +373,35 @@ public class DomainEntity extends AbstractDomainEntity implements GeoEntity {
 
     @Override
     public void handleDomainClash(ArrayList<AbstractDomainEntity> opposingDomains) {
-        if(!buildTasks.isEmpty() && this.tickCount%10==0){
-            ServerLevel serverLevel = (ServerLevel) level();
-            for(BuildTask task: buildTasks) {
-                for (BlockPos blockPos : task.positions()) {
-                    if (!originalBlocks.containsKey(blockPos)) {
-                        originalBlocks.put(blockPos, serverLevel.getBlockState(blockPos));
-                    }
+        if(!level().isClientSide) {
+            if(this.tickCount % 10 == 0){
 
-                    if (task.placeBarrier()) {
-                        serverLevel.setBlock(blockPos, YpsBlocks.DOMAIN_BLOCK.get().defaultBlockState(), 3);
-                        if (serverLevel.getBlockEntity(blockPos) instanceof DomainBlockEntity be) {
-                            int random = this.random.nextInt(0, opposingDomains.size()-1);
-                            if(opposingDomains.get(random) instanceof DomainEntity domainEntity) {
-                                be.setColor(domainEntity.getColor());
-                            }else{
-                                be.setColor(this.getColor());
+                if(this.getOwner() instanceof LivingEntity owner){
+                    if(owner.getHealth() < owner.getMaxHealth()/2)
+                        this.destroyDomain();
+                }
+
+                if (!buildTasks.isEmpty()) {
+                    ServerLevel serverLevel = (ServerLevel) level();
+                    for (BuildTask task : buildTasks) {
+                        for (BlockPos blockPos : task.positions()) {
+                            if (task.placeBarrier()) {
+                                if (serverLevel.getBlockEntity(blockPos) instanceof DomainBlockEntity be) {
+                                    int random = this.random.nextInt(0, opposingDomains.size()+1);
+                                    if (random == opposingDomains.size()) {
+                                        be.setColor(this.getColor());
+                                    } else {
+                                        if (opposingDomains.get(random) instanceof DomainEntity domainEntity) {
+                                            be.setColor(domainEntity.getColor());
+                                        }
+                                    }
+
+                                }
                             }
+
+
                         }
-                    } else {
-                        serverLevel.setBlock(blockPos, Blocks.AIR.defaultBlockState(), 3);
                     }
-
-
                 }
             }
         }
@@ -384,59 +422,94 @@ public class DomainEntity extends AbstractDomainEntity implements GeoEntity {
                 }
             }
 
-            if(building && !isRemoved() && tickCount>1){
-                for(LivingEntity target: affectedEntities){
-                    target.setDeltaMovement(Vec3.ZERO);
-                }
-                if (buildIndex < buildTasks.size()) {
-                    BuildTask task = buildTasks.get(buildIndex);
-                    ServerLevel serverLevel = (ServerLevel) level();
-
-                    for (BlockPos blockPos : task.positions()) {
-                        if (!originalBlocks.containsKey(blockPos)) {
-                            originalBlocks.put(blockPos, serverLevel.getBlockState(blockPos));
-                        }
-
-                        if (task.placeBarrier()) {
-                            serverLevel.setBlock(blockPos, YpsBlocks.DOMAIN_BLOCK.get().defaultBlockState(), 3);
-                            if (serverLevel.getBlockEntity(blockPos) instanceof DomainBlockEntity be) {
-                                be.setColor(this.getColor());
-                            }
-                        } else {
-                            serverLevel.setBlock(blockPos, Blocks.AIR.defaultBlockState(), 3);
-                        }
-
-                        AABB area = new AABB(blockPos.getX(), blockPos.getY() - 15, blockPos.getZ(),
-                                blockPos.getX() + 1, blockPos.getY() + 1 + 15, blockPos.getZ() + 1);
-                        List<LivingEntity> blockArea = level().getEntitiesOfClass(LivingEntity.class, area, LivingEntity::isAlive);
-
-                        double safeRadius = getRadius() - 2;
-                        Vec3 barrierPos = getPos(this);
-                        double BARRIER_Y = barrierPos.y + 1;
-
-                        for(LivingEntity target: blockArea){
-                            if(affectedEntities.contains(target)){
-
-                                entityPositions.put(target, getPos(target));
-
-                                Vec3 delta = getPos(target).subtract(barrierPos);
-                                double xzDist = Math.sqrt(delta.x * delta.x + delta.z * delta.z);
-
-                                if (xzDist > safeRadius) {
-                                    delta = new Vec3(delta.x, 0, delta.z).normalize().scale(safeRadius);
-                                }
-
-                                Vec3 safePos = new Vec3(barrierPos.x + delta.x, BARRIER_Y, barrierPos.z + delta.z);
-                                target.moveTo(safePos);
-                                target.setDeltaMovement(Vec3.ZERO);
-                            }
-                        }
-
+            if(building){
+                if(!isRemoved() && tickCount>1){
+                    for(LivingEntity target: affectedEntities){
+                        target.setDeltaMovement(Vec3.ZERO);
                     }
-                    buildIndex++;
-                }else {
-                    building = false;
+                    if (buildIndex < buildTasks.size()) {
+                        BuildTask task = buildTasks.get(buildIndex);
+                        ServerLevel serverLevel = (ServerLevel) level();
+
+                        for (BlockPos blockPos : task.positions()) {
+                            if (!originalBlocks.containsKey(blockPos)) {
+                                originalBlocks.put(blockPos, serverLevel.getBlockState(blockPos));
+                            }
+
+                            if (task.placeBarrier()) {
+                                serverLevel.setBlock(blockPos, YpsBlocks.DOMAIN_BLOCK.get().defaultBlockState(), 3);
+                                if (serverLevel.getBlockEntity(blockPos) instanceof DomainBlockEntity be) {
+                                    be.setColor(this.getColor());
+                                }
+                            } else {
+                                serverLevel.setBlock(blockPos, Blocks.AIR.defaultBlockState(), 3);
+                            }
+
+                            AABB area = new AABB(blockPos.getX(), blockPos.getY() - 15, blockPos.getZ(),
+                                    blockPos.getX() + 1, blockPos.getY() + 1 + 15, blockPos.getZ() + 1);
+                            List<LivingEntity> blockArea = level().getEntitiesOfClass(LivingEntity.class, area, LivingEntity::isAlive);
+
+                            double safeRadius = getRadius() - 2;
+                            Vec3 barrierPos = getPos(this);
+                            double BARRIER_Y = barrierPos.y + 1;
+
+                            for(LivingEntity target: blockArea){
+                                if(affectedEntities.contains(target)){
+
+                                    Vec3 delta = getPos(target).subtract(barrierPos);
+                                    double xzDist = Math.sqrt(delta.x * delta.x + delta.z * delta.z);
+
+                                    if (xzDist > safeRadius) {
+                                        delta = new Vec3(delta.x, 0, delta.z).normalize().scale(safeRadius);
+                                    }
+
+                                    Vec3 safePos = new Vec3(barrierPos.x + delta.x, BARRIER_Y, barrierPos.z + delta.z);
+                                    target.moveTo(safePos);
+                                    target.setDeltaMovement(Vec3.ZERO);
+                                }
+                            }
+
+                        }
+                        buildIndex++;
+                    }else {
+                        building = false;
+                    }
                 }
+            }else{
+                if(tickCount % 20 == 0) {
+                    for (LivingEntity affectedEntity : affectedEntities) {
+                        if (affectedEntity instanceof LivingEntity target) {
+                            target.removeEffect(ModEffects.TRAPPED_EFFECT);
+                            target.addEffect(new MobEffectInstance(
+                                            ModEffects.SPATIAL_DISRUPTION,
+                                            60,
+                                            0,
+                                            false,
+                                            false
+                                    )
+                            );
+                        }
+                    }
+                }
+            }
+
+            //CLASHING BARRIER COLORING
+            if(!this.isClashing() && getTimeSpentClashing()>1 && this.isAlive()){
+                setTimeSpentClashing(0);
+                if (!buildTasks.isEmpty()) {
+                    ServerLevel serverLevel = (ServerLevel) level();
+                    for (BuildTask task : buildTasks) {
+                        for (BlockPos blockPos : task.positions()) {
+                            if (task.placeBarrier()) {
+                                if (serverLevel.getBlockEntity(blockPos) instanceof DomainBlockEntity be) {
+                                    be.setColor(this.getColor());
+                                }
+                            }
+
+                        }
+                    }
+                }
+
             }
 
         }
@@ -462,7 +535,7 @@ public class DomainEntity extends AbstractDomainEntity implements GeoEntity {
             if(!target.level().isClientSide && tickCount%20==0){
                 Holder<DamageType> damageTypeHolder = target.level().registryAccess().holderOrThrow(schoolType.getDamageType());
                 DamageSource source = new DamageSource(damageTypeHolder, target, owner);
-                DamageSources.applyDamage(target, 8, source);
+                DamageSources.applyDamage(target, getRefinement()*8, source);
             }
         }
 

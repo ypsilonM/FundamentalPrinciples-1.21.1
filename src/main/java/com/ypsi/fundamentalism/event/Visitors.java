@@ -1,9 +1,11 @@
 package com.ypsi.fundamentalism.event;
 
+import io.redspace.ironsspellbooks.registries.MobEffectRegistry;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import org.objectweb.asm.*;
 
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -39,6 +41,7 @@ public class Visitors {
             }
         }
 
+
         public void analyzeChildEntity(String internalClassName) {
             try {
                 //System.out.println(" Analyzing Children C: " + internalClassName);
@@ -48,17 +51,14 @@ public class Visitors {
                 String resourcePath = internalClassName + ".class";
 
                 try (InputStream classStream = classLoader.getResourceAsStream(resourcePath)) {
-                    if (classStream == null) {
-                        //LOGGER.error("          Cannot find child class: {} with ClassLoader: {}", resourcePath, classLoader);
-                        return;
-                    }
+                    if (classStream == null) { return; }
 
                     ClassReader classReader = new ClassReader(classStream);
                     ChildEntityAnalyzer childVisitor = new ChildEntityAnalyzer();
                     classReader.accept(childVisitor, ClassReader.SKIP_DEBUG);
 
                     Set<String> childCats = childVisitor.getDetectedCategories();
-                    //LOGGER.info("          RESULTs for {}: {}", internalClassName, childCats);
+
                     detectedCategories.addAll(childCats);
                 }
 
@@ -77,6 +77,8 @@ public class Visitors {
             }
             return new MethodAnalyzer();
         }
+
+
 
         public void processPowerCategory() {
             if (!foundGetSpellPower) {
@@ -136,6 +138,7 @@ public class Visitors {
                 }
 
             }
+
             private boolean matchesOwner(String owner, String methodName) {
                 return switch (methodName) {
                     case "initSummon" -> owner.contains("SummonManager");
@@ -147,8 +150,11 @@ public class Visitors {
                 };
             }
 
+
         }
 
+
+        // -> CHILD ENTITY ANALYZER
         private class ChildEntityAnalyzer extends ClassVisitor {
             private final Set<String> childDetectedCategories = new HashSet<>();
 
@@ -199,6 +205,7 @@ public class Visitors {
             }
         }
 
+
         private boolean isProjectile(String internalName) {
             return checkClassHierarchy(internalName, "net.minecraft.world.entity.projectile.Projectile");
         }
@@ -217,6 +224,7 @@ public class Visitors {
             }
             return checkClassHierarchy(internalName, "net.minecraft.world.entity.Entity");
         }
+
         private boolean isEffectClass(String internalName){
             if(internalName == null){
                 return false;

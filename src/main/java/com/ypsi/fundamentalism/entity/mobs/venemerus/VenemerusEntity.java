@@ -6,6 +6,7 @@ import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import io.redspace.ironsspellbooks.entity.mobs.abstract_spell_casting_mob.AbstractSpellCastingMob;
 import io.redspace.ironsspellbooks.entity.mobs.goals.PatrolNearLocationGoal;
 import io.redspace.ironsspellbooks.entity.mobs.goals.WarlockAttackGoal;
+import net.acetheeldritchking.aces_spell_utils.entity.mobs.UniqueAbstractMeleeCastingMob;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -45,22 +46,14 @@ import software.bernie.geckolib.animation.*;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import java.util.List;
 
-public class VenemerusEntity extends AbstractSpellCastingMob implements Enemy {
-
-    private static final EntityDataAccessor<Byte> DATA_FLAGS_ID;
+public class VenemerusEntity extends UniqueAbstractMeleeCastingMob implements Enemy {
 
     public VenemerusEntity(EntityType<? extends AbstractSpellCastingMob> entityType, Level level) {
         super(entityType, level);
         xpReward = 12;
     }
-    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
-    private static final RawAnimation WALK_ANIM = RawAnimation.begin().thenLoop("walk");
-    private static final RawAnimation IDLE_ANIM = RawAnimation.begin().thenLoop("idle");
-    private static final RawAnimation SPELL_ANIM = RawAnimation.begin().thenPlay("spit");
-    private static final RawAnimation ATTACK_1 = RawAnimation.begin().thenPlay("melee");
-
-    private int meleeTimer = 0;
+    private static final EntityDataAccessor<Byte> DATA_FLAGS_ID;
     private double originalMovementSpeed = -1;
     private boolean wasRooted = false;
 
@@ -96,11 +89,6 @@ public class VenemerusEntity extends AbstractSpellCastingMob implements Enemy {
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Axolotl.class, true));
     }
 
-    protected PathNavigation createNavigation(Level level) {
-        return new WallClimberNavigation(this, level);
-    }
-
-
     public static AttributeSupplier.Builder createAttributes() {
         return LivingEntity.createLivingAttributes()
                 .add(Attributes.MAX_HEALTH, 40.0)
@@ -112,67 +100,10 @@ public class VenemerusEntity extends AbstractSpellCastingMob implements Enemy {
                 .add(Attributes.FOLLOW_RANGE, 25.0);
     }
 
-    @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "move_controller", 0, this::movePredicate));
-        controllers.add(new AnimationController<>(this, "spit_controller", 0, this::castPredicate)
-                .triggerableAnim("spit", SPELL_ANIM));
-        controllers.add(new AnimationController<>(this, "melee_controller", 0, this::meleePredicate)
-                .triggerableAnim("melee", ATTACK_1));
-    }
-
-    private <E extends GeoAnimatable> PlayState movePredicate(AnimationState<E> event) {
-        boolean isCastingRootSpell = false;
-        if (isCasting()) {
-            AbstractSpell castingSpell = getMagicData().getCastingSpell() != null
-                    ? getMagicData().getCastingSpell().getSpell() : null;
-
-            isCastingRootSpell = (
-                    castingSpell == SpellRegistry.ACID_ORB_SPELL.get()
-            );
-        }
-
-        if (isCastingRootSpell || this.meleeTimer > 0) {
-            return PlayState.STOP;
-        }
-        if (event.isMoving()) {
-            event.getController().setAnimation(WALK_ANIM);
-        } else {
-            event.getController().setAnimation(IDLE_ANIM);
-        }
-        return PlayState.CONTINUE;
-    }
-
-    private <E extends GeoAnimatable> PlayState castPredicate(AnimationState<E> event) {
-        return isCasting()?PlayState.CONTINUE:PlayState.STOP;
-    }
-
-    private <E extends GeoAnimatable> PlayState meleePredicate(AnimationState<E> event) {
-        return this.meleeTimer > 0 ? PlayState.CONTINUE : PlayState.STOP;
-    }
-
-    @Override
-    public void initiateCastSpell(AbstractSpell spell, int spellLevel) {
-            super.initiateCastSpell(spell, spellLevel);
-
-            if(spell == SpellRegistry.ACID_ORB_SPELL){
-                this.triggerAnim("spit_controller", "spit");
-            }
-
-    }
-
-    public void triggerMeleeAttack(){
-        this.meleeTimer = 15;
-        this.triggerAnim("melee_controller", "melee");
-    }
 
     @Override
     public void tick() {
         super.tick();
-
-        if (this.meleeTimer > 0) {
-            this.meleeTimer--;
-        }
 
         boolean shouldBeRooted = false;
         if (isCasting()) {
@@ -204,6 +135,58 @@ public class VenemerusEntity extends AbstractSpellCastingMob implements Enemy {
         }
     }
 
+    @Override
+    public boolean hurt(DamageSource source, float amount) {
+        Entity attacker = source.getEntity();
+        if(attacker instanceof VenemerusEntity){
+            return false;
+        }
+        return super.hurt(source, amount);
+    }
+
+    public boolean doHurtTarget(Entity entity) {
+        if (super.doHurtTarget(entity)) {
+
+            if (entity instanceof LivingEntity) {
+
+                int i = 0;
+                if (this.level().getDifficulty() == Difficulty.NORMAL) {
+                    i = 7;
+                } else if (this.level().getDifficulty() == Difficulty.HARD) {
+                    i = 15;
+                }
+                if (i > 0) {
+                    ((LivingEntity)entity).addEffect(new MobEffectInstance(MobEffects.POISON, i * 20, 0), this);
+                }
+            }
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    static {
+        DATA_FLAGS_ID = SynchedEntityData.defineId(VenemerusEntity.class, EntityDataSerializers.BYTE);
+    }
+
+    protected PathNavigation createNavigation(Level level) {
+        return new WallClimberNavigation(this, level);
+    }
+
+    @Override
+    public void makeStuckInBlock(BlockState state, Vec3 motionMultiplier) {
+        if (!state.is(Blocks.COBWEB)) {
+            super.makeStuckInBlock(state, motionMultiplier);
+        }
+
+    }
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder pBuilder) {
+        super.defineSynchedData(pBuilder);
+        pBuilder.define(DATA_FLAGS_ID, (byte)0);
+    }
+
     public void setClimbing(boolean climbing) {
         byte b0 = (Byte)this.entityData.get(DATA_FLAGS_ID);
         if (climbing) {
@@ -223,54 +206,45 @@ public class VenemerusEntity extends AbstractSpellCastingMob implements Enemy {
         return ((Byte)this.entityData.get(DATA_FLAGS_ID) & 1) != 0;
     }
 
-    public boolean doHurtTarget(Entity entity) {
-        if (super.doHurtTarget(entity)) {
-            if (entity instanceof LivingEntity) {
-                int i = 0;
-                if (this.level().getDifficulty() == Difficulty.NORMAL) {
-                    i = 7;
-                } else if (this.level().getDifficulty() == Difficulty.HARD) {
-                    i = 15;
-                }
-                if (i > 0) {
-                    ((LivingEntity)entity).addEffect(new MobEffectInstance(MobEffects.POISON, i * 20, 0), this);
-                }
-            }
 
-            return true;
-        } else {
-            return false;
+    private static final RawAnimation WALK_ANIM = RawAnimation.begin().thenLoop("walk");
+    private static final RawAnimation IDLE_ANIM = RawAnimation.begin().thenLoop("idle");
+    private static final RawAnimation SPELL_ANIM = RawAnimation.begin().thenPlay("spit");
+    //private static final RawAnimation ATTACK_1 = RawAnimation.begin().thenPlay("melee");
+
+    @Override
+    protected PlayState predicate(AnimationState event) {
+        if (isAnimating()) {
+            return PlayState.STOP;
         }
+        if (event.isMoving()) {
+            event.getController().setAnimation(WALK_ANIM);
+        } else {
+            event.getController().setAnimation(IDLE_ANIM);
+        }
+        return PlayState.CONTINUE;
     }
 
     @Override
     public void swing(InteractionHand hand) {
         super.swing(hand);
-        this.triggerMeleeAttack();
+        this.playAnimation("melee");
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder pBuilder) {
-        super.defineSynchedData(pBuilder);
-        pBuilder.define(DATA_FLAGS_ID, (byte)0);
-    }
-
-    static {
-        DATA_FLAGS_ID = SynchedEntityData.defineId(VenemerusEntity.class, EntityDataSerializers.BYTE);
-    }
-
-    @Override
-    public void makeStuckInBlock(BlockState state, Vec3 motionMultiplier) {
-        if (!state.is(Blocks.COBWEB)) {
-            super.makeStuckInBlock(state, motionMultiplier);
+    protected void setStartAnimationFromSpell(AnimationController controller, AbstractSpell spell) {
+        if (spell == SpellRegistry.ACID_ORB_SPELL.get()) {
+            controller.forceAnimationReset();
+            controller.setAnimation(SPELL_ANIM);
+            lastCastSpellType = spell;
+            cancelCastAnimation = false;
+            animatingLegs = false;
+            return;
         }
 
+        super.setStartAnimationFromSpell(controller, spell);
     }
 
-    @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return this.cache;
-    }
 
     @Override
     protected void playStepSound(BlockPos pos, BlockState state) {
@@ -285,5 +259,10 @@ public class VenemerusEntity extends AbstractSpellCastingMob implements Enemy {
     @Override
     protected SoundEvent getDeathSound() {
         return SoundEvents.SPIDER_DEATH;
+    }
+
+    @Override
+    protected void playAttackSound() {
+        this.playSound(SoundEvents.PHANTOM_BITE, 1, 1.4F);
     }
 }

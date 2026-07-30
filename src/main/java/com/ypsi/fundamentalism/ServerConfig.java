@@ -9,7 +9,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
-@EventBusSubscriber(modid = FundamentalPrinciples.MOD_ID)
+//@EventBusSubscriber(modid = FundamentalPrinciples.MOD_ID)
 public class ServerConfig {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
     static final ModConfigSpec SPEC;
@@ -74,8 +74,19 @@ public class ServerConfig {
         public static ModConfigSpec.DoubleValue BASE_FOOD_PTS;
         public static ModConfigSpec.DoubleValue SUB_FOOD_PTS;
         //11.- Motus
+        public static ModConfigSpec.BooleanValue ACTIVE_MOTUS;
+        public static ModConfigSpec.DoubleValue ADD_MOVESPEED;
         //12.- Augere
+        public static ModConfigSpec.BooleanValue ACTIVE_AUGERE;
+        public static ModConfigSpec.DoubleValue ADD_DAMAGE;
+
         //13.- Pertinacia
+        public static ModConfigSpec.BooleanValue ACTIVE_PERTINACIA;
+        public static ModConfigSpec.DoubleValue BASE_BENEFICIAL_MULTIPLIER;
+        public static ModConfigSpec.DoubleValue ADD_BENEFICIAL;
+        public static ModConfigSpec.DoubleValue BASE_HARMFUL_MULTIPLIER;
+        public static ModConfigSpec.DoubleValue SUB_HARMFUL;
+
 
     public static ModConfigSpec.DoubleValue MOB_STAR_ALIGNMENT;
     public static ModConfigSpec.DoubleValue ALIGNMENT_MULTIPLIER;
@@ -293,6 +304,44 @@ public class ServerConfig {
                     .worldRestart().comment("Points to be reduced from the base amount per Remedium level")
                     .defineInRange("subFoodPts",0.125, 0, 10);
 
+            //11.-
+            ACTIVE_MOTUS = BUILDER
+                    .worldRestart()
+                    .comment("Whether MOTUS passive should be active.")
+                    .define("motusPassive", true);
+            ADD_MOVESPEED = BUILDER
+                    .worldRestart().comment("Percentage casting movespeed addition.")
+                    .defineInRange("addMovespeed", 0.05, 0.0, 10.0);
+
+            //12.-
+            ACTIVE_AUGERE = BUILDER
+                    .worldRestart()
+                    .comment("Whether AUGERE passive should be active.")
+                    .define("augerePassive", true);
+            ADD_DAMAGE = BUILDER
+                    .worldRestart().comment("Damage point addition per level.")
+                    .defineInRange("addDamagePts", 0.5, 0.0, 10.0);
+
+            //13.-
+            ACTIVE_PERTINACIA = BUILDER
+                    .worldRestart()
+                    .comment("Whether PERTINACIA passive should be active.")
+                    .define("pertinaciaPassive", true);
+            BASE_BENEFICIAL_MULTIPLIER = BUILDER
+                    .worldRestart().comment("Percentage base time multiplier for beneficial effects.")
+                    .defineInRange("baseBeneficialMultiplier", 0.60, 0, 10);
+            ADD_BENEFICIAL = BUILDER
+                    .worldRestart().comment("Percentage addition to time multiplier for beneficial effects.")
+                    .defineInRange("addBeneficialMultiplier", 0.04, 0, 10);
+
+            BASE_HARMFUL_MULTIPLIER = BUILDER
+                    .worldRestart().comment("Percentage base time multiplier for harmful effects.")
+                    .defineInRange("baseHarmfulMultiplier", 1.40, 0, 10);
+            SUB_HARMFUL = BUILDER
+                    .worldRestart().comment("Percentage subtraction to time multiplier for harmful effects.")
+                    .defineInRange("addHarmfulMultiplier", 0.04, 0, 10);
+
+
 
         }
         BUILDER.pop();
@@ -315,122 +364,10 @@ public class ServerConfig {
     }
 
 
-    public static boolean lockedSpells;
-    public static boolean restrictedInsc;
-    public static boolean spellbookLevel;
-    public static int spellbookXPMultiplier;
-
-    public static List<Integer> dominanLvls;
-    public static int dominanPrinciples;
-
-    public static boolean fatigueSystem;
-    public static double fatigueMultiplier;
-    public static List<Double> fatigueSpellpowerMultipliers;
-    public static double fatigueManaRegen;
-
-    public static boolean principlesSYSTEM;
-    public static double basePower;
-    public static double baseAddition;
-    public static boolean subcategories;
-    public static int principlesXPMultiplier;
-
-    public static boolean concentratioActive;
-    public static int manaAdd;
-
-    public static boolean potentiaActive;
-    public static double baseAccuracy;
-    public static double addAccuracy;
-
-    public static boolean vitaleActive;
-    public static double crdAdd;
-
-    public static boolean expansioActive;
-    public static double aoeBaseRadius;
-    public static double aoeBaseAdd;
-
-    public static boolean apparitioActive;
-    public static double successTpAdd;
-
-    public static boolean repetitioActive;
-    public static double addChanceCast;
-
-    public static boolean perceptioActive;
-    public static double addRange;
-
-    public static boolean locusActive;
-    public static double percentageBaseRange;
-    public static double percentageAddRange;
-
-    public static boolean certumActive;
-    public static List<Double> fatigueManaAdditionMultipliers;
-    public static double manaDebuffReduction;
-
-    public static boolean remediumActive;
-    public static double baseFoodPts;
-    public static double subFoodPts;
-
-    public static double mobStarAlignment;
-    public static double starAlignmentMultiplier;
-
-    @SubscribeEvent
-    static void onLoad(final ModConfigEvent.Loading event) {
-
-        lockedSpells = UNIQUE_SPELLBOOKS.get();
-        restrictedInsc = RESTRICTED_INSCRIPTION.get();
-        spellbookLevel = SPELLBOOK_LEVELS.get();
-        spellbookXPMultiplier = XP_SPELLBOOK_MULTIPLIER.get();
-
-        dominanLvls = (List<Integer>) DOMINAN_LEVELS.get();
-        dominanPrinciples = DOMINAN_PRINCIPLES.get();
-
-        fatigueSystem = FATIGUE_SYSTEM.get();
-        fatigueMultiplier = FATIGUE_MULTIPLIER.get();
-        fatigueSpellpowerMultipliers = (List<Double>) FATIGUE_SPELLPOWER.get();
-        fatigueManaRegen = MANA_REGEN_DEBUFF.get();
-
-        principlesSYSTEM = PRINCIPLES_SYSTEM.get();
-        basePower = BASE_PRINCIPLE_POWER.get();
-        baseAddition = BASE_PRINCIPLE_ADD.get();
-        subcategories = SUBCATEGORIES_HALF.get();
-        principlesXPMultiplier = XP_PRINCIPLE_MULTIPLIER.get();
-        //
-            concentratioActive = ACTIVE_CONCENTRATIO.get();
-            manaAdd = ADD_MANA.get();
-
-            potentiaActive = ACTIVE_POTENTIA.get();
-            baseAccuracy = BASE_ACCURACY.get();
-            addAccuracy = ADD_ACCURACY.get();
-
-            vitaleActive = ACTIVE_VITALE.get();
-            crdAdd = COOLDOWN_REDUCTION_ADD.get();
-
-            expansioActive = ACTIVE_EXPANSIO.get();
-            aoeBaseRadius = BASE_RADIUS.get();
-            aoeBaseAdd = ADD_RADIUS.get();
-
-            apparitioActive = ACTIVE_APPARITIO.get();
-            successTpAdd = ADD_PERCENTAGE_CHANCE.get();
-
-            repetitioActive = ACTIVE_REPETITIO.get();
-            addChanceCast = ADD_SUCCESS_CHANCE.get();
-
-            perceptioActive = ACTIVE_PERCEPTIO.get();
-            addRange = ADD_DISTANCE.get();
-
-            locusActive = ACTIVE_LOCUS.get();
-            percentageBaseRange = BASE_PERCENTAGE_DISTANCE.get();
-            percentageAddRange = ADD_PERCENTAGE_DISTANCE.get();
-
-            certumActive = ACTIVE_CERTUM.get();
-            fatigueManaAdditionMultipliers = (List<Double>) MANA_ADD_FATIGUE.get();
-            manaDebuffReduction = MANA_REDUCTION_BUFF.get();
-
-            remediumActive = ACTIVE_REMEDIUM.get();
-            baseFoodPts = BASE_FOOD_PTS.get();
-            subFoodPts = SUB_FOOD_PTS.get();
-
-        mobStarAlignment = MOB_STAR_ALIGNMENT.get();
-        starAlignmentMultiplier = ALIGNMENT_MULTIPLIER.get();
-
-    }
+//    @SubscribeEvent
+//    static void onLoad(final ModConfigEvent.Loading event) {
+//
+//
+//
+//    }
 }

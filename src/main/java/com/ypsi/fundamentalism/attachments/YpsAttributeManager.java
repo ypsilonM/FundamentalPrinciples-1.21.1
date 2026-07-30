@@ -28,7 +28,7 @@ public class YpsAttributeManager {
             ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "fatigue_mana"),
             AttributeRegistry.MANA_REGEN,
             AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL,
-            fatigue -> -ServerConfig.fatigueManaRegen * fatigue
+            fatigue -> -ServerConfig.MANA_REGEN_DEBUFF.get() * fatigue
             //-0.15
     );
 

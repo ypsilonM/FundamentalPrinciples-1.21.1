@@ -23,6 +23,7 @@ public class ModBiomeModifiers {
     public static final ResourceKey<BiomeModifier> SPAWN_IMP = registerKey("spawn_imp");
     public static final ResourceKey<BiomeModifier> SPAWN_VENE = registerKey("spawn_venemerus");
     public static final ResourceKey<BiomeModifier> SPAWN_RUNEAR = registerKey("spawn_runear");
+    public static final ResourceKey<BiomeModifier> SPAWN_CHERRY_BIRD = registerKey("spawn_cherry_bird");
 
     public static void bootstrap(BootstrapContext<BiomeModifier> context){
         var placedFeatures = context.lookup(Registries.PLACED_FEATURE);
@@ -60,6 +61,13 @@ public class ModBiomeModifiers {
                    biomes.getOrThrow(Biomes.ICE_SPIKES)
            ),
                 List.of(new MobSpawnSettings.SpawnerData(ModEntities.RUNEAR.get(), 5, 1, 1))
+        ));
+
+        context.register(SPAWN_CHERRY_BIRD, new BiomeModifiers.AddSpawnsBiomeModifier(
+                HolderSet.direct(
+                        biomes.getOrThrow(Biomes.CHERRY_GROVE)
+                ),
+                List.of(new MobSpawnSettings.SpawnerData(ModEntities.CHERRY_BIRD.get(), 10, 1, 3))
         ));
 
 

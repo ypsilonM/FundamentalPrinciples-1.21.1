@@ -8,16 +8,15 @@
     "clientMixins.LifeGuiMixin",
     "clientMixins.ReinforcementMixin",
     "clientMixins.ScrollInfoMixin",
-    "clientMixins.SpellWheelOverlayMixin"
+    "clientMixins.SpellWheelOverlayMixin",
+    "clientMixins.ManaBarMixin"
 
   ],
   "mixins": [
 
     "ArcaneAnvilMixin",
     "InscriptionMixin",
-    "SpellBookMixin",
-    "SpellBookTooltipMixin",
-    "UniqueBookMixin",
+    
     "principlesMixins.PowerSpellsMixin",
     "principlesMixins.AoERadiusMixin",
     "principlesMixins.CertumManaMixin",

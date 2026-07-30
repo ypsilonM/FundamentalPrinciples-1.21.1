@@ -6,14 +6,19 @@ import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import io.redspace.ironsspellbooks.entity.mobs.abstract_spell_casting_mob.AbstractSpellCastingMob;
 import io.redspace.ironsspellbooks.entity.mobs.goals.PatrolNearLocationGoal;
 import io.redspace.ironsspellbooks.entity.mobs.goals.WarlockAttackGoal;
+import net.acetheeldritchking.aces_spell_utils.entity.mobs.UniqueAbstractMeleeCastingMob;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -40,30 +45,19 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class RunearEntity extends AbstractSpellCastingMob implements Enemy {
+public class RunearEntity extends UniqueAbstractMeleeCastingMob implements Enemy {
 
     public RunearEntity(EntityType<? extends AbstractSpellCastingMob> entityType, Level level) {
         super(entityType, level);
         xpReward = 60;
     }
 
-    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
-
-    private static final RawAnimation WALK_ANIM = RawAnimation.begin().thenLoop("anim.walking");
-    private static final RawAnimation RUN_ANIM = RawAnimation.begin().thenLoop("anim.running");
-    private static final RawAnimation IDLE_ANIM = RawAnimation.begin().thenLoop("anim.idle");
-    private static final RawAnimation SPELL_SMASH = RawAnimation.begin().thenPlay("anim.smash");
-    private static final RawAnimation SPELL_SLAM = RawAnimation.begin().thenPlay("anim.slam");
-    private static final RawAnimation ATTACK_1 = RawAnimation.begin().thenPlay("anim.attack");
-
-    private int meleeTimer = 0;
     private double originalMovementSpeed = -1;
     private boolean wasRooted = false;
-
+    private boolean heavyAttack = false;
 
     @Override
     protected void registerGoals() {
-//        super.registerGoals();
         this.goalSelector.addGoal(1, new FloatGoal(this));
         this.goalSelector.addGoal(2, new WarlockAttackGoal(this, 1.25, 80, 120)
                 .setSpells(
@@ -87,8 +81,6 @@ public class RunearEntity extends AbstractSpellCastingMob implements Enemy {
                 .add(Attributes.ARMOR, 20.0)
                 .add(Attributes.MOVEMENT_SPEED, 0.3)
                 .add(Attributes.ATTACK_DAMAGE, 15.0)
-                .add(AttributeRegistry.SPELL_RESIST, 2)
-                .add(AttributeRegistry.SPELL_POWER, 1.0)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 0.8)
                 .add(Attributes.FALL_DAMAGE_MULTIPLIER, 0.1)
                 .add(Attributes.WATER_MOVEMENT_EFFICIENCY, 2)
@@ -100,69 +92,9 @@ public class RunearEntity extends AbstractSpellCastingMob implements Enemy {
     }
 
     @Override
-    public boolean isInvertedHealAndHarm() {
-        return false;
-    }
-
-    @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "move_controller", 0, this::movePredicate));
-        controllers.add(new AnimationController<>(this, "stomp_controller", 2, this::castPredicate).triggerableAnim("anim.smash", SPELL_SMASH));
-        controllers.add(new AnimationController<>(this, "slam_controller", 2, this::castPredicate).triggerableAnim("anim.slam", SPELL_SLAM));
-        controllers.add(new AnimationController<>(this, "melee_controller", 0, this::meleePredicate).triggerableAnim("anim.attack", ATTACK_1));
-
-    }
-
-    private <E extends GeoAnimatable> PlayState movePredicate(AnimationState<E> event) {
-        boolean isCastingRootSpell = false;
-        if (isCasting()) {
-            AbstractSpell castingSpell = getMagicData().getCastingSpell() != null
-                    ? getMagicData().getCastingSpell().getSpell() : null;
-
-            isCastingRootSpell = (
-                        castingSpell == SpellRegistry.STOMP_SPELL.get() ||
-                        castingSpell == SpellRegistry.EARTHQUAKE_SPELL.get()
-            );
-        }
-
-        if (isCastingRootSpell && this.meleeTimer > 0) {
-            return PlayState.STOP;
-        }
-        if (event.isMoving()) {
-            boolean isChasing = this.getTarget()!=null && this.getTarget().isAlive();
-            event.getController().setAnimation(isChasing ? RUN_ANIM : WALK_ANIM);
-        } else {
-            event.getController().setAnimation(IDLE_ANIM);
-        }
-        return PlayState.CONTINUE;
-    }
-
-    private <E extends GeoAnimatable> PlayState castPredicate(AnimationState<E> event) {
-        return isCasting()? PlayState.CONTINUE: PlayState.STOP;
-    }
-
-    private <E extends GeoAnimatable> PlayState meleePredicate(AnimationState<E> event) {
-        return this.meleeTimer > 0 ? PlayState.CONTINUE : PlayState.STOP;
-    }
-
-    @Override
-    public void initiateCastSpell(AbstractSpell spell, int spellLevel) {
-        super.initiateCastSpell(spell, spellLevel);
-
-        if(spell == SpellRegistry.STOMP_SPELL.get()) {
-            this.triggerAnim("stomp_controller", "anim.smash");
-        }else if(spell == SpellRegistry.EARTHQUAKE_SPELL.get()) {
-            this.triggerAnim("slam_controller", "anim.slam");
-        }
-    }
-
-    @Override
     public void tick() {
         super.tick();
 
-        if (this.meleeTimer > 0) {
-            this.meleeTimer--;
-        }
 
         boolean shouldBeRooted = false;
         if (isCasting()) {
@@ -176,14 +108,12 @@ public class RunearEntity extends AbstractSpellCastingMob implements Enemy {
         }
 
         if (shouldBeRooted && !wasRooted) {
-            // Entering rooted state: store original speed and immobilise
             originalMovementSpeed = this.getAttributeBaseValue(Attributes.MOVEMENT_SPEED);
             this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0);
             this.setNoGravity(true);
             wasRooted = true;
         }
         else if (!shouldBeRooted && wasRooted) {
-            // Exiting rooted state: restore speed and gravity
             if (originalMovementSpeed != -1) {
                 this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(originalMovementSpeed);
             }
@@ -192,6 +122,22 @@ public class RunearEntity extends AbstractSpellCastingMob implements Enemy {
             originalMovementSpeed = -1;
         }
     }
+
+//    public boolean doHurtTarget(Entity target) {
+//        boolean attacked = super.doHurtTarget(target);
+//        if (attacked && target instanceof LivingEntity livingTarget) {
+//            if (this.heavyAttack) {
+//                this.heavyAttack = false;
+//
+//                double knockbackStrength = 5.5;
+//                double dx = this.getX() - target.getX();
+//                double dz = this.getZ() - target.getZ();
+//                livingTarget.knockback(knockbackStrength, dx, dz);
+//                livingTarget.hurt(this.damageSources().mobAttack(this), 4.0F);
+//            }
+//        }
+//        return attacked;
+//    }
 
     @Override
     public void aiStep() {
@@ -227,27 +173,58 @@ public class RunearEntity extends AbstractSpellCastingMob implements Enemy {
                 block.getName().toString().contains(("log"));
     }
 
-    public void triggerMeleeAttack(){
-        this.meleeTimer = 15;
-        this.triggerAnim("melee_controller", "anim.attack");
-    }
 
+    private static final RawAnimation WALK_ANIM = RawAnimation.begin().thenLoop("anim.walking");
+    private static final RawAnimation RUN_ANIM = RawAnimation.begin().thenLoop("anim.running");
+    private static final RawAnimation IDLE_ANIM = RawAnimation.begin().thenLoop("anim.idle");
+    private static final RawAnimation SPELL_SMASH = RawAnimation.begin().thenPlay("anim.smash");
+    private static final RawAnimation SPELL_SLAM = RawAnimation.begin().thenPlay("anim.slam");
+    //private static final RawAnimation ATTACK_1 = RawAnimation.begin().thenPlay("anim.attack");
+
+    @Override
+    protected PlayState predicate(AnimationState event) {
+        if (isAnimating()) {
+            return PlayState.STOP;
+        }
+        if (event.isMoving()) {
+            if(this.getTarget() != null) {
+                event.getController().setAnimation(RUN_ANIM);
+            }else{
+                event.getController().setAnimation(WALK_ANIM);
+            }
+        } else {
+            event.getController().setAnimation(IDLE_ANIM);
+        }
+        return PlayState.CONTINUE;
+    }
 
 
     @Override
     public void swing(InteractionHand hand) {
         super.swing(hand);
-        this.triggerMeleeAttack();
+        this.playAnimation("anim.attack");
+
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder pBuilder) {
-        super.defineSynchedData(pBuilder);
-    }
+    protected void setStartAnimationFromSpell(AnimationController controller, AbstractSpell spell) {
+        if (spell == SpellRegistry.STOMP_SPELL.get()) {
+            controller.forceAnimationReset();
+            controller.setAnimation(SPELL_SMASH);
+            lastCastSpellType = spell;
+            cancelCastAnimation = false;
+            animatingLegs = false;
+            return;
+        } else if (spell == SpellRegistry.EARTHQUAKE_SPELL.get()) {
+            controller.forceAnimationReset();
+            controller.setAnimation(SPELL_SLAM);
+            lastCastSpellType = spell;
+            cancelCastAnimation = false;
+            animatingLegs = false;
+            return;
+        }
 
-    @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return this.cache;
+        super.setStartAnimationFromSpell(controller, spell);
     }
 
     @Override

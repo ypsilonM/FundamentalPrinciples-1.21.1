@@ -30,6 +30,7 @@ public class ModItemModelProvider extends ItemModelProvider {
         withExistingParent(ModItems.IMP_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
         withExistingParent(ModItems.VENEMERUS_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
         withExistingParent(ModItems.RUNEAR_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
+        withExistingParent(ModItems.CHERRY_BIRD_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
 
         registerCustomSwordModel();
 

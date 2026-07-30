@@ -17,6 +17,8 @@ public class YpTriggers {
 
     public static final Supplier<PrinciplesLevelTrigger> PRINCIPLES_LEVEL_TRIGGER_SUPPLIER =
             TRIGGERS.register("principles_trigger_level", PrinciplesLevelTrigger::new);
+    public static final Supplier<TecnhiqueTrigger> TECHNIQUES_TRIGGER_SUPPLIER =
+            TRIGGERS.register("technique_trigger", TecnhiqueTrigger::new);
 
     public static void register(IEventBus bus){
         TRIGGERS.register(bus);

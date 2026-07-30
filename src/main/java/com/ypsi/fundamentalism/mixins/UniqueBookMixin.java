@@ -25,24 +25,28 @@ public abstract class UniqueBookMixin {
 
     @Inject(method = "initializeSpellContainer", at = @At("HEAD"), cancellable = true, remap = false)
     private void ypsInitializeSpellContainer(ItemStack itemStack, CallbackInfo ci) {
-        if (itemStack == null) {
-            return;
-        }
-        SpellBookComponentHelper.ensureSpellBookComponents(itemStack);
-        if (!ISpellContainer.isSpellContainer(itemStack)) {
-            if(ServerConfig.spellbookLevel) {
-                var spellContainer = ISpellContainer.create(4, true, true).mutableCopy();
-                getSpells().forEach(spellSlot -> spellContainer.addSpell(spellSlot.getSpell(), spellSlot.getLevel(), ServerConfig.lockedSpells));
-                SpellBook spellBook = (SpellBook) (Object) this;
-                itemStack.set(YpsDataComponents.YP_SPELL_SLOTS.get(), spellBook.getMaxSpellSlots());
-                itemStack.set(ComponentRegistry.SPELL_CONTAINER, spellContainer.toImmutable());
-            }else{
-                SpellBook spellBook = (SpellBook) (Object) this;
-                var spellContainer = ISpellContainer.create(spellBook.getMaxSpellSlots(), true, true).mutableCopy();
-                getSpells().forEach(spellSlot -> spellContainer.addSpell(spellSlot.getSpell(), spellSlot.getLevel(), ServerConfig.lockedSpells));
-                itemStack.set(ComponentRegistry.SPELL_CONTAINER, spellContainer.toImmutable());
-            }
-        }
-        ci.cancel();
+//        if (itemStack == null) {
+//            return;
+//        }
+//        SpellBookComponentHelper.ensureSpellBookComponents(itemStack);
+//        if (!ISpellContainer.isSpellContainer(itemStack)) {
+//            if(ServerConfig.spellbookLevel) {
+//
+//                var spellContainer = ISpellContainer.create(4, true, true).mutableCopy();
+//                getSpells().forEach(spellSlot -> spellContainer.addSpell(spellSlot.getSpell(), spellSlot.getLevel(), ServerConfig.lockedSpells));
+//                SpellBook spellBook = (SpellBook) (Object) this;
+//                itemStack.set(YpsDataComponents.YP_SPELL_SLOTS.get(), spellBook.getMaxSpellSlots());
+//                itemStack.set(ComponentRegistry.SPELL_CONTAINER, spellContainer.toImmutable());
+//
+//            }else{
+//
+//                SpellBook spellBook = (SpellBook) (Object) this;
+//                var spellContainer = ISpellContainer.create(spellBook.getMaxSpellSlots(), true, true).mutableCopy();
+//                getSpells().forEach(spellSlot -> spellContainer.addSpell(spellSlot.getSpell(), spellSlot.getLevel(), ServerConfig.lockedSpells));
+//                itemStack.set(ComponentRegistry.SPELL_CONTAINER, spellContainer.toImmutable());
+//
+//            }
+//        }
+//        ci.cancel();
     }
 }

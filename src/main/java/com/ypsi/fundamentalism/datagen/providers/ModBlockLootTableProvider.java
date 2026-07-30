@@ -26,6 +26,7 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
 
     @Override
     protected void generate() {
+        add(YpsBlocks.DOMAIN_BLOCK.get(), noDrop());
 //        dropSelf(YpsBlocks.MAGIC_BLOCK.get());
 //        add(YpsBlocks.MANA_ORE.get(),
 //                block -> createOreDrop(YpsBlocks.MANA_ORE.get(), ModItems.PURE_ORB.get()));

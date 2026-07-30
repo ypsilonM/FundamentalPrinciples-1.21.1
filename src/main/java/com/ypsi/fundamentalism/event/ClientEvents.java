@@ -1,21 +1,30 @@
 package com.ypsi.fundamentalism.event;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.ypsi.fundamentalism.ClientConfig;
 import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.attachments.FatigueManager;
 import com.ypsi.fundamentalism.entity.spells.sacredDisk.SacredDiskRenderer;
 import com.ypsi.fundamentalism.entity.spells.thorn.ThornRenderer;
+import com.ypsi.fundamentalism.gui.PrincipleLevelUpToast;
 import com.ypsi.fundamentalism.gui.PrinciplesScreen;
 import com.ypsi.fundamentalism.gui.TierWheelOverlay;
 import com.ypsi.fundamentalism.item.ModFluids;
 import com.ypsi.fundamentalism.keybind.KeyState;
 import com.ypsi.fundamentalism.keybind.ModKeyBinds;
+import com.ypsi.fundamentalism.network.packets.ClientToastPacket;
 import com.ypsi.fundamentalism.network.packets.ToggleReinforcementPacket;
 import com.ypsi.fundamentalism.render.ChargeSpellVisuals;
 import com.ypsi.fundamentalism.render.ReinforcementLayer;
+import io.redspace.ironsspellbooks.IronsSpellbooks;
+import io.redspace.ironsspellbooks.api.registry.AttributeRegistry;
 import io.redspace.ironsspellbooks.api.spells.SpellAnimations;
+import io.redspace.ironsspellbooks.config.ClientConfigs;
 import io.redspace.ironsspellbooks.fluids.SimpleClientFluidType;
+import io.redspace.ironsspellbooks.gui.overlays.ManaBarOverlay;
+import io.redspace.ironsspellbooks.player.ClientMagicData;
 import io.redspace.ironsspellbooks.player.ClientSpellCastHelper;
 import io.redspace.ironsspellbooks.render.animation.AnimationHelper;
 import net.minecraft.client.KeyMapping;
@@ -32,11 +41,17 @@ import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
+import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
+import top.theillusivec4.curios.api.CuriosTooltip;
+
 import java.util.ArrayList;
+
+import static com.ypsi.fundamentalism.util.Util.getExhaustionColor;
 import static com.ypsi.fundamentalism.util.Util.getMaxFatigue;
 
 
@@ -46,8 +61,24 @@ public class ClientEvents {
         //Eventos MOD
 
         @SubscribeEvent
+        public static void onClientSetup(FMLClientSetupEvent event){
+            event.enqueueWork(() -> {
+                ClientToastPacket.toastAction = (player, packet) -> {
+                    Minecraft.getInstance().getToasts().addToast(
+                            new PrincipleLevelUpToast(packet.category(), packet.newLevel())
+                    );
+                };
+            });
+        }
+
+
+
+        @SubscribeEvent
         public static void registerOverlays(RegisterGuiLayersEvent event) {
-            event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "levels_wheel"), TierWheelOverlay.instance);
+            event.registerAboveAll(
+                    ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "levels_wheel"),
+                    TierWheelOverlay.instance
+            );
 
             event.registerAbove(
                     VanillaGuiLayers.HOTBAR,
@@ -64,120 +95,65 @@ public class ClientEvents {
                         int hotbarCenterX = screenWidth / 2;
                         int hotbarRightEdge = hotbarCenterX + 91;
 
-                        int x = hotbarRightEdge + 20;
-                        int y = screenHeight - 25;
+                        int offsetX = ClientConfig.XOFFSET.get();
+                        int offsetY = ClientConfig.YOFFSET.get();
+
+                        int x = hotbarRightEdge + 10 + offsetX;
+                        int y = screenHeight - 20 + offsetY;
+
 
                         renderBottleExhaustionBar(guiGraphics, x, y, exhaustion, exhaustionLvl, player);
                     }
             );
         }
 
+
         private static void renderBottleExhaustionBar(GuiGraphics gui, int x, int y, int exhaustion, int exhaustionLvl, Player player) {
             int maxEx = getMaxFatigue(exhaustionLvl, player);
-            float progress = Math.min(1.0f, exhaustion / (float)maxEx);
+            renderExhaustionCounter(gui, x, y, exhaustion, exhaustionLvl ,maxEx );
+//            renderExhaustionLevel(gui, x, y, exhaustionLvl, BOTTLE_HEIGHT, BOTTLE_WIDTH);
 
-            ResourceLocation EMPTY_BOTTLE_TEXTURE = ResourceLocation.fromNamespaceAndPath(
-                    FundamentalPrinciples.MOD_ID, "textures/gui/empty_bottle.png"
-            );
-
-            ResourceLocation LIQUID_TEXTURE = switch (exhaustionLvl) {
-              case 4 -> ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "textures/gui/exhaustion/lvl4.png");
-              case 3 -> ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "textures/gui/exhaustion/lvl3.png");
-              case 2 -> ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "textures/gui/exhaustion/lvl2.png");
-              case 1 -> ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "textures/gui/exhaustion/lvl1.png");
-              default -> ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "textures/gui/exhaustion/lvl0.png");
-            };
-
-            int size = 16;
-
-            gui.blit(EMPTY_BOTTLE_TEXTURE, x, y - size, 0, 0, size, size, size, size);
-
-            if (progress > 0) {
-                int fillHeight = (int) (size * progress);
-                int textureV = getLiquidTextureV(progress);
-
-                gui.blit(LIQUID_TEXTURE,
-                        x, y - fillHeight,
-                        0, textureV + (size - fillHeight),
-                        size, fillHeight,
-                        size, size);
-            }
-            renderExhaustionCounter(gui, x, y, exhaustion, exhaustionLvl ,maxEx , size);
-            renderExhaustionLevel(gui, x, y, exhaustionLvl, size);
         }
-        private static void renderExhaustionCounter(GuiGraphics gui, int bottleX, int bottleY, int exhaustion, int exhaustionLvl, int maxEx,int size) {
+        private static void renderExhaustionCounter(GuiGraphics gui, int bottleX, int bottleY, int exhaustion, int exhaustionLvl, int maxEx) {
             Minecraft minecraft = Minecraft.getInstance();
             Font font = minecraft.font;
 
-            String exhaustionText = String.valueOf(exhaustion);
-            exhaustionText+="/"+maxEx;
-            int exhaustionX = bottleX + size - 4;
+            String exhaustionText = "["+(exhaustion);
+            exhaustionText+="/"+maxEx+"]";
+            int exhaustionX = bottleX ;
             int exhaustionY = bottleY + 2;
 
             PoseStack poseStack = gui.pose();
 
             poseStack.pushPose();
-            poseStack.scale(0.8f, 0.8f, 0.8f);
 
-            int scaledExhaustionX = (int) (exhaustionX / 0.8f);
-            int scaledExhaustionY = (int) (exhaustionY / 0.8f);
+            int exhaustionColor = getExhaustionColor(exhaustionLvl);
 
-            int exhaustionColor = getExhaustionTextColor(exhaustionLvl);
-            int shadowColor = getExhaustionShadowColor(exhaustionLvl);
-
-            gui.drawString(font, exhaustionText, scaledExhaustionX + 1, scaledExhaustionY + 1, shadowColor, false);
-            gui.drawString(font, exhaustionText, scaledExhaustionX, scaledExhaustionY, exhaustionColor, false);
+            gui.drawString(font, exhaustionText, (exhaustionX), (exhaustionY), exhaustionColor, true);
             poseStack.popPose();
         }
-        private static void renderExhaustionLevel(GuiGraphics gui, int bottleX, int bottleY, int exhaustionLvl, int size) {
+        private static void renderExhaustionLevel(GuiGraphics gui, int bottleX, int bottleY, int exhaustionLvl, int height, int width) {
             Minecraft minecraft = Minecraft.getInstance();
             Font font = minecraft.font;
 
             String levelText = String.valueOf(exhaustionLvl);
-            int levelX = bottleX - 2;
-            int levelY = bottleY - size - 2;
+            int levelX = bottleX + (width/2)-2;
+            int levelY = bottleY - height + 4;
 
             PoseStack poseStack = gui.pose();
 
             poseStack.pushPose();
-            poseStack.scale(0.8f, 0.8f, 0.8f);
+            int scaledLevelX = (int) (levelX);
+            int scaledLevelY = (int) (levelY);
 
-            int scaledLevelX = (int) (levelX / 0.8f);
-            int scaledLevelY = (int) (levelY / 0.8f);
+            int levelColor = getExhaustionColor(exhaustionLvl);
 
-            int levelColor = getExhaustionTextColor(exhaustionLvl);
-            int shadowColor = getExhaustionShadowColor(exhaustionLvl);
-
-            gui.drawString(font, levelText, scaledLevelX + 1, scaledLevelY + 1, shadowColor, false);
             gui.drawString(font, levelText, scaledLevelX, scaledLevelY, levelColor, false);
 
             poseStack.popPose();
         }
 
-        private static int getExhaustionTextColor(int exhaustionLevel) {
-            return switch (exhaustionLevel){
-                case 4 -> 0xFF3366; // Rojo vibrante
-                case 3 -> 0xCC33CC; // Púrpura brillante
-                case 2 -> 0x3366FF; // Azul brillante
-                case 1 -> 0x3399FF; // Azul cielo
-                default -> 0x33CCCC; // Turquesa
-            };
-        }
-        private static int getExhaustionShadowColor(int exhaustionLevel) {
-            return switch (exhaustionLevel){
-                case 4 -> 0x660022; // Sombra rojo más oscuro
-                case 3 -> 0x660066; // Sombra púrpura más oscuro
-                case 2 -> 0x001188; // Sombra azul más oscuro
-                case 1 -> 0x004488; // Sombra azul medio más oscuro
-                default -> 0x004444; // Sombra verde azulado más oscuro
-            };
-        }
-        private static int getLiquidTextureV(float progress) {
-            if (progress < 0.25f) return 0;
-            if (progress < 0.5f) return 16;
-            if (progress < 0.75f) return 32;
-            return 48;
-        }
+
 
         @SubscribeEvent
         public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
@@ -196,6 +172,8 @@ public class ClientEvents {
             addReinforcementLayerToRenderer(event, PlayerSkin.Model.WIDE);
             addReinforcementLayerToRenderer(event, PlayerSkin.Model.SLIM);
         }
+
+
 
         private static void addReinforcementLayerToRenderer(EntityRenderersEvent.AddLayers event, PlayerSkin.Model modelType) {
             EntityRenderer<? extends Player> renderer = event.getSkin(modelType);

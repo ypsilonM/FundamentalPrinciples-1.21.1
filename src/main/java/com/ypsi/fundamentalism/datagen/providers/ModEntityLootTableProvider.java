@@ -8,6 +8,8 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.data.loot.EntityLootSubProvider;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.flag.FeatureFlags;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -17,6 +19,7 @@ import net.minecraft.world.level.storage.loot.predicates.LootItemKilledByPlayerC
 import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
+import net.neoforged.fml.common.Mod;
 
 import java.util.Set;
 import java.util.stream.Stream;
@@ -50,8 +53,14 @@ public class ModEntityLootTableProvider extends EntityLootSubProvider {
         add(ModEntities.RUNEAR.get(),
                 LootTable.lootTable()
                         .withPool(createRunePool(3))
-
                         .withPool(createArcanePool(35, 45, 0.7F, 10, 12))
+
+                        .withPool(createFurPool(1))
+        );
+        add(ModEntities.CHERRY_BIRD.get(),
+                LootTable.lootTable()
+                        .withPool(createItemPool(1,2, Items.FEATHER))
+                        .withPool(createItemPool(2,4, Items.PINK_PETALS))
         );
 
     }
@@ -68,6 +77,20 @@ public class ModEntityLootTableProvider extends EntityLootSubProvider {
                         .when(LootItemKilledByPlayerCondition.killedByPlayer())
                 );
     }
+    protected LootPool.Builder createItemPool(int min, int max, Item item) {
+        return LootPool.lootPool()
+                .setRolls(ConstantValue.exactly(1))
+                .add(LootItem.lootTableItem(item)
+                        .apply(SetItemCountFunction.setCount(
+                                UniformGenerator.between(min, max)
+                        ))
+                        .apply(EnchantedCountIncreaseFunction.lootingMultiplier(
+                                this.registries, UniformGenerator.between(0,1)))
+                        .when(LootItemKilledByPlayerCondition.killedByPlayer())
+                );
+    }
+
+
     protected LootPool.Builder createSpiderEyePool(int min, int max) {
         return LootPool.lootPool()
                 .setRolls(ConstantValue.exactly(1))
@@ -130,7 +153,8 @@ public class ModEntityLootTableProvider extends EntityLootSubProvider {
                 ModEntities.HEMOMANCER.get(),
                 ModEntities.IMP.get(),
                 ModEntities.VENEMERUS.get(),
-                ModEntities.RUNEAR.get()
+                ModEntities.RUNEAR.get(),
+                ModEntities.CHERRY_BIRD.get()
         );
 
         return ModEntities.ENTITY_TYPES.getEntries().stream()

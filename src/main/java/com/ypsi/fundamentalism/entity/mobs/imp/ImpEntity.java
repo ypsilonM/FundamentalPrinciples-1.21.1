@@ -1,20 +1,13 @@
 package com.ypsi.fundamentalism.entity.mobs.imp;
 
-import com.ypsi.fundamentalism.spells.ModSpells;
 import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
-import io.redspace.ironsspellbooks.capabilities.magic.MagicManager;
 import io.redspace.ironsspellbooks.entity.mobs.abstract_spell_casting_mob.AbstractSpellCastingMob;
 import io.redspace.ironsspellbooks.entity.mobs.goals.PatrolNearLocationGoal;
-import io.redspace.ironsspellbooks.entity.mobs.goals.SpellBarrageGoal;
 import io.redspace.ironsspellbooks.entity.mobs.goals.WizardAttackGoal;
-import io.redspace.ironsspellbooks.entity.mobs.goals.WizardRecoverGoal;
-import io.redspace.ironsspellbooks.registries.ParticleRegistry;
-import net.minecraft.core.BlockPos;
-import net.minecraft.network.syncher.SynchedEntityData;
+import net.acetheeldritchking.aces_spell_utils.entity.mobs.UniqueAbstractSpellCastingMob;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -27,39 +20,30 @@ import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.attachment.AttachmentType;
-import software.bernie.geckolib.animatable.GeoAnimatable;
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animation.*;
-import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.List;
 
 
-public class ImpEntity extends AbstractSpellCastingMob implements Enemy {
+public class ImpEntity extends UniqueAbstractSpellCastingMob implements Enemy {
 
     public ImpEntity(EntityType<? extends AbstractSpellCastingMob> entityType, Level level) {
         super(entityType, level);
         xpReward = 8;
     }
 
-    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
-    private static final RawAnimation WALK_ANIM = RawAnimation.begin().thenLoop("animation.imp.walk");
-    private static final RawAnimation IDLE_ANIM = RawAnimation.begin().thenLoop("animation.imp.idle");
-    private static final RawAnimation FIREBOLT_ANIM = RawAnimation.begin().thenPlay("animation.imp.firebolt");
-    private static final RawAnimation FIREBALL_ANIM = RawAnimation.begin().thenPlay("animation.imp.fireball");
-
 
     @Override
     protected void registerGoals() {
 //        super.registerGoals();
         this.goalSelector.addGoal(1, new FloatGoal(this));
+
         this.goalSelector.addGoal(2, new WizardAttackGoal(this, 1.25f, 50, 75)
                 .setSpells(
-                        List.of(SpellRegistry.FIREBOLT_SPELL.get(), SpellRegistry.FIREBALL_SPELL.get()),
+                        List.of(SpellRegistry.FIREBOLT_SPELL.get(), SpellRegistry.FIREBOLT_SPELL.get(), SpellRegistry.FIREBOLT_SPELL.get(), SpellRegistry.FIREBALL_SPELL.get()),
                         List.of(),
-                        List.of(),
+                        List.of(SpellRegistry.BURNING_DASH_SPELL.get(), SpellRegistry.BURNING_DASH_SPELL.get(), SpellRegistry.BURNING_DASH_SPELL.get(), SpellRegistry.FLAMING_STRIKE_SPELL.get()),
                         List.of()
                 ));
         this.goalSelector.addGoal(3, new PatrolNearLocationGoal(this, 30, .75f));
@@ -75,63 +59,71 @@ public class ImpEntity extends AbstractSpellCastingMob implements Enemy {
                 .add(Attributes.MOVEMENT_SPEED, 0.3)
                 .add(Attributes.ARMOR, 5.0)
                 .add(Attributes.ATTACK_DAMAGE, 5.0)
-                .add(Attributes.FOLLOW_RANGE, 25.0);
+                .add(Attributes.FOLLOW_RANGE, 25.0)
+                .add(Attributes.FALL_DAMAGE_MULTIPLIER, 0.1)
+                ;
     }
 
-    @Override
-    public void initiateCastSpell(AbstractSpell spell, int spellLevel) {
-        super.initiateCastSpell(spell, spellLevel);
-
-        if (spell == SpellRegistry.FIREBOLT_SPELL.get()) {
-            this.triggerAnim("firebolt_controller","fireboltCast");
-        }else if(spell == SpellRegistry.FIREBALL_SPELL.get()){
-            this.triggerAnim("fireball_controller","fireballCast");
-        }else if(spell == ModSpells.TAUNT.get()){
-            this.triggerAnim("fireball_controller","fireballCast");
-        }
-    }
 
     @Override
     public void tick() {
         super.tick();
     }
 
-    @Override
-    protected void defineSynchedData(SynchedEntityData.Builder pBuilder) {
-        super.defineSynchedData(pBuilder);
-    }
+    private static final RawAnimation WALK_ANIM = RawAnimation.begin().thenLoop("animation.imp.walk");
+    private static final RawAnimation IDLE_ANIM = RawAnimation.begin().thenLoop("animation.imp.idle");
+    private static final RawAnimation FIREBOLT_ANIM = RawAnimation.begin().thenPlay("animation.imp.firebolt");
+    private static final RawAnimation FIREBALL_ANIM = RawAnimation.begin().thenPlay("animation.imp.fireball");
+    private static final RawAnimation SLASH_ANIM = RawAnimation.begin().thenPlay("animation.imp.slash");
+
+
 
     @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "move_controller", 5, this::movePredicate));
-        controllers.add(new AnimationController<>(this, "firebolt_controller", 1, this::castPredicate).triggerableAnim("fireboltCast", FIREBOLT_ANIM));
-        controllers.add(new AnimationController<>(this, "fireball_controller", 2, this::castPredicate).triggerableAnim("fireballCast", FIREBALL_ANIM));
-    }
-
-    private <E extends GeoAnimatable> PlayState movePredicate(AnimationState<E> event) {
-        if (isCasting()) {
+    protected PlayState predicate(AnimationState event) {
+        if (isAnimating()) {
             return PlayState.STOP;
         }
         if (event.isMoving()) {
             event.getController().setAnimation(WALK_ANIM);
+            return PlayState.CONTINUE;
         } else {
             event.getController().setAnimation(IDLE_ANIM);
+            return PlayState.CONTINUE;
         }
-        return PlayState.CONTINUE;
-    }
-
-    private <E extends GeoAnimatable> PlayState castPredicate(AnimationState<E> event) {
-        return isCasting() ? PlayState.CONTINUE:PlayState.STOP;
     }
 
     @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return this.cache;
+    protected void setStartAnimationFromSpell(AnimationController controller, AbstractSpell spell) {
+
+        if(spell == SpellRegistry.FIREBOLT_SPELL.get()){
+            controller.forceAnimationReset();
+            controller.setAnimation(FIREBOLT_ANIM);
+            lastCastSpellType = spell;
+            cancelCastAnimation = false;
+            animatingLegs = false;
+            return;
+        }else if(spell == SpellRegistry.FIREBALL_SPELL.get()){
+            controller.forceAnimationReset();
+            controller.setAnimation(FIREBALL_ANIM);
+            lastCastSpellType = spell;
+            cancelCastAnimation = false;
+            animatingLegs = false;
+            return;
+        }else if(spell == SpellRegistry.FLAMING_STRIKE_SPELL.get()) {
+            controller.forceAnimationReset();
+            controller.setAnimation(SLASH_ANIM);
+            lastCastSpellType = spell;
+            cancelCastAnimation = false;
+            animatingLegs = false;
+            return;
+        }
+
+        super.setStartAnimationFromSpell(controller, spell);
     }
 
     @Override
-    protected void playStepSound(BlockPos pos, BlockState state) {
-        this.playSound(SoundEvents.VEX_AMBIENT, 0.5F,1);
+    protected @Nullable SoundEvent getAmbientSound() {
+        return SoundEvents.VEX_AMBIENT;
     }
 
     @Override

@@ -1,18 +1,24 @@
 package com.ypsi.fundamentalism.util;
 
 import com.ypsi.fundamentalism.ServerConfig;
+import com.ypsi.fundamentalism.attachments.PrinciplesProgressionManager;
 import com.ypsi.fundamentalism.attributes.YpsAttributes;
 import com.ypsi.fundamentalism.spells.YpsSchoolRegistry;
+import io.redspace.ironsspellbooks.api.config.SpellConfigManager;
+import io.redspace.ironsspellbooks.api.config.SpellConfigParameter;
+import io.redspace.ironsspellbooks.api.registry.AttributeRegistry;
 import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
 import io.redspace.ironsspellbooks.api.spells.SchoolType;
 import io.redspace.ironsspellbooks.api.spells.SpellData;
 import io.redspace.ironsspellbooks.api.util.Utils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import org.joml.Vector3f;
 
+import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -114,6 +120,23 @@ public class Util {
                 .max()
                 .orElse(1);
     }
+
+    public static int getExhaustionColor(int exhaustionLevel) {
+        return switch (exhaustionLevel){
+            case 4 -> 0xE00B2D; // Red
+            case 3 -> 0xF23DE4; // Pink
+            case 2 -> 0x9B1EFA; // Purple
+            case 1 -> 0x365DF7; // Deep blue
+            default -> 0x00B7EC; // Blue
+        };
+    }
+    public static float[] getExhaustionColors(int color) {
+        int red   = (color >>> 16) & 0xFF;
+        int green = (color >>> 8)  & 0xFF;
+        int blue  = color & 0xFF;
+        return new float[]{red, green, blue, 1};
+    }
+
     //Principles leveling
     public static int getXpForPrincipleLevel(int level) {
         return (int) (20+20*(Math.pow(1.3, level)));
@@ -185,18 +208,22 @@ public class Util {
     }
     //PERTINACIA
     public static double beneficialPertinaciaMultiplier(int level){
-        return 0.6 + (0.04*level);
+        return ServerConfig.BASE_BENEFICIAL_MULTIPLIER.get() + (ServerConfig.ADD_BENEFICIAL.get()*level);
     }
     public static double harmfulPertinaciaMultiplier(int level){
-        return 1.4 - (0.04*level);
+        return ServerConfig.BASE_HARMFUL_MULTIPLIER.get() - (ServerConfig.SUB_HARMFUL.get()*level);
     }
     //AUGERE
     public static float getAdditionalWeaponDamage(int level){
-        return (float) level/2;
+        return (float) (ServerConfig.ADD_DAMAGE.get()*level);
     }
     //MOTUS
     public static float getAdditionalCastingMovespeed(int level){
-        return level * 0.05f;
+        if(ServerConfig.ACTIVE_MOTUS.get() && ServerConfig.PRINCIPLES_SYSTEM.get()) {
+            return (float) (level * ServerConfig.ADD_MOVESPEED.get());
+        }else{
+            return 0;
+        }
     }
 
 
@@ -218,6 +245,39 @@ public class Util {
     public static double getPureSubEntityModificator(int level){
         int divider = ServerConfig.SUBCATEGORIES_HALF.get() ? 2:1;
         return (ServerConfig.BASE_PRINCIPLE_POWER.get()/divider) + ((ServerConfig.BASE_PRINCIPLE_ADD.get()/divider)*level);
+    }
+
+
+    //DOMAINS
+
+    public static float getRefinementMultiplier(LivingEntity livingEntity, float spellPower){
+        if(livingEntity instanceof Player player) {
+            int concentratioLvl = PrinciplesProgressionManager.getCategoryLevel(player, Principles.CONCENTRATIO);
+            int perceptioLvl = PrinciplesProgressionManager.getCategoryLevel(player, Principles.PERCEPTIO);
+            int locusLvl = PrinciplesProgressionManager.getCategoryLevel(player, Principles.LOCUS);
+            int apparitioLvl = PrinciplesProgressionManager.getCategoryLevel(player, Principles.APPARITIO);
+
+            float concentratioAdd = ((spellPower * 0.65f) / 20) * concentratioLvl;
+            float locusAdd = ((spellPower * 0.25f) / 20) * locusLvl;
+            float perceptioAdd = ((spellPower * 0.25f) / 20) * perceptioLvl;
+            float apparitioAdd = ((spellPower * 0.30f) / 20) * apparitioLvl;
+
+            return concentratioAdd + locusAdd + perceptioAdd + apparitioAdd;
+        }
+        return 1;
+    }
+
+    public static float getAdaptativeSpellPower(@Nullable Entity sourceEntity, SchoolType schoolType) {
+
+        double entitySpellPowerModifier = 1;
+        double entitySchoolPowerModifier = 1;
+
+        if (sourceEntity instanceof LivingEntity livingEntity) {
+            entitySpellPowerModifier = (float) livingEntity.getAttributeValue(AttributeRegistry.SPELL_POWER);
+            entitySchoolPowerModifier = schoolType.getPowerFor(livingEntity);
+        }
+
+        return (float) (entitySpellPowerModifier * entitySchoolPowerModifier);
     }
 
 

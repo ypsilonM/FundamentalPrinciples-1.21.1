@@ -12,10 +12,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
+import java.util.function.BiConsumer;
+
 public record ClientToastPacket(int playerId, String category, int newLevel) implements CustomPacketPayload {
     public static final Type<ClientToastPacket> TYPE = new Type<>(
             ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "toast_packet")
     );
+    public static BiConsumer<Player, ClientToastPacket> toastAction = null;
 
     public static final StreamCodec<FriendlyByteBuf, ClientToastPacket> STREAM_CODEC =
             StreamCodec.of(
@@ -36,8 +39,10 @@ public record ClientToastPacket(int playerId, String category, int newLevel) imp
             var level = context.player().level();
             var entity = level.getEntity(packet.playerId());
 
-            if (entity instanceof Player player && player.level().isClientSide) {
-                Minecraft.getInstance().getToasts().addToast(new PrincipleLevelUpToast(packet.category(), packet.newLevel()));
+            if (entity instanceof Player player) {
+                if (toastAction != null) {
+                    toastAction.accept(player, packet);
+                }
             }
         });
     }

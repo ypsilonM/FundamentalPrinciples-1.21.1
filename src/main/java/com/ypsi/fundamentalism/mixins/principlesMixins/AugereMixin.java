@@ -1,5 +1,6 @@
 package com.ypsi.fundamentalism.mixins.principlesMixins;
 
+import com.ypsi.fundamentalism.ServerConfig;
 import com.ypsi.fundamentalism.attachments.PrinciplesProgressionManager;
 import com.ypsi.fundamentalism.util.Principles;
 import com.ypsi.fundamentalism.util.Util;
@@ -7,6 +8,7 @@ import io.redspace.ironsspellbooks.api.util.Utils;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import org.apache.logging.log4j.core.jmx.Server;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -18,6 +20,7 @@ public abstract class AugereMixin {
     @Inject(method = "getWeaponDamage", at = @At("RETURN"), cancellable = true, remap = false)
     private static void modifyAugerePotentiation(LivingEntity entity, CallbackInfoReturnable<Float> cir){
         float original = cir.getReturnValue();
+        if(!ServerConfig.ACTIVE_AUGERE.get() || !ServerConfig.PRINCIPLES_SYSTEM.get()) return;
         if(original > 0 && entity instanceof Player player){
             int augereLvl = PrinciplesProgressionManager.getCategoryLevel(player, Principles.AUGERE);
             cir.setReturnValue(original + Util.getAdditionalWeaponDamage(augereLvl));

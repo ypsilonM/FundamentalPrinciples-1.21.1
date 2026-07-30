@@ -10,6 +10,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -34,6 +35,9 @@ public record ClientScrollCaseUsePacket(int playerId) implements CustomPacketPay
             var entity = level.getEntity(packet.playerId());
 
             if (entity instanceof Player player && player.level().isClientSide) {
+                player.playSound(
+                        SoundEvents.COPPER_BULB_BREAK, 1, 0.6F
+                );
                 ItemStack stack = new ItemStack(ModItems.ANCIENT_SCROLL_CASE.get());
                 Minecraft.getInstance().gameRenderer.displayItemActivation(stack);
             }

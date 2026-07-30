@@ -16,11 +16,14 @@
   "entity.ypfundamentals.imp": "Imp",
   "entity.ypfundamentals.venemerus": "Venemerus",
   "entity.ypfundamentals.runear": "Runear",
+  "entity.ypfundamentals.cherry_bird": "Cherry Bird",
 
   "item.ypfundamentals.hemomancer_spawn_egg": "Hemomancer Spawn Egg",
   "item.ypfundamentals.imp_spawn_egg": "Imp Spawn Egg",
   "item.ypfundamentals.venemerus_spawn_egg": "Venemerus Spawn Egg",
   "item.ypfundamentals.runear_spawn_egg": "Runear Spawn Egg",
+  "item.ypfundamentals.cherry_bird_spawn_egg": "Cherry Bird Spawn Egg",
+
   "item.ypfundamentals.mana_fruit": "Ancient Fruit",
   "item.ypfundamentals.ancient_scroll_case": "Ancient Scroll Case",
   "item.ypfundamentals.arcane_mixture": "Arcane Mixture",
@@ -48,7 +51,7 @@
   "spell.ypfundamentals.sacred_disk": "Sacred Disk",
   "spell.ypfundamentals.ignite": "Ignite",
   "spell.ypfundamentals.law_of_regression": "Law Of Regression",
-  "spell.ypfundamentals.ultimatum": "Ultimatum",
+  "spell.ypfundamentals.saeptum": "Saeptum",
 
   "spell.ypfundamentals.proiectum": "Proiectum Principle",
 
@@ -65,6 +68,8 @@
   "spell.ypfundamentals.taunt.guide": "Attracts an enemy's attention, causing them to shift focus to you. Against other players, it causes them to turn to look at you.",
   "spell.ypfundamentals.laceration.guide": "Make a front slash and inflicts a laceration that reduces healing for a while.",
   "spell.ypfundamentals.ignite.guide": "Select an enemy to set on fire. If the enemy is fire immune or already on fire the spell inflicts an amount of damage.",
+  "spell.ypfundamentals.law_of_regression.guide": "Law Of Regression returns your body to an original state, recovering from physical damage. Regression is the pull of meaning; that all things yearn eternally to converge.",
+  "spell.ypfundamentals.saeptum.guide": "Materialize an area separated from the physical state through a solid and impenetrable barrier, enclosing and damaging all the entities in a radius.",
 
   "key.category.fundamentalism": "Fundamentalism",
   "key.fundamentalism.reinforce": "Mana Reinforcement",
@@ -78,11 +83,15 @@
   "ui.ypfundamentals.fire_time": "%d on fire",
   "ui.ypfundamentals.summon_target_failure": "You must target a summon",
   "ui.ypfundamentals.dominan_spell_failure": "Dominan spell unable to be casted.",
+  "ui.ypfundamentals.saeptum_apparitio_failure": "Your spells seem to be distorted by a strange force...",
+  "ui.ypfundamentals.saeptum_teleport_failure": "YOU SHALL NOT ESCAPE FROM THIS SPACE",
 
   "tooltip.ypfundamentals.scroll_case_description1": "This case contains pieces",
   "tooltip.ypfundamentals.scroll_case_description2": "of ancient knowledge...",
 
   "fluid_type.ypfundamentals.pitcher_extract": "Pitcher Extract",
-  "fluid_type.ypfundamentals.arcane_mixture": "Arcane Mixture"
+  "fluid_type.ypfundamentals.arcane_mixture": "Arcane Mixture",
+
+  "block.ypfundamentals.domain_block": "Domain Block"
 
 }

@@ -41,7 +41,7 @@ public class SpellbookLevelCommand {
 
     private static CompletableFuture<Suggestions> suggestLevels(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
         String[] rarities = {
-                "COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"
+                "COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"
         };
         String currentInput = builder.getRemaining().toLowerCase();
         for (String rarity : rarities) {
@@ -74,6 +74,7 @@ public class SpellbookLevelCommand {
             case "rare" -> 3;
             case "epic" -> 4;
             case "legendary" -> 5;
+            case "mythic" -> 6;
             default -> 1;
         };
     }

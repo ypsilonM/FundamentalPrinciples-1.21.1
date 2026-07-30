@@ -26,5 +26,8 @@ public class Animations {
     public static final AnimationHolder REMEDIUM = new AnimationHolder(
             ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "regression_law"), false, false);
 
+    public static final AnimationHolder SAEPTUM = new AnimationHolder(
+            ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "saeptum"), false, false);
+
 
 }

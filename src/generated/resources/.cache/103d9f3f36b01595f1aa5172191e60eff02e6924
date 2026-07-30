@@ -1,6 +1,7 @@
-// 1.21.1	2026-04-23T21:23:06.3176409	Registries
+// 1.21.1	2026-07-18T12:03:37.5587119	Registries
 cc3bd697750c84ecffb7e84896940b9228ac32a9 data/ypfundamentals/damage_type/fundamentalism_magic.json
 1bf393aa7c848735f8911dcaf7bd864e88094b4d data/ypfundamentals/enchantment/aegis.json
+beefa90367ed4c478c2301942a1f174fd8c1e1cb data/ypfundamentals/neoforge/biome_modifier/spawn_cherry_bird.json
 a1454861ffb43316392a3a3d80c31f98c986a748 data/ypfundamentals/neoforge/biome_modifier/spawn_hemomancer.json
 debdf88fdcd25feb5f66bb2c14abdccd2d3da992 data/ypfundamentals/neoforge/biome_modifier/spawn_imp.json
 5078719a80c16a3976d3b09dbda3706a3b9f352d data/ypfundamentals/neoforge/biome_modifier/spawn_runear.json

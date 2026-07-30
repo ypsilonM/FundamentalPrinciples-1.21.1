@@ -51,10 +51,10 @@ public record ToggleReinforcementPacket() implements CustomPacketPayload {
                     if (hasEnoughMana(player)) {
                         int augereLvl = PrinciplesProgressionManager.getCategoryLevel(player, Principles.AUGERE);
                         MobEffectInstance effectInstance = getMobEffectInstance(augereLvl);
-                        if(augereLvl>=3) {
+
                             player.addEffect(effectInstance);
                             PacketDistributor.sendToAllPlayers(new SyncReinforcementPacket(player.getId(), true));
-                        }
+
                     }
                 } else {
                     player.removeEffect(ModEffects.REINFORCEMENT_EFFECT);

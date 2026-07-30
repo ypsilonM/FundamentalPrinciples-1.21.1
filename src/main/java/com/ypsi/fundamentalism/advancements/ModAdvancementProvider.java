@@ -2,10 +2,12 @@ package com.ypsi.fundamentalism.advancements;
 
 import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.advancements.triggers.PrinciplesLevelTrigger;
+import com.ypsi.fundamentalism.advancements.triggers.TecnhiqueTrigger;
 import com.ypsi.fundamentalism.advancements.triggers.YpTriggers;
 import com.ypsi.fundamentalism.effect.ModEffects;
 import com.ypsi.fundamentalism.item.ModItems;
 import com.ypsi.fundamentalism.util.Principles;
+import com.ypsi.fundamentalism.util.Techniques;
 import io.redspace.ironsspellbooks.registries.ItemRegistry;
 import net.minecraft.advancements.*;
 import net.minecraft.advancements.critereon.EffectsChangedTrigger;
@@ -60,7 +62,6 @@ public class ModAdvancementProvider {
                     .addCriterion("tick", PlayerTrigger.TriggerInstance.tick())
                     .save(saver, ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "root_principles"), existingFileHelper);
 
-
             //Advancement: Effect
             AdvancementHolder burnoutAdvancement = Advancement.Builder.advancement()
                     .parent(root)
@@ -104,6 +105,155 @@ public class ModAdvancementProvider {
                     )
                     .addCriterion("get_lum", InventoryChangeTrigger.TriggerInstance.hasItems(ModItems.LUMINAIRE_EXTRACT.get()))
                     .save(saver, ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "luminaire_advancement"), existingFileHelper);
+
+            //LAW OF REGRESSION
+            AdvancementHolder getLawOfRegression1 = Advancement.Builder.advancement()
+                    .parent(rootPrinciples)
+                    .display(
+                            Items.ENCHANTED_GOLDEN_APPLE,
+                            Component.literal("First-aid kit I"),
+                            Component.literal("Learn Law of Regression"),
+                            null,
+                            AdvancementType.GOAL,
+                            true, true, false
+                    ).addCriterion("firstGoalRegression",
+                            new Criterion<>(
+                                    YpTriggers.TECHNIQUES_TRIGGER_SUPPLIER.get(),
+                                    TecnhiqueTrigger.Instance.hasAcquired(Techniques.REGRESSION, 1)
+                            )).save(saver, ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "first_regression_advancement"), existingFileHelper);
+            AdvancementHolder getLawOfRegression2 = Advancement.Builder.advancement()
+                    .parent(getLawOfRegression1)
+                    .display(
+                            Items.ENCHANTED_GOLDEN_APPLE,
+                            Component.literal("First-aid kit II"),
+                            Component.literal("Understand Law of Regression"),
+                            null,
+                            AdvancementType.GOAL,
+                            true, true, false
+                    ).addCriterion("secondGoalRegression",
+                            new Criterion<>(
+                                    YpTriggers.TECHNIQUES_TRIGGER_SUPPLIER.get(),
+                                    TecnhiqueTrigger.Instance.hasAcquired(Techniques.REGRESSION, 2)
+                            )).save(saver, ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "second_regression_advancement"), existingFileHelper);
+            AdvancementHolder getLawOfRegression3 = Advancement.Builder.advancement()
+                    .parent(getLawOfRegression2)
+                    .display(
+                            Items.ENCHANTED_GOLDEN_APPLE,
+                            Component.literal("First-aid kit III"),
+                            Component.literal("Refine Law of Regression"),
+                            null,
+                            AdvancementType.GOAL,
+                            true, true, false
+                    ).addCriterion("thirdGoalRegression",
+                            new Criterion<>(
+                                    YpTriggers.TECHNIQUES_TRIGGER_SUPPLIER.get(),
+                                    TecnhiqueTrigger.Instance.hasAcquired(Techniques.REGRESSION, 3)
+                            )).save(saver, ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "third_regression_advancement"), existingFileHelper);
+            AdvancementHolder getLawOfRegression4 = Advancement.Builder.advancement()
+                    .parent(getLawOfRegression3)
+                    .display(
+                            Items.ENCHANTED_GOLDEN_APPLE,
+                            Component.literal("First-aid kit IV"),
+                            Component.literal("Perfect Law of Regression"),
+                            null,
+                            AdvancementType.GOAL,
+                            true, true, false
+                    ).addCriterion("fourthGoalRegression",
+                            new Criterion<>(
+                                    YpTriggers.TECHNIQUES_TRIGGER_SUPPLIER.get(),
+                                    TecnhiqueTrigger.Instance.hasAcquired(Techniques.REGRESSION, 4)
+                            )).save(saver, ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "fourth_regression_advancement"), existingFileHelper);
+
+            //SAEPTUM
+            AdvancementHolder getSaeptum = Advancement.Builder.advancement()
+                    .parent(rootPrinciples)
+                    .display(
+                            Items.HEART_OF_THE_SEA,
+                            Component.literal("Unbreakable Trap"),
+                            Component.literal("Learn Saeptum Technique"),
+                            null,
+                            AdvancementType.GOAL,
+                            true, true, false
+                    ).addCriterion("goalSaeptum",
+                            new Criterion<>(
+                                    YpTriggers.TECHNIQUES_TRIGGER_SUPPLIER.get(),
+                                    TecnhiqueTrigger.Instance.hasAcquired(Techniques.SAEPTUM, 1)
+                            )).save(saver, ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "saeptum_advancement"), existingFileHelper);
+
+            //REINFORCEMENT LEVELS
+            AdvancementHolder getReinforcement1 = Advancement.Builder.advancement()
+                    .parent(rootPrinciples)
+                    .display(
+                            Items.SHIELD,
+                            Component.literal("Battlemage I"),
+                            Component.literal("Learn Mana Reinforcement Technique"),
+                            null,
+                            AdvancementType.GOAL,
+                            true, true, false
+                    ).addCriterion("goalFirstReinforcement",
+                            new Criterion<>(
+                                    YpTriggers.TECHNIQUES_TRIGGER_SUPPLIER.get(),
+                                    TecnhiqueTrigger.Instance.hasAcquired(Techniques.REINFORCEMENT, 1)
+                            )).save(saver, ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "first_reinforcement_advancement"), existingFileHelper);
+            AdvancementHolder getReinforcement2 = Advancement.Builder.advancement()
+                    .parent(getReinforcement1)
+                    .display(
+                            Items.SHIELD,
+                            Component.literal("Battlemage II"),
+                            Component.literal("Upgrade your Mana Reinforcement"),
+                            null,
+                            AdvancementType.GOAL,
+                            true, true, false
+                    ).addCriterion("goalSecondReinforcement",
+                            new Criterion<>(
+                                    YpTriggers.TECHNIQUES_TRIGGER_SUPPLIER.get(),
+                                    TecnhiqueTrigger.Instance.hasAcquired(Techniques.REINFORCEMENT, 2)
+                            )).save(saver, ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "second_reinforcement_advancement"), existingFileHelper);
+            AdvancementHolder getReinforcement3 = Advancement.Builder.advancement()
+                    .parent(getReinforcement2)
+                    .display(
+                            Items.SHIELD,
+                            Component.literal("Battlemage III"),
+                            Component.literal("Understand better Mana Reinforcement"),
+                            null,
+                            AdvancementType.GOAL,
+                            true, true, false
+                    ).addCriterion("goalThirdReinforcement",
+                            new Criterion<>(
+                                    YpTriggers.TECHNIQUES_TRIGGER_SUPPLIER.get(),
+                                    TecnhiqueTrigger.Instance.hasAcquired(Techniques.REINFORCEMENT, 3)
+                            )).save(saver, ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "third_reinforcement_advancement"), existingFileHelper);
+            AdvancementHolder getReinforcement4 = Advancement.Builder.advancement()
+                    .parent(getReinforcement3)
+                    .display(
+                            ItemRegistry.HEAVY_CHAIN.get(),
+                            Component.literal("Battlemage IV"),
+                            Component.literal("Refine Mana Reinforcement"),
+                            null,
+                            AdvancementType.GOAL,
+                            true, true, false
+                    ).addCriterion("goalFourthReinforcement",
+                            new Criterion<>(
+                                    YpTriggers.TECHNIQUES_TRIGGER_SUPPLIER.get(),
+                                    TecnhiqueTrigger.Instance.hasAcquired(Techniques.REINFORCEMENT, 4)
+                            )).save(saver, ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "fourth_reinforcement_advancement"), existingFileHelper);
+            AdvancementHolder getReinforcement5 = Advancement.Builder.advancement()
+                    .parent(getReinforcement4)
+                    .display(
+                            ItemRegistry.HEAVY_CHAIN.get(),
+                            Component.literal("Battlemage V"),
+                            Component.literal("Fully master Mana Reinforcement"),
+                            null,
+                            AdvancementType.CHALLENGE,
+                            true, true, false
+                    ).addCriterion("goalFifthReinforcement",
+                            new Criterion<>(
+                                    YpTriggers.TECHNIQUES_TRIGGER_SUPPLIER.get(),
+                                    TecnhiqueTrigger.Instance.hasAcquired(Techniques.REINFORCEMENT, 5)
+                            )).save(saver, ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "fifth_reinforcement_advancement"), existingFileHelper);
+
+
+
 
             //ALL PRINCIPLES
 
@@ -258,7 +408,7 @@ public class ModAdvancementProvider {
                             )).save(saver, ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "motus_advancement"), existingFileHelper);
 
             AdvancementHolder principleREMEDIUM = Advancement.Builder.advancement()
-                    .parent(rootPrinciples)
+                    .parent(getLawOfRegression4)
                     .display(
                             Items.TOTEM_OF_UNDYING,
                             Component.literal("Remedium"),
@@ -273,7 +423,7 @@ public class ModAdvancementProvider {
                             )).save(saver, ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "remedium_advancement"), existingFileHelper);
 
             AdvancementHolder principleAUGERE = Advancement.Builder.advancement()
-                    .parent(rootPrinciples)
+                    .parent(getReinforcement5)
                     .display(
                             Items.GOLDEN_SWORD,
                             Component.literal("Augere"),
@@ -301,6 +451,7 @@ public class ModAdvancementProvider {
                                     YpTriggers.PRINCIPLES_LEVEL_TRIGGER_SUPPLIER.get(),
                                     PrinciplesLevelTrigger.Instance.levelAtLeast(Principles.CERTUM, 20)
                             )).save(saver, ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "certum_advancement"), existingFileHelper);
+
         }
     }
 }

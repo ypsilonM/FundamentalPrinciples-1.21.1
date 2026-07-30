@@ -24,20 +24,24 @@ public abstract class SpellBookMixin {
 
     @Inject(method = "initializeSpellContainer", at = @At("HEAD"), cancellable = true, remap = false)
     private void ypsInitializeSpellContainer(ItemStack itemStack, CallbackInfo ci) {
-        if (itemStack == null) {
-            return;
-        }
-        SpellBookComponentHelper.ensureSpellBookComponents(itemStack);
-        if (!ISpellContainer.isSpellContainer(itemStack)) {
-            if(ServerConfig.spellbookLevel) {
-                itemStack.set(YpsDataComponents.YP_SPELL_SLOTS.get(), getMaxSpellSlots());
-                itemStack.set(ComponentRegistry.SPELL_CONTAINER, ISpellContainer.create(4, true, true));
-            }else{
-                ISpellContainer.set(itemStack, ISpellContainer.create(getMaxSpellSlots(), true, true));
-            }
-            //ISpellContainer.set(itemStack, ISpellContainer.create(4, true, true));
-        }
-        ci.cancel();
+//        if (itemStack == null) {
+//            return;
+//        }
+//        SpellBookComponentHelper.ensureSpellBookComponents(itemStack);
+//        if (!ISpellContainer.isSpellContainer(itemStack)) {
+//            if(ServerConfig.spellbookLevel) {
+//
+//                itemStack.set(YpsDataComponents.YP_SPELL_SLOTS.get(), getMaxSpellSlots());
+//                itemStack.set(ComponentRegistry.SPELL_CONTAINER, ISpellContainer.create(4, true, true));
+//
+//            }else{
+//
+//                ISpellContainer.set(itemStack, ISpellContainer.create(getMaxSpellSlots(), true, true));
+//
+//            }
+//            //ISpellContainer.set(itemStack, ISpellContainer.create(4, true, true));
+//        }
+//        ci.cancel();
     }
 
 

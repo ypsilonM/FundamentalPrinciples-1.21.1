@@ -20,6 +20,7 @@ import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
@@ -35,8 +36,10 @@ import java.util.stream.Collectors;
 
 @OnlyIn(Dist.CLIENT)
 public class ReinforcementLayer extends RenderLayer<Player, PlayerModel<Player>> {
-    private static final ResourceLocation REINFORCEMENT_TEXTURE =
-            ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "textures/mana_b.png");
+    private static final ResourceLocation REINFORCEMENT_TEXTURE_WIDE =
+            ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "textures/reinforcement/reinforcement_wide.png");
+    private static final ResourceLocation REINFORCEMENT_TEXTURE_SLIM =
+            ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "textures/reinforcement/reinforcement_slim.png");
 
     private final PlayerModel<Player> modelNormal;
     private final PlayerModel<Player> modelSlim;
@@ -55,7 +58,14 @@ public class ReinforcementLayer extends RenderLayer<Player, PlayerModel<Player>>
                        float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
 
         if (player.hasEffect(ModEffects.REINFORCEMENT_EFFECT)) {
-            PlayerModel<Player> currentModel = determineModel(player);
+
+            Minecraft minecraft = Minecraft.getInstance();
+            PlayerSkin skin = minecraft.getSkinManager().getInsecureSkin(minecraft.getGameProfile());
+            PlayerSkin.Model modelType = skin.model();
+
+            boolean isSlim = modelType == PlayerSkin.Model.SLIM;
+
+            PlayerModel<Player> currentModel = isSlim ? modelSlim : modelNormal;
 
             int color1 = Utils.packRGB(Util.getElementalColor(player));
 
@@ -68,7 +78,7 @@ public class ReinforcementLayer extends RenderLayer<Player, PlayerModel<Player>>
             currentModel.setupAnim(player, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
 
             VertexConsumer consumer = buffer.getBuffer(
-                    RenderType.entityTranslucentEmissive(REINFORCEMENT_TEXTURE)
+                    RenderType.entityTranslucentEmissive(isSlim? REINFORCEMENT_TEXTURE_SLIM : REINFORCEMENT_TEXTURE_WIDE )
             );
             poseStack.pushPose();
             float scalePulse = (float) Math.sin(gameTime * 0.15f) * 0.02f + 1.05f;
@@ -81,33 +91,29 @@ public class ReinforcementLayer extends RenderLayer<Player, PlayerModel<Player>>
         }
     }
 
-    private PlayerModel<Player> determineModel(Player player) {
-        try {
-            Field slimField = PlayerModel.class.getDeclaredField("slim");
-            slimField.setAccessible(true);
-            boolean isSlim = slimField.getBoolean(this.getParentModel());
-            return isSlim ? modelSlim : modelNormal;
-        } catch (Exception e) {
-            String rendererStr = this.getParentModel().toString().toLowerCase();
-            if (rendererStr.contains("slim")) {
-                return modelSlim;
-            }
-            return modelNormal;
-        }
-    }
+//    private PlayerModel<Player> determineModel(Player player) {
+//            Minecraft minecraft = Minecraft.getInstance();
+//            PlayerSkin skin = minecraft.getSkinManager().getInsecureSkin(minecraft.getGameProfile());
+//            PlayerSkin.Model model = skin.model();
+//        try {
+//            Field slimField = PlayerModel.class.getDeclaredField("slim");
+//            slimField.setAccessible(true);
+//            boolean isSlim = slimField.getBoolean(this.getParentModel());
+//            if(isSlim) this.isSlim = true;
+//            return isSlim ? modelSlim : modelNormal;
+//        } catch (Exception e) {
+//            String rendererStr = this.getParentModel().toString().toLowerCase();
+//            if (rendererStr.contains("slim")) {
+//                this.isSlim = true;
+//                return modelSlim;
+//            }
+//            return modelNormal;
+//        }
+//    }
 
     public static int rgbToArgb(int rgb, float alpha) {
         int alphaByte = (int)(alpha * 255) << 24;
         return alphaByte | (rgb & 0xFFFFFF);
     }
 
-    public static int increaseSaturation(int rgb, float saturationFactor) {
-        int r = (rgb >> 16) & 0xFF;
-        int g = (rgb >> 8) & 0xFF;
-        int b = rgb & 0xFF;
-
-        float[] hsb = Color.RGBtoHSB(r, g, b, null);
-        hsb[1] = Math.min(1.0f, hsb[1] * (1 + saturationFactor));
-        return Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]) & 0xFFFFFF;
-    }
 }

@@ -12,9 +12,9 @@ import java.util.List;
 public class SpellbookTooltip {
 
     public static void addSpellBookInfo(ItemStack stack, List<Component> tooltip) {
-        if (stack.getItem() instanceof SpellBook && ServerConfig.spellbookLevel) {
+        if (stack.getItem() instanceof SpellBook && ServerConfig.SPELLBOOK_LEVELS.get()) {
             int level = SpellBookComponentHelper.getLevel(stack);
-            float progress = SpellBookComponentHelper.getProgressToNextLevel(stack);
+            //float progress = SpellBookComponentHelper.getProgressToNextLevel(stack);
             ChatFormatting chatFormatting = getChatFormatting(level);
             String rarity = getRarity(level);
 
@@ -22,10 +22,10 @@ public class SpellbookTooltip {
             tooltip.add(Component.literal(rarity)
                     .withStyle(chatFormatting));
 
-            int xpToNext = SpellBookComponentHelper.getXPToNextLevel(stack);
-            String progressBar = createProgressBar(progress, 10, chatFormatting);
-            tooltip.add(Component.literal(progressBar + " " + xpToNext + " XP")
-                    .withStyle(ChatFormatting.GRAY));
+//            int xpToNext = SpellBookComponentHelper.getXPToNextLevel(stack);
+//            String progressBar = createProgressBar(progress, 10, chatFormatting);
+//            tooltip.add(Component.literal(progressBar + " " + xpToNext + " XP")
+//                    .withStyle(ChatFormatting.GRAY));
 
         }
     }

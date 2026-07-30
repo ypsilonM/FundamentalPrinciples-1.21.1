@@ -17,6 +17,6 @@ public class RunearModel extends GeoModel<RunearEntity> {
 
     @Override
     public ResourceLocation getAnimationResource(RunearEntity animatable) {
-        return ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "animations/runear.animation.json");
+        return ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "animations/runear.animations.json");
     }
 }

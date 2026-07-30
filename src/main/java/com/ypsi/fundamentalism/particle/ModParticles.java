@@ -21,6 +21,8 @@ public class ModParticles {
             PARTICLE_TYPES.register("constellation_particle", () -> new SimpleParticleType(true));
     public static final Supplier<SimpleParticleType> MINDFUL_PARTICLE =
             PARTICLE_TYPES.register("mindful_particle", () -> new SimpleParticleType(true));
+    public static final Supplier<SimpleParticleType> REGRESSION_PARTICLE =
+            PARTICLE_TYPES.register("regression_particle", () -> new SimpleParticleType(true));
 
     //public static final Supplier<SimpleParticleType> SOL_PARTICLE =
             //PARTICLE_TYPES.register("sol_particle", () -> new SimpleParticleType(true));

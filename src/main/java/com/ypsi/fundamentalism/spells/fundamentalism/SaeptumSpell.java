@@ -12,6 +12,7 @@ import io.redspace.ironsspellbooks.api.util.AnimationHolder;
 import io.redspace.ironsspellbooks.api.util.Utils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -21,23 +22,28 @@ import org.joml.Vector3f;
 
 import java.util.Optional;
 
-public class UltimatumSpell extends AbstractSpell {
+public class SaeptumSpell extends AbstractSpell {
 
-    private final ResourceLocation spellId = ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "ultimatum");
+    private final ResourceLocation spellId = ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "saeptum");
 
     private final DefaultConfig defaultConfig = new DefaultConfig()
             .setMinRarity(SpellRarity.LEGENDARY)
             .setSchoolResource(YpsSchoolRegistry.FUNDAMENTAL_RESOURCE)
-            .setMaxLevel(4)
-            .setCooldownSeconds(5)
+            .setMaxLevel(1)
+            .setCooldownSeconds(60*5)
             .build();
 
-    public UltimatumSpell() {
-        this.manaCostPerLevel = -10;
-        this.baseSpellPower = 1;
-        this.spellPowerPerLevel = 1;
-        this.castTime = (20) * 1;
-        this.baseManaCost = 500;
+    public SaeptumSpell() {
+        this.manaCostPerLevel = 0;
+        this.baseSpellPower = 0;
+        this.spellPowerPerLevel = 0;
+        this.castTime = (80);
+        this.baseManaCost = 600;
+    }
+
+    @Override
+    public int getCastTime(int spellLevel) {
+        return this.castTime;
     }
 
     @Override
@@ -61,7 +67,8 @@ public class UltimatumSpell extends AbstractSpell {
             schoolType = YpsSchoolRegistry.FUNDAMENTALISM.get();
         }
 
-        DomainEntity domainEntity = new DomainEntity(level, maxColor, schoolType);
+        float spellPower = getSpellPower(entity, schoolType);
+        DomainEntity domainEntity = new DomainEntity(level, maxColor, schoolType, refinementLevel(entity, spellPower));
         domainEntity.setPos(entity.position().add(0, - domainEntity.getBoundingBox().getYsize() * 0.5f, 0));
         domainEntity.setOwner(entity);
         level.addFreshEntity(domainEntity);
@@ -82,18 +89,34 @@ public class UltimatumSpell extends AbstractSpell {
     @Override
     public boolean allowCrafting() { return false; }
 
+
     @Override
     public AnimationHolder getCastStartAnimation() {
-        return Animations.REMEDIUM;
+        return Animations.SAEPTUM;
+    }
+
+    public float getSpellPower(@Nullable Entity sourceEntity, SchoolType schoolType) {
+        return Util.getAdaptativeSpellPower(sourceEntity, schoolType);
     }
 
     @Override
-    public float getSpellPower(int spellLevel, @Nullable Entity sourceEntity) {
-        return super.getSpellPower(spellLevel, sourceEntity);
+    public Optional<SoundEvent> getCastStartSound() {
+        return Optional.of(SoundEvents.PORTAL_TRIGGER);
     }
 
     @Override
-    public void playSound(Optional<SoundEvent> sound, Entity entity) {
-        super.playSound(sound, entity);
+    public Optional<SoundEvent> getCastFinishSound() {
+        return Optional.of(SoundEvents.END_PORTAL_SPAWN);
+    }
+
+    @Override
+    public boolean stopSoundOnCancel() {
+        return true;
+    }
+
+
+    public int refinementLevel(LivingEntity caster, float spellPower){
+        float refinementMultiplier = Util.getRefinementMultiplier(caster, spellPower);
+        return (int) (spellPower*refinementMultiplier);
     }
 }

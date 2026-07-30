@@ -1,4 +1,5 @@
 package com.ypsi.fundamentalism;
+
 import com.ypsi.fundamentalism.advancements.triggers.YpTriggers;
 import com.ypsi.fundamentalism.attributes.YpsAttributes;
 import com.ypsi.fundamentalism.block.YpsBlocks;
@@ -9,6 +10,7 @@ import com.ypsi.fundamentalism.datagen.RecipeSerializers;
 import com.ypsi.fundamentalism.datagen.providers.ModLootProvider;
 import com.ypsi.fundamentalism.effect.ModEffects;
 import com.ypsi.fundamentalism.entity.ModEntities;
+import com.ypsi.fundamentalism.entity.mobs.cherry_bird.CherryBirdRenderer;
 import com.ypsi.fundamentalism.entity.mobs.hemomancer.HemomancerRenderer;
 import com.ypsi.fundamentalism.entity.mobs.imp.ImpRenderer;
 import com.ypsi.fundamentalism.entity.mobs.runear.RunearRenderer;
@@ -43,9 +45,7 @@ import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import org.slf4j.Logger;
-
 import com.mojang.logging.LogUtils;
-
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -64,8 +64,6 @@ public class FundamentalPrinciples {
     public static final String MOD_ID = "ypfundamentals";
 
     public static final Logger LOGGER = LogUtils.getLogger();
-
-
 
     public FundamentalPrinciples(IEventBus modEventBus, ModContainer modContainer) {
 
@@ -86,7 +84,7 @@ public class FundamentalPrinciples {
 
         ModEffects.register(modEventBus);
         ModParticles.register(modEventBus);
-        ModNetwork.register(modEventBus);
+        //ModNetwork.register(modEventBus);
         ModEntities.register(modEventBus);
 
         YpsAttributes.register(modEventBus);
@@ -101,6 +99,8 @@ public class FundamentalPrinciples {
         RecipeSerializers.registrar(modEventBus);
 
         modContainer.registerConfig(ModConfig.Type.SERVER, ServerConfig.SPEC);
+
+        modContainer.registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC);
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
             clientReg(modEventBus);
@@ -118,7 +118,7 @@ public class FundamentalPrinciples {
         SpellCategoriesCommand.register(event.getDispatcher());
         SpellbookLevelCommand.register(event.getDispatcher());
 
-        ShowToastCommand.register(event.getDispatcher());
+        //ShowToastCommand.register(event.getDispatcher());
 
     }
 
@@ -155,6 +155,7 @@ public class FundamentalPrinciples {
             event.registerEntityRenderer(ModEntities.HEMOMANCER.get(), HemomancerRenderer::new);
             event.registerEntityRenderer(ModEntities.VENEMERUS.get(), VenemerusRenderer::new);
             event.registerEntityRenderer(ModEntities.RUNEAR.get(), RunearRenderer::new);
+            event.registerEntityRenderer(ModEntities.CHERRY_BIRD.get(), CherryBirdRenderer::new);
 
             event.registerEntityRenderer(ModEntities.HOLY_LIGHTNING_PROJECTILE.get(), HolyLightningRenderer::new);
             event.registerEntityRenderer(ModEntities.CHAINS.get(), ChainsRenderer::new);
@@ -173,12 +174,14 @@ public class FundamentalPrinciples {
 
 
         }
+
         @SubscribeEvent
         public static void registerParticleFactories(RegisterParticleProvidersEvent event) {
             event.registerSpriteSet(ModParticles.REINFORCEMENT_PARTICLE.get(), ReinforceParticles.Provider::new);
             event.registerSpriteSet(ModParticles.CONSTELLATION_PARTICLE.get(), ConstellationParticle.Provider::new);
 
             event.registerSpriteSet(ModParticles.MINDFUL_PARTICLE.get(), MindfulParticle.Provider::new);
+            event.registerSpriteSet(ModParticles.REGRESSION_PARTICLE.get(), RegressionParticle.Provider::new);
             //event.registerSpriteSet(ModParticles.SOL_PARTICLE.get(), SolAppearanceParticle.Provider::new);
         }
         @SubscribeEvent
