@@ -22,7 +22,14 @@ public class ModItemModelProvider extends ItemModelProvider {
         basicItem(ModItems.LUMINAIRE_EXTRACT.get());
         basicItem(ModItems.FLASK.get());
         basicItem(ModItems.URSIDAE_FUR.get());
+
         basicItem(ModItems.ANCIENT_SCROLL_CASE.get());
+        basicItem(ModItems.SPELLBOOK_COVER.get());
+        basicItem(ModItems.NOVICE_SPELLBOOK_COVER.get());
+        basicItem(ModItems.ADEPT_SPELLBOOK_COVER.get());
+        basicItem(ModItems.SORCERER_SPELLBOOK_COVER.get());
+        basicItem(ModItems.SCHOLAR_SPELLBOOK_COVER.get());
+        basicItem(ModItems.ARCHMAGE_SPELLBOOK_COVER.get());
 
         generateTonicModels();
 

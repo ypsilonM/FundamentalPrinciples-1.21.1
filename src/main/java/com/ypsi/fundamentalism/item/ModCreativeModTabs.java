@@ -17,7 +17,7 @@ public class ModCreativeModTabs {
 
     public static final Supplier<CreativeModeTab> MANA_ITEMS_TAB = CREATIVE_MODE_TAB.register("mana_items_tab",
             () -> CreativeModeTab.builder()
-                    .icon(() -> new ItemStack(ModItems.MANA_FRUIT.get()))
+                    .icon(() -> new ItemStack(ModItems.FUNDAMENTALISM_SCROLL.get()))
                     .title(Component.translatable("creativetab.ypfundamentals.mana_items"))
                     .displayItems((parameters, output) -> {
                         output.accept(ModItems.MANA_FRUIT);
@@ -29,12 +29,20 @@ public class ModCreativeModTabs {
                         output.accept(ModItems.TONIC);
                         output.accept(ModItems.ANCIENT_SCROLL_CASE);
                         output.accept(ModItems.URSIDAE_FUR);
+                        output.accept(ModItems.SPELLBOOK_COVER);
+                        output.accept(ModItems.NOVICE_SPELLBOOK_COVER);
+                        output.accept(ModItems.ADEPT_SPELLBOOK_COVER);
+                        output.accept(ModItems.SORCERER_SPELLBOOK_COVER);
+                        output.accept(ModItems.SCHOLAR_SPELLBOOK_COVER);
+                        output.accept(ModItems.ARCHMAGE_SPELLBOOK_COVER);
+
                         output.accept(ModItems.NULLIFIER);
                         output.accept(ModItems.IMP_SPAWN_EGG);
                         output.accept(ModItems.HEMOMANCER_SPAWN_EGG);
                         output.accept(ModItems.VENEMERUS_SPAWN_EGG);
                         output.accept(ModItems.RUNEAR_SPAWN_EGG);
                         output.accept(ModItems.CHERRY_BIRD_SPAWN_EGG);
+
                     })
                     .build());
 //    public static final Supplier<CreativeModeTab> MANA_BLOCKS_TAB = CREATIVE_MODE_TAB.register("mana_blocks_tab",

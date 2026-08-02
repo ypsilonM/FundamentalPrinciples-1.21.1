@@ -43,6 +43,7 @@ import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
+import net.neoforged.neoforge.common.brewing.BrewingRecipeRegistry;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
@@ -99,7 +100,6 @@ public class FundamentalPrinciples {
         RecipeSerializers.registrar(modEventBus);
 
         modContainer.registerConfig(ModConfig.Type.SERVER, ServerConfig.SPEC);
-
         modContainer.registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC);
 
         if (FMLEnvironment.dist == Dist.CLIENT) {

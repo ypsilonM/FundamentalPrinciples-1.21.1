@@ -15,14 +15,10 @@ public class ModLootProvider {
     public static final DeferredRegister<MapCodec<? extends IGlobalLootModifier>> LOOT_MODIFIERS =
             DeferredRegister.create(NeoForgeRegistries.Keys.GLOBAL_LOOT_MODIFIER_SERIALIZERS, FundamentalPrinciples.MOD_ID);
 
-    public static final Supplier<MapCodec<ItemLootModifier>> OMINOUS_VAULT =
-            LOOT_MODIFIERS.register("ominous_vault_scroll_case", () -> ItemLootModifier.CODEC);
-    public static final Supplier<MapCodec<ItemLootModifier>> STRONGHOLD_LIBRARY  =
-            LOOT_MODIFIERS.register("stronghold_library_scroll_case", () -> ItemLootModifier.CODEC);
-    public static final Supplier<MapCodec<ArcheologyLootModifier>> DESERT_WELL  =
-            LOOT_MODIFIERS.register("desert_well_archeology_scroll_case", () -> ArcheologyLootModifier.CODEC);
-    public static final Supplier<MapCodec<ArcheologyLootModifier>> DESERT_PYRAMID  =
-            LOOT_MODIFIERS.register("desert_pyramid_archeology_scroll_case", () -> ArcheologyLootModifier.CODEC);
+    public static final Supplier<MapCodec<ItemLootModifier>> ITEM_SCROLL_CASE =
+            LOOT_MODIFIERS.register("item_modifier_scroll_case", () -> ItemLootModifier.CODEC);
+    public static final Supplier<MapCodec<ArcheologyLootModifier>> ARCHEOLOGY_SCROLL_CASE  =
+            LOOT_MODIFIERS.register("archeology_modifier_scroll_case", () -> ArcheologyLootModifier.CODEC);
 //    public static final Supplier<MapCodec<ItemLootModifier>> TRAIL_RUINS_COMMON  =
 //            LOOT_MODIFIERS.register("trail_ruins_archeology_common_scroll_case", () -> ItemLootModifier.CODEC);
 //    public static final Supplier<MapCodec<ItemLootModifier>> TRAIL_RUINS_RARE  =

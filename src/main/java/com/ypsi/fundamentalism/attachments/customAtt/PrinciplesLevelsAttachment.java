@@ -106,18 +106,15 @@ public class PrinciplesLevelsAttachment {
             if (category.equals(PrinciplesProgressionManager.getTechnicalName(Principles.MOTUS))) {
                 YpsAttributeManager.CASTING_MOVESPEED.applyModifier(player, level);
             }
-            if (category.equals(PrinciplesProgressionManager.getTechnicalName(Principles.AUGERE)) && level>=3){
+            if (category.equals(PrinciplesProgressionManager.getTechnicalName(Principles.AUGERE))){
                 switch (level) {
-                    case 3,4,5,6:
-                            YpTriggers.TECHNIQUES_TRIGGER_SUPPLIER.get().trigger((ServerPlayer) player, Techniques.REINFORCEMENT.name(), 1);
-                            break;
-                    case 7,8,9,10:
+                    case 5,6,7,8,9:
                             YpTriggers.TECHNIQUES_TRIGGER_SUPPLIER.get().trigger((ServerPlayer) player, Techniques.REINFORCEMENT.name(), 2);
                             break;
-                    case 11,12,13,14,15:
+                    case 10,11,12,13,14:
                             YpTriggers.TECHNIQUES_TRIGGER_SUPPLIER.get().trigger((ServerPlayer) player, Techniques.REINFORCEMENT.name(), 3);
                             break;
-                    case 16,17,18,19:
+                    case 15,16,17,18,19:
                             YpTriggers.TECHNIQUES_TRIGGER_SUPPLIER.get().trigger((ServerPlayer) player, Techniques.REINFORCEMENT.name(), 4);
                             break;
                     case 20:

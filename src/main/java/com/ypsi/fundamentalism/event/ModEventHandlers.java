@@ -9,12 +9,14 @@ import com.ypsi.fundamentalism.entity.mobs.imp.ImpEntity;
 import com.ypsi.fundamentalism.entity.mobs.runear.RunearEntity;
 import com.ypsi.fundamentalism.entity.mobs.venemerus.VenemerusEntity;
 import com.ypsi.fundamentalism.entity.spells.chains.ChainsEntity;
+import com.ypsi.fundamentalism.item.ModItems;
 import io.redspace.ironsspellbooks.entity.mobs.abstract_spell_casting_mob.AbstractSpellCastingMob;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.SpawnPlacementTypes;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.common.brewing.BrewingRecipeRegistry;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
@@ -56,4 +58,5 @@ public class ModEventHandlers {
                 AbstractSpellCastingMob::checkMobSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
 
     }
+
 }

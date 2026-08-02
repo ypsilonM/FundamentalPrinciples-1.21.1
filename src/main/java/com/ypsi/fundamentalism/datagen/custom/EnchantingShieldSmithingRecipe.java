@@ -21,8 +21,6 @@ public class EnchantingShieldSmithingRecipe implements SmithingRecipe {
     private final Ingredient base;
     private final Ingredient addition;
 
-
-
     private final ResourceKey<Enchantment> enchantmentToAdd;
     private final int level;
 

@@ -35,6 +35,14 @@
   "item.ypfundamentals.ursidae_fur": "Ursidae Fur",
   "item.ypfundamentals.nullifier": "Nullifier Blade",
 
+
+  "item.ypfundamentals.spellbook_cover": "Spellbook cover",
+  "item.ypfundamentals.novice_spellbook_cover": "Novice cover",
+  "item.ypfundamentals.adept_spellbook_cover": "Adept cover",
+  "item.ypfundamentals.sorcerer_spellbook_cover": "Sorcerer cover",
+  "item.ypfundamentals.scholar_spellbook_cover": "Scholar cover",
+  "item.ypfundamentals.archmage_spellbook_cover": "Archmage cover",
+
   "attribute.name.technique.exhaustion": "Exhaustion",
 
   "spell.ypfundamentals.grantstrength": "Burning Spirit",
@@ -92,6 +100,10 @@
   "fluid_type.ypfundamentals.pitcher_extract": "Pitcher Extract",
   "fluid_type.ypfundamentals.arcane_mixture": "Arcane Mixture",
 
-  "block.ypfundamentals.domain_block": "Domain Block"
+  "block.ypfundamentals.domain_block": "Domain Block",
+
+  "tooltip.ypfundamentals.cover_description": "An item to enhance your spellbook.",
+  "tooltip.ypfundamentals.cover_description2": "§eRight-click to upgrade your equipped spellbook.",
+  "tooltip.ypfundamentals.cover_alt": "§7[Alt]"
 
 }

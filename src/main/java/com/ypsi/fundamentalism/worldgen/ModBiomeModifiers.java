@@ -67,7 +67,7 @@ public class ModBiomeModifiers {
                 HolderSet.direct(
                         biomes.getOrThrow(Biomes.CHERRY_GROVE)
                 ),
-                List.of(new MobSpawnSettings.SpawnerData(ModEntities.CHERRY_BIRD.get(), 10, 1, 3))
+                List.of(new MobSpawnSettings.SpawnerData(ModEntities.CHERRY_BIRD.get(), 15, 2, 3))
         ));
 
 

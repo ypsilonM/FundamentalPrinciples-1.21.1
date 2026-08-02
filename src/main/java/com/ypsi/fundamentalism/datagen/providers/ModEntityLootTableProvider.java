@@ -61,6 +61,7 @@ public class ModEntityLootTableProvider extends EntityLootSubProvider {
                 LootTable.lootTable()
                         .withPool(createItemPool(1,2, Items.FEATHER))
                         .withPool(createItemPool(2,4, Items.PINK_PETALS))
+                        .withPool(createArcanePool(1, 1, 0.5F,0, 2))
         );
 
     }

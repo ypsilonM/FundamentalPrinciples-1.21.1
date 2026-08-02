@@ -5,6 +5,7 @@ import com.ypsi.fundamentalism.entity.ModEntities;
 import com.ypsi.fundamentalism.item.custom.AncientScrollCase;
 import com.ypsi.fundamentalism.item.custom.NullifierBlade;
 import com.ypsi.fundamentalism.item.custom.FatigueReducerContainer;
+import com.ypsi.fundamentalism.item.custom.SpellbookCover;
 import com.ypsi.fundamentalism.item.custom.food.ManaFruit;
 import net.minecraft.world.item.*;
 import net.neoforged.bus.api.IEventBus;
@@ -72,6 +73,18 @@ public class ModItems {
 
     public static final DeferredItem<Item> URSIDAE_FUR = ITEMS.register("ursidae_fur",
             () -> new Item(new Item.Properties().stacksTo(8)));
+    public static final DeferredItem<Item> SPELLBOOK_COVER = ITEMS.register("spellbook_cover",
+            () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.COMMON)));
+    public static final DeferredItem<Item> NOVICE_SPELLBOOK_COVER = ITEMS.register("novice_spellbook_cover",
+            () -> new SpellbookCover(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+    public static final DeferredItem<Item> ADEPT_SPELLBOOK_COVER = ITEMS.register("adept_spellbook_cover",
+            () -> new SpellbookCover(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+    public static final DeferredItem<Item> SORCERER_SPELLBOOK_COVER = ITEMS.register("sorcerer_spellbook_cover",
+            () -> new SpellbookCover(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+    public static final DeferredItem<Item> SCHOLAR_SPELLBOOK_COVER = ITEMS.register("scholar_spellbook_cover",
+            () -> new SpellbookCover(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+    public static final DeferredItem<Item> ARCHMAGE_SPELLBOOK_COVER = ITEMS.register("archmage_spellbook_cover",
+            () -> new SpellbookCover(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC)));
 
 
     private static <T extends Item> DeferredItem<T> registerItem(String name, Supplier<T> item){

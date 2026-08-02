@@ -9,6 +9,7 @@ import com.ypsi.fundamentalism.component.SpellbookLevel.SpellBookComponentHelper
 import com.ypsi.fundamentalism.component.YpsDataComponents;
 import com.ypsi.fundamentalism.entity.mobs.cherry_bird.CherryBirdEntity;
 import com.ypsi.fundamentalism.entity.mobs.runear.RunearEntity;
+import com.ypsi.fundamentalism.item.custom.SpellbookCover;
 import com.ypsi.fundamentalism.principleGen.SpellCategoriesGenerator;
 import com.ypsi.fundamentalism.effect.ModEffects;
 import com.ypsi.fundamentalism.enchantment.FundEnchantments;
@@ -60,7 +61,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.TimeUtil;
-import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -68,24 +68,19 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ShieldItem;
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RenderTooltipEvent;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
 import net.neoforged.neoforge.event.entity.living.*;
@@ -96,11 +91,9 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
-import org.spongepowered.asm.mixin.injection.selectors.ISelectorContext;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.event.CurioAttributeModifierEvent;
 
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 
@@ -144,19 +137,51 @@ public class ModEvents {
     }
 
     @SubscribeEvent
-    public static void registerBrewingRecipeRegister(RegisterBrewingRecipesEvent event){
-        PotionBrewing.Builder builder = event.getBuilder();
+    public static void putCoverInSpellbok(PlayerInteractEvent.RightClickItem event) {
+        if(!ServerConfig.SPELLBOOK_LEVELS.get()) return;
 
-        builder.addRecipe(
-                Ingredient.of(ModItems.TEST_TUBE),  Ingredient.of(Items.PITCHER_PLANT),
-                ModItems.PITCHER_EXTRACT.toStack(1)
-        );
-        builder.addRecipe(
-                Ingredient.of(ModItems.TEST_TUBE),  Ingredient.of(ModItems.ARCANE_MIXTURE),
-                ModItems.LUMINAIRE_EXTRACT.toStack(1)
-        );
+        Player player = event.getEntity();
+        ItemStack stackInHand = player.getItemInHand(event.getHand());
+        if (!(stackInHand.getItem() instanceof SpellbookCover)) return;
+        CuriosApi.getCuriosInventory(player).ifPresent(inv -> {
+
+            var slotResult = inv.findCurios(Curios.SPELLBOOK_SLOT);
+
+            if (slotResult.isEmpty()) return;
+            ItemStack curioSpellbook = slotResult.getFirst().stack();
+
+            if (!(curioSpellbook.getItem() instanceof SpellBook)) return;
+            if (stackInHand.getItem() instanceof SpellbookCover spellbookCover) {
+                boolean used = false;
+                int currentLevel = SpellBookComponentHelper.getLevel(curioSpellbook);
+
+                if (ModItems.NOVICE_SPELLBOOK_COVER.get().equals(spellbookCover) && currentLevel == 1) {
+                    SpellBookComponentHelper.setLevel(curioSpellbook, 2, player);
+                    used = true;
+                } else if (ModItems.ADEPT_SPELLBOOK_COVER.get().equals(spellbookCover) && currentLevel == 2) {
+                    SpellBookComponentHelper.setLevel(curioSpellbook, 3, player);
+                    used = true;
+                } else if (ModItems.SORCERER_SPELLBOOK_COVER.get().equals(spellbookCover) && currentLevel == 3) {
+                    SpellBookComponentHelper.setLevel(curioSpellbook, 4, player);
+                    used = true;
+                } else if (ModItems.SCHOLAR_SPELLBOOK_COVER.get().equals(spellbookCover) && currentLevel == 4) {
+                    SpellBookComponentHelper.setLevel(curioSpellbook, 5, player);
+                    used = true;
+                } else if (ModItems.ARCHMAGE_SPELLBOOK_COVER.get().equals(spellbookCover) && currentLevel == 5) {
+                    SpellBookComponentHelper.setLevel(curioSpellbook, 6, player);
+                    used = true;
+                }
+
+                if (used) {
+                    stackInHand.shrink(1);
+                    event.setCanceled(true);
+                }
+            }
+        });
 
     }
+
+
 
     @SubscribeEvent
     public static void mobStarAlignment(LivingDamageEvent.Pre event){
@@ -548,13 +573,17 @@ public class ModEvents {
             int mana = event.getManaCost();
             int currentExLvl = FatigueManager.getFatigueLevel(p);
             //int currentExLvl = player.getData(YpsAttachments.LEVEL_EXHAUSTION.get());
+
+
             if(ServerConfig.FATIGUE_SYSTEM.get()
                     && ServerConfig.ACTIVE_CERTUM.get()
                     && ServerConfig.PRINCIPLES_SYSTEM.get())
             {
                 if (SpellCategoriesGenerator.isInCategory(spellId, "immutable")) {
                     int certumLevel = PrinciplesProgressionManager.getCategoryLevel(player, Principles.CERTUM);
-                    event.setManaCost((int) (mana * (1 + Util.certumManaMultiplier(currentExLvl, certumLevel))));
+                    event.setManaCost((int)
+                            (mana * (1 + Util.certumManaMultiplier(currentExLvl, certumLevel)))
+                    );
                 }
             }
 
@@ -798,7 +827,6 @@ public class ModEvents {
                 true
         ));
     }
-
     public static float principleFatigueRatio(Set<String> categories, Player player){
         float ratio = 1f;
         for(String category: categories){
@@ -808,7 +836,6 @@ public class ModEvents {
         }
         return ratio;
     }
-
     private static void addExhaustion(ServerPlayer player, int amountToAdd) {
 
         FatigueManager.addFatigue(player, amountToAdd);
@@ -837,7 +864,6 @@ public class ModEvents {
             );
         }
     }
-
     private static int calculateXpFromSpell(int level, AbstractSpell spell) {
         SpellRarity spellRarity = spell.getRarity(level);
         if(spell.getCastType() != CastType.CONTINUOUS) {
@@ -868,8 +894,6 @@ public class ModEvents {
             }
         }
     }
-
-
 
     @SubscribeEvent
     public static void onDimensionChange(PlayerEvent.PlayerChangedDimensionEvent event) {
@@ -1210,9 +1234,23 @@ public class ModEvents {
                 default -> ChatFormatting.BLACK.getColor();
             };
             first.append(Component.literal(" ♦ ").withColor(color));
+            tooltip.removeFirst();
             tooltip.addFirst(first);
         }
     }
+
+    @SubscribeEvent
+    public static void registerBrewingRecipeRegister(RegisterBrewingRecipesEvent event){
+
+        event.getBuilder().addRecipe(
+                Ingredient.of(ModItems.TEST_TUBE),  Ingredient.of(Items.PITCHER_PLANT), ModItems.PITCHER_EXTRACT.toStack(1)
+        );
+        event.getBuilder().addRecipe(
+                Ingredient.of(ModItems.TEST_TUBE),  Ingredient.of(ModItems.ARCANE_MIXTURE), ModItems.LUMINAIRE_EXTRACT.toStack(1)
+        );
+
+    }
+
 
 
 

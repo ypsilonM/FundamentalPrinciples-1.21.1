@@ -5,6 +5,8 @@ import com.ypsi.fundamentalism.datagen.custom.EnchantingShieldSmithingRecipe;
 import com.ypsi.fundamentalism.enchantment.FundEnchantments;
 import com.ypsi.fundamentalism.item.ModFluids;
 import com.ypsi.fundamentalism.item.ModItems;
+import io.redspace.ironsspellbooks.jei.ArcaneAnvilJeiRecipe;
+import io.redspace.ironsspellbooks.jei.ArcaneAnvilRecipeMaker;
 import io.redspace.ironsspellbooks.recipe_types.alchemist_cauldron.BrewAlchemistCauldronRecipe;
 import io.redspace.ironsspellbooks.registries.FluidRegistry;
 import io.redspace.ironsspellbooks.registries.ItemRegistry;
@@ -16,6 +18,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.SmithingRecipe;
+import net.minecraft.world.item.crafting.SmithingTransformRecipe;
+import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.common.NeoForge;
@@ -23,6 +28,7 @@ import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.conditions.IConditionBuilder;
 import net.neoforged.neoforge.fluids.FluidStack;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import static io.redspace.ironsspellbooks.datagen.IronRecipeProvider.cauldronTwoWayInteraction;
@@ -83,6 +89,71 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('W', ItemRegistry.WEAPON_PARTS.get())
                 .unlockedBy("weapon_part_null", has(ItemRegistry.WEAPON_PARTS.get())).save(recipeOutput);
 
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.SPELLBOOK_COVER.get())
+                .pattern("LL ")
+                .pattern("SI ")
+                .pattern("LL ")
+                .define('L', Items.LEATHER)
+                .define('S', Items.STRING)
+                .define('I', Items.ITEM_FRAME)
+                .unlockedBy("has_leather", has(Items.LEATHER))
+                .save(recipeOutput);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.NOVICE_SPELLBOOK_COVER.get())
+                .pattern("AAG")
+                .pattern("ACG")
+                .pattern("GGA")
+                .define('C', ModItems.SPELLBOOK_COVER)
+                .define('A', ItemRegistry.ARCANE_ESSENCE.get())
+                .define('G', Items.GOLD_INGOT)
+                .unlockedBy("has_cover", has(ModItems.SPELLBOOK_COVER))
+                .save(recipeOutput);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.ADEPT_SPELLBOOK_COVER.get())
+                .pattern("ASI")
+                .pattern("SCS")
+                .pattern("ISA")
+                .define('C', ModItems.SPELLBOOK_COVER)
+                .define('A', ItemRegistry.ARCANE_ESSENCE.get())
+                .define('I', ItemRegistry.ARCANE_INGOT.get())
+                .define('S', Items.AMETHYST_SHARD)
+                .unlockedBy("has_cover", has(ModItems.SPELLBOOK_COVER))
+                .save(recipeOutput);
+
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.SORCERER_SPELLBOOK_COVER.get())
+                .pattern("AEI")
+                .pattern("ECE")
+                .pattern("IEA")
+                .define('C', ModItems.SPELLBOOK_COVER)
+                .define('A', ItemRegistry.ARCANE_ESSENCE.get())
+                .define('I', ItemRegistry.MITHRIL_INGOT.get())
+                .define('E', Items.ECHO_SHARD)
+                .unlockedBy("has_cover", has(ModItems.SPELLBOOK_COVER))
+                .save(recipeOutput);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.SCHOLAR_SPELLBOOK_COVER.get())
+                .pattern("AQI")
+                .pattern("QCA")
+                .pattern("IAQ")
+                .define('C', ModItems.SPELLBOOK_COVER)
+                .define('A', ItemRegistry.CINDER_ESSENCE.get())
+                .define('I', Items.NETHERITE_INGOT)
+                .define('Q', Items.QUARTZ)
+                .unlockedBy("has_cover", has(ModItems.SPELLBOOK_COVER))
+                .save(recipeOutput);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.ARCHMAGE_SPELLBOOK_COVER.get())
+                .pattern("ADI")
+                .pattern("DCA")
+                .pattern("IAD")
+                .define('C', ModItems.SPELLBOOK_COVER)
+                .define('A', ItemRegistry.CINDER_ESSENCE.get())
+                .define('I', ItemRegistry.PYRIUM_INGOT.get())
+                .define('D', ItemRegistry.DRAGONSKIN.get())
+                .unlockedBy("has_cover", has(ModItems.SPELLBOOK_COVER))
+                .save(recipeOutput);
+
 
         EnchantingShieldSmithingRecipe recipe = new EnchantingShieldSmithingRecipe(
                 ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "shield_upgrade"),
@@ -93,7 +164,6 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 1
         );
         recipeOutput.accept(recipe.getId(), recipe, null);
-
 
 
         BrewAlchemistCauldronRecipe.builder()
@@ -110,6 +180,8 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
 
         cauldronRecipientInteraction(recipeOutput, ModItems.LUMINAIRE_EXTRACT, ModFluids.ARCANE_MIXTURE);
         cauldronRecipientInteraction(recipeOutput, ModItems.PITCHER_EXTRACT, ModFluids.PITCHER_EXTRACT);
+
+
 
 
 //        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.ORB.get(), 9)

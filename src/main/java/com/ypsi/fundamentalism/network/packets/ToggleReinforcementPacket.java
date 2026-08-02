@@ -70,10 +70,10 @@ public record ToggleReinforcementPacket() implements CustomPacketPayload {
 
     private static @NotNull MobEffectInstance getMobEffectInstance(int augereLvl) {
         int amplifier = switch (augereLvl) {
-            case 3,4,5,6 -> 0;
-            case 7,8,9,10 -> 1;
-            case 11,12,13,14,15 -> 2;
-            case 16,17,18,19 -> 3;
+            case 0,1,2,3,4 -> 0;
+            case 5,6,7,8,9 -> 1;
+            case 10,11,12,13,14 -> 2;
+            case 15,16,17,18,19 -> 3;
             case 20 -> 4;
             default -> 0;
         };

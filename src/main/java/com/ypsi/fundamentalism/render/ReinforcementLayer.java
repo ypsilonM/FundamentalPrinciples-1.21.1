@@ -23,6 +23,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.PlayerModelPart;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Vector3f;
@@ -60,7 +61,7 @@ public class ReinforcementLayer extends RenderLayer<Player, PlayerModel<Player>>
         if (player.hasEffect(ModEffects.REINFORCEMENT_EFFECT)) {
 
             Minecraft minecraft = Minecraft.getInstance();
-            PlayerSkin skin = minecraft.getSkinManager().getInsecureSkin(minecraft.getGameProfile());
+            PlayerSkin skin = minecraft.getSkinManager().getInsecureSkin(player.getGameProfile());
             PlayerSkin.Model modelType = skin.model();
 
             boolean isSlim = modelType == PlayerSkin.Model.SLIM;

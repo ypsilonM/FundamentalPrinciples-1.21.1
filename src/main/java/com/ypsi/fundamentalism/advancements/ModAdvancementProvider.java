@@ -181,22 +181,9 @@ public class ModAdvancementProvider {
                             )).save(saver, ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "saeptum_advancement"), existingFileHelper);
 
             //REINFORCEMENT LEVELS
-            AdvancementHolder getReinforcement1 = Advancement.Builder.advancement()
-                    .parent(rootPrinciples)
-                    .display(
-                            Items.SHIELD,
-                            Component.literal("Battlemage I"),
-                            Component.literal("Learn Mana Reinforcement Technique"),
-                            null,
-                            AdvancementType.GOAL,
-                            true, true, false
-                    ).addCriterion("goalFirstReinforcement",
-                            new Criterion<>(
-                                    YpTriggers.TECHNIQUES_TRIGGER_SUPPLIER.get(),
-                                    TecnhiqueTrigger.Instance.hasAcquired(Techniques.REINFORCEMENT, 1)
-                            )).save(saver, ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "first_reinforcement_advancement"), existingFileHelper);
+
             AdvancementHolder getReinforcement2 = Advancement.Builder.advancement()
-                    .parent(getReinforcement1)
+                    .parent(rootPrinciples)
                     .display(
                             Items.SHIELD,
                             Component.literal("Battlemage II"),
