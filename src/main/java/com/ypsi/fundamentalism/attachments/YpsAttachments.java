@@ -5,6 +5,7 @@ import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.attachments.customAtt.AvailableSpellsAttachment;
 import com.ypsi.fundamentalism.attachments.customAtt.EfficiencyAttachment;
 import com.ypsi.fundamentalism.attachments.customAtt.PrinciplesLevelsAttachment;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.IEventBus;
@@ -18,6 +19,17 @@ import java.util.function.Supplier;
 public class YpsAttachments {
     private static final DeferredRegister<AttachmentType<?>> ATTACHMENTS =
             DeferredRegister.create(NeoForgeRegistries.Keys.ATTACHMENT_TYPES, FundamentalPrinciples.MOD_ID);
+
+    public static final Supplier<AttachmentType<Integer>> BOOST =
+            ATTACHMENTS.register("boost_fatigue", () ->
+                AttachmentType.builder(() -> 0)
+                        .serialize(Codec.INT)
+                        .copyOnDeath()
+                        .sync(
+                                (IAttachmentHolder holder, ServerPlayer receiver) -> holder == receiver,
+                                ByteBufCodecs.INT
+                        )
+                        .build());
 
     public static final Supplier<AttachmentType<Integer>> CURRENT_FATIGUE =
             ATTACHMENTS.register("current_exhaustion", () ->
@@ -54,6 +66,10 @@ public class YpsAttachments {
                     AttachmentType.<EfficiencyAttachment>builder(EfficiencyAttachment::new)
                             .serialize(EfficiencyAttachment.CODEC)
                             .copyOnDeath()
+                            .sync(
+                                    (holder, receiver) -> holder == receiver,
+                                    ByteBufCodecs.fromCodec(EfficiencyAttachment.CODEC)
+                            )
                             .build()
                     );
 

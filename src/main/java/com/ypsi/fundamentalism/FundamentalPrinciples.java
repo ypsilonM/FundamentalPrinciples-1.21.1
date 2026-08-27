@@ -6,7 +6,6 @@ import com.ypsi.fundamentalism.block.YpsBlocks;
 import com.ypsi.fundamentalism.block.YpsEntityBlocks;
 import com.ypsi.fundamentalism.block.custom.DomainBlockEntityRenderer;
 import com.ypsi.fundamentalism.component.YpsDataComponents;
-import com.ypsi.fundamentalism.datagen.RecipeSerializers;
 import com.ypsi.fundamentalism.datagen.providers.ModLootProvider;
 import com.ypsi.fundamentalism.effect.ModEffects;
 import com.ypsi.fundamentalism.entity.ModEntities;
@@ -27,11 +26,7 @@ import com.ypsi.fundamentalism.item.ModCreativeModTabs;
 import com.ypsi.fundamentalism.item.ModFluids;
 import com.ypsi.fundamentalism.item.ModItems;
 import com.ypsi.fundamentalism.keybind.ModKeyBinds;
-import com.ypsi.fundamentalism.network.*;
-import com.ypsi.fundamentalism.network.commands.ExhaustionCommand;
-import com.ypsi.fundamentalism.network.commands.ShowToastCommand;
-import com.ypsi.fundamentalism.network.commands.SpellCategoriesCommand;
-import com.ypsi.fundamentalism.network.commands.SpellbookLevelCommand;
+import com.ypsi.fundamentalism.network.commands.*;
 import com.ypsi.fundamentalism.particle.*;
 import com.ypsi.fundamentalism.sound.ModSounds;
 import com.ypsi.fundamentalism.spells.ModSpells;
@@ -43,7 +38,6 @@ import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
-import net.neoforged.neoforge.common.brewing.BrewingRecipeRegistry;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
@@ -97,8 +91,6 @@ public class FundamentalPrinciples {
 
         modEventBus.addListener(this::addCreative);
 
-        RecipeSerializers.registrar(modEventBus);
-
         modContainer.registerConfig(ModConfig.Type.SERVER, ServerConfig.SPEC);
         modContainer.registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC);
 
@@ -117,6 +109,7 @@ public class FundamentalPrinciples {
         ExhaustionCommand.registerSet(event.getDispatcher());
         SpellCategoriesCommand.register(event.getDispatcher());
         SpellbookLevelCommand.register(event.getDispatcher());
+        EfficiencyCommand.register(event.getDispatcher());
 
         //ShowToastCommand.register(event.getDispatcher());
 

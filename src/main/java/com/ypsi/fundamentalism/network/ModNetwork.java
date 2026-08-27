@@ -44,6 +44,12 @@ public class ModNetwork {
                 ToggleReinforcementPacket.STREAM_CODEC,
                 ToggleReinforcementPacket::handle
         );
+        //Charge Boost
+        registrar.playToServer(
+                ChargeBoostPacket.TYPE,
+                ChargeBoostPacket.STREAM_CODEC,
+                ChargeBoostPacket::handle
+        );
 
         //Reinforcement
         registrar.playToClient(

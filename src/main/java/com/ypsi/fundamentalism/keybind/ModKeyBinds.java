@@ -20,6 +20,12 @@ public class ModKeyBinds {
                     KeyConflictContext.IN_GAME,
                     InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_Y,
                     "key.category.fundamentalism");
+    public static final Supplier<KeyMapping> BOOST_KEY =
+            registerKey(
+                    "boost",
+                    KeyConflictContext.IN_GAME,
+                    InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_C,
+                    "key.category.fundamentalism");
     public static final Supplier<KeyMapping> SELECTION_KEY =
             registerKey(
                     "selection",

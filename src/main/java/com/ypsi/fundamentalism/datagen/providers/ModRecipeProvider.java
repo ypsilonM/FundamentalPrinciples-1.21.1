@@ -1,32 +1,21 @@
 package com.ypsi.fundamentalism.datagen.providers;
 
-import com.ypsi.fundamentalism.FundamentalPrinciples;
-import com.ypsi.fundamentalism.datagen.custom.EnchantingShieldSmithingRecipe;
-import com.ypsi.fundamentalism.enchantment.FundEnchantments;
 import com.ypsi.fundamentalism.item.ModFluids;
 import com.ypsi.fundamentalism.item.ModItems;
-import io.redspace.ironsspellbooks.jei.ArcaneAnvilJeiRecipe;
-import io.redspace.ironsspellbooks.jei.ArcaneAnvilRecipeMaker;
 import io.redspace.ironsspellbooks.recipe_types.alchemist_cauldron.BrewAlchemistCauldronRecipe;
-import io.redspace.ironsspellbooks.registries.FluidRegistry;
 import io.redspace.ironsspellbooks.registries.ItemRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.SmithingRecipe;
-import net.minecraft.world.item.crafting.SmithingTransformRecipe;
-import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.common.Tags;
+import net.neoforged.fml.loading.ModDirTransformerDiscoverer;
 import net.neoforged.neoforge.common.conditions.IConditionBuilder;
 import net.neoforged.neoforge.fluids.FluidStack;
+import software.bernie.geckolib.event.GeoRenderEvent;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -154,16 +143,12 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("has_cover", has(ModItems.SPELLBOOK_COVER))
                 .save(recipeOutput);
 
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.COMBAT, ModItems.HIRSUTE_NECKLACE)
+                .requires(ModItems.URSIDAE_FUR.get(), 1)
+                .requires(ItemRegistry.HEAVY_CHAIN.get(), 1)
+                .unlockedBy("has_heavy_chain", has(ItemRegistry.HEAVY_CHAIN.get()))
+                .save(recipeOutput);
 
-        EnchantingShieldSmithingRecipe recipe = new EnchantingShieldSmithingRecipe(
-                ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "shield_upgrade"),
-                Ingredient.of(ItemRegistry.BLANK_RUNE.get()),
-                Ingredient.of(Items.SHIELD),
-                Ingredient.of(ModItems.URSIDAE_FUR),
-                FundEnchantments.AEGIS,
-                1
-        );
-        recipeOutput.accept(recipe.getId(), recipe, null);
 
 
         BrewAlchemistCauldronRecipe.builder()

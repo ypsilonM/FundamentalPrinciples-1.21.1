@@ -3,6 +3,7 @@ package com.ypsi.fundamentalism.mixins.clientMixins;
 import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.ServerConfig;
 import com.ypsi.fundamentalism.attachments.FatigueManager;
+import com.ypsi.fundamentalism.attachments.YpsAttachments;
 import com.ypsi.fundamentalism.principleGen.SpellCategoriesGenerator;
 import com.ypsi.fundamentalism.attachments.PrinciplesProgressionManager;
 import com.ypsi.fundamentalism.util.Principles;
@@ -36,6 +37,7 @@ import java.util.stream.Collectors;
 @Mixin(SpellWheelOverlay.class)
 public class SpellWheelOverlayMixin {
 
+    //EXTRA INFO LIKE "% TP FAILURE" AND PRINCIPLES SYMBOLS
     @Inject(method = "render", at = @At("TAIL"), remap = false)
     private void addAllExtraInfo(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
         try {
@@ -107,6 +109,7 @@ public class SpellWheelOverlayMixin {
         }
     }
 
+    //DOMINAN SPELLS VISUAL COLOR CHANGED
     @Redirect(
             method = "render",
             at = @At(
@@ -129,6 +132,8 @@ public class SpellWheelOverlayMixin {
         }
     }
 
+
+    //RENDER VISUAL MANA MODIFIED COST
     @Redirect(
             method = "render",
             at = @At(
@@ -146,14 +151,31 @@ public class SpellWheelOverlayMixin {
         int originalCost = spell.getManaCost(spellLevel);
         int certumLevel = 0;
         if(player!=null) {
+
+            int efficiencyLvl = 5;
+            if(ServerConfig.EFFICIENCY_ATTRIBUTE.get())
+                efficiencyLvl = player.getData(YpsAttachments.CAST_EFFICIENCY.get()).getEfficiencyLevel();
+
             certumLevel = PrinciplesProgressionManager.getCategoryLevel(player, Principles.CERTUM);
-//        if(SpellCategoriesGenerator.isInCategory(spell.getSpellId(), "immutable")){
-//           originalCost = (int)(originalCost * (1+Util.manaMultiplier( player.getData(YpsAttachments.LEVEL_EXHAUSTION), certumLevel )));
-//        }
-            if (SpellCategoriesGenerator.isInCategory(spell.getSpellId(), "immutable")
-                    && ServerConfig.ACTIVE_CERTUM.get()
-                    && ServerConfig.PRINCIPLES_SYSTEM.get()) {
-                originalCost = (int) (originalCost * (1 + Util.certumManaMultiplier(FatigueManager.getFatigueLevel(player), certumLevel)));
+
+            if (ServerConfig.FATIGUE_SYSTEM.get() && ServerConfig.ACTIVE_CERTUM.get() && ServerConfig.PRINCIPLES_SYSTEM.get()) {
+
+                if(SpellCategoriesGenerator.isInPrinciple(spell.getSpellId(), Principles.CERTUM)) {
+                    originalCost = (int) (
+                            originalCost * (1 + Util.certumManaMultiplier(FatigueManager.getFatigueLevel(player), certumLevel)) * (
+                                    ServerConfig.EFFICIENCY_ATTRIBUTE.get() ? Util.getEfficiencyMultiplier(efficiencyLvl, true) : 1)
+                    );
+                }else{
+                    originalCost = (int) (
+                            originalCost * (
+                                    ServerConfig.EFFICIENCY_ATTRIBUTE.get() ? Util.getEfficiencyMultiplier(efficiencyLvl, false) : 1)
+                    );
+                }
+            }else{
+                originalCost = (int) (
+                        originalCost * (
+                                ServerConfig.EFFICIENCY_ATTRIBUTE.get() ? Util.getEfficiencyMultiplier(efficiencyLvl, false) : 1)
+                );
             }
         }
         return (originalCost);

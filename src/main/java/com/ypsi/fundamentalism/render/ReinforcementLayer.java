@@ -12,6 +12,7 @@ import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
 import io.redspace.ironsspellbooks.api.spells.SchoolType;
 import io.redspace.ironsspellbooks.api.util.Utils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.model.geom.ModelLayers;
@@ -67,6 +68,7 @@ public class ReinforcementLayer extends RenderLayer<Player, PlayerModel<Player>>
             boolean isSlim = modelType == PlayerSkin.Model.SLIM;
 
             PlayerModel<Player> currentModel = isSlim ? modelSlim : modelNormal;
+            currentModel.setAllVisible(true);
 
             int color1 = Utils.packRGB(Util.getElementalColor(player));
 
@@ -92,25 +94,6 @@ public class ReinforcementLayer extends RenderLayer<Player, PlayerModel<Player>>
         }
     }
 
-//    private PlayerModel<Player> determineModel(Player player) {
-//            Minecraft minecraft = Minecraft.getInstance();
-//            PlayerSkin skin = minecraft.getSkinManager().getInsecureSkin(minecraft.getGameProfile());
-//            PlayerSkin.Model model = skin.model();
-//        try {
-//            Field slimField = PlayerModel.class.getDeclaredField("slim");
-//            slimField.setAccessible(true);
-//            boolean isSlim = slimField.getBoolean(this.getParentModel());
-//            if(isSlim) this.isSlim = true;
-//            return isSlim ? modelSlim : modelNormal;
-//        } catch (Exception e) {
-//            String rendererStr = this.getParentModel().toString().toLowerCase();
-//            if (rendererStr.contains("slim")) {
-//                this.isSlim = true;
-//                return modelSlim;
-//            }
-//            return modelNormal;
-//        }
-//    }
 
     public static int rgbToArgb(int rgb, float alpha) {
         int alphaByte = (int)(alpha * 255) << 24;

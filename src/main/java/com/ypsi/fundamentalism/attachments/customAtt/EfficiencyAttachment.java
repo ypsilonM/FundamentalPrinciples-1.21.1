@@ -2,8 +2,11 @@ package com.ypsi.fundamentalism.attachments.customAtt;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.ypsi.fundamentalism.attachments.YpsAttachments;
 import com.ypsi.fundamentalism.util.Util;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
+import net.neoforged.neoforge.attachment.IAttachmentHolder;
 
 public class EfficiencyAttachment {
     private int efficiencyLevel;
@@ -49,44 +52,21 @@ public class EfficiencyAttachment {
             if (listener != null) {
                 listener.onLevelChanged(oldLevel, level);
             }
+
         }
     }
     public void setExperience(int experience) {
         this.efficiencyExperience = Math.max(0, experience);
     }
 
-    public void addExperience(int amount) {
-        int currentExp = getEfficiencyExperience();
-        int currentLevel = getEfficiencyLevel();
-
-        if (currentLevel >= 10) return;
-
-        int totalXp = currentExp + amount;
-
-        while(currentLevel<10){
-            int xp4NextLvl = getExpForLevel(currentLevel + 1);
-            if (totalXp >= xp4NextLvl) {
-                totalXp-=xp4NextLvl;
-                currentLevel++;
-                setLevel(currentLevel);
-            }else{
-                break;
-            }
-        }
-        setExperience(totalXp);
-    }
-
     public int getExpForLevel(int level) {
         return Util.getXpForEfficiencyLevel(level);
     }
 
-    public float getProgress(String category) {
+    public float getProgress() {
         int currentLevel = getEfficiencyLevel();
-        if (currentLevel >= 10) return 1.0f;
-
         int currentExp = getEfficiencyExperience();
         int expForNextLevel = getExpForLevel(currentLevel + 1);
-
         return (float) currentExp / expForNextLevel;
     }
 

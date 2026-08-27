@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.ServerConfig;
+import com.ypsi.fundamentalism.attachments.EfficiencyManager;
 import com.ypsi.fundamentalism.keybind.ModKeyBinds;
 import com.ypsi.fundamentalism.network.packets.data.ClientCategoryLevelsData;
 import com.ypsi.fundamentalism.attachments.PrinciplesProgressionManager;
@@ -11,11 +12,13 @@ import com.ypsi.fundamentalism.util.Principles;
 import com.ypsi.fundamentalism.util.Util;
 import io.redspace.ironsspellbooks.api.util.Utils;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.*;
 
@@ -24,16 +27,26 @@ public class PrinciplesScreen extends Screen {
     private static final int WINDOW_HEIGHT = 210;
     private int leftPos, topPos;
 
+    private static final int SECTION_PRINCIPLES = 0;
+    private static final int SECTION_DOMINAN = 1;
+    private static final int SECTION_CLEAN = 2;
+    private int currentSection = SECTION_PRINCIPLES;
+
+    private static final int TAB_WIDTH = 70;
+    private static final int TAB_HEIGHT = 20;
+    private static final int TAB_SPACING = 10;
+    private final boolean[] tabHovered = new boolean[3];
+
     private String selectedCategory = null;
     private static final int LARGE_ICON_SIZE = 48;
     private static final int CENTER_ANIMATION_TIME = 30;
     private int animationTimer = 0;
 
     private static final int ICON_SIZE = 32;
-    private static final int ICON_SPACING = 34; // Espacio entre iconos
-    private static final int ICONS_PER_ROW = 4; // Número de iconos por fila
-    private static final int GRID_START_X = 95; // Margen izquierdo para los iconos
-    private static final int GRID_START_Y = 60; // Margen superior para los iconos
+    private static final int ICON_SPACING = 34;
+    private static final int ICONS_PER_ROW = 4;
+    private static final int GRID_START_X = 95;
+    private static final int GRID_START_Y = 50;
 
     private final String[] CATEGORIES = {
             "createEntity", "usesShoot", "usesSummon", "usesTargeting",
@@ -45,6 +58,8 @@ public class PrinciplesScreen extends Screen {
     private Map<String, Integer> hoverTimers = new HashMap<>();
     private static final int HOVER_ANIMATION_TIME = 10;
 
+    private static final int BACK_BUTTON_SIZE = 15;
+    private boolean backButtonHovered = false;
 
     public PrinciplesScreen() {
         super(Component.literal("Magic Principles"));
@@ -87,37 +102,123 @@ public class PrinciplesScreen extends Screen {
         poseStack.popPose();
     }
 
+
+
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-
         this.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
-        Component styledTitle = this.title.copy().withStyle(ChatFormatting.BOLD).withColor(0x4D4942);
+
+        String titleString;
+        switch (currentSection) {
+            case SECTION_PRINCIPLES -> titleString = "Magic Principles";
+            case SECTION_DOMINAN -> titleString = "Dominan Spells";
+            case SECTION_CLEAN -> titleString = " Efficiency";
+            default -> titleString = "Magic Principles";
+        }
+        Component styledTitle = Component.literal(titleString).copy().withStyle(ChatFormatting.BOLD).withColor(0x4D4942);
 
         int titleWidth = this.font.width(styledTitle);
-        int titleX = leftPos+10 + (WINDOW_WIDTH - titleWidth) / 4;
-        guiGraphics.drawString(this.font, styledTitle, titleX, topPos + 30, 0xFFFFFF, false);
+        int titleX = leftPos + 10 + (WINDOW_WIDTH - titleWidth) / 4;
+        guiGraphics.drawString(this.font, styledTitle, titleX, topPos + 25, 0xFFFFFF, false);
 
-        guiGraphics.enableScissor(leftPos + 8, topPos + 20, leftPos + WINDOW_WIDTH - 8, topPos + WINDOW_HEIGHT - 8);
+        renderTabs(guiGraphics, mouseX, mouseY);
 
-        renderGridIcons(guiGraphics, mouseX, mouseY);
-
-        guiGraphics.disableScissor();
-    }
-
-    private void renderGridIcons(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         int centerX = leftPos + WINDOW_WIDTH / 2;
         int centerY = topPos + WINDOW_HEIGHT / 2;
 
-        if (selectedCategory != null) {
-            int level = ClientCategoryLevelsData.getLevel(selectedCategory);
-            float progress = ClientCategoryLevelsData.getProgress(selectedCategory);
-            renderSelectedCategoryTooltip(guiGraphics, selectedCategory, level, progress, centerX, centerY);
-        }else{
-            renderInfoText(guiGraphics, centerX, centerY);
+        switch (currentSection) {
+            case SECTION_PRINCIPLES -> {
+                renderPrinciplesGrid(guiGraphics, mouseX, mouseY);
+                if (selectedCategory != null) {
+                    int level = ClientCategoryLevelsData.getLevel(selectedCategory);
+                    float progress = ClientCategoryLevelsData.getProgress(selectedCategory);
+                    renderSelectedPrincipleDetails(guiGraphics, selectedCategory, level, progress, centerX, centerY);
+                } else {
+                    renderEmptyPrinciplesInfo(guiGraphics, centerX, centerY);
+                }
+                if (selectedCategory != null) {
+                    renderBackButton(guiGraphics, mouseX, mouseY);
+                }
+            }
+            case SECTION_DOMINAN -> {
+                renderDominanMastery(guiGraphics, centerX, centerY);
+                renderDominanInfo(guiGraphics, centerX, centerY);
+            }
+            case SECTION_CLEAN -> {
+                Minecraft mc = Minecraft.getInstance();
+                Player player = mc.player;
+                int level = EfficiencyManager.getCurrentLvl(player);
+                int xp = EfficiencyManager.getCurrentXP(player);
+                int expForLevel = EfficiencyManager.getExpForLevel(level+1);
+
+                renderEfficiencyLeft(guiGraphics);
+                renderEfficiencyRight(guiGraphics, centerX, centerY, level, xp, expForLevel);
+
+            }
+        }
+    }
+
+    private void renderTabs(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        float scale = 1.3f;
+        int originalWidth = 288;
+        int originalHeight = 180;
+        int scaledWidth = (int) (originalWidth * scale);
+        int scaledHeight = (int) (originalHeight * scale);
+        int offsetX = leftPos + (WINDOW_WIDTH - scaledWidth) / 2;
+        int offsetY = topPos + (WINDOW_HEIGHT - scaledHeight) / 2;
+
+        int totalTabsWidth = TAB_WIDTH * 3 + TAB_SPACING * 2;
+        int startX = offsetX + (scaledWidth - totalTabsWidth) / 2;
+        int tabY = offsetY - TAB_HEIGHT - 5;
+
+        String[] labels = {"Principles", "Dominan", "Efficiency"};
+
+        for (int i = 0; i < 3; i++) {
+            int x = startX + i * (TAB_WIDTH + TAB_SPACING);
+            tabHovered[i] = (mouseX >= x && mouseX <= x + TAB_WIDTH && mouseY >= tabY && mouseY <= tabY + TAB_HEIGHT);
+
+            int bgColor = tabHovered[i] ? 0xFFD7B36D : 0xFF4D4942;
+            int borderColor = tabHovered[i] ? 0xFFFFD700 : 0xFFD1BFA1;
+            int textColor = tabHovered[i] ? 0xFFFFF2DB : 0xFFD1BFA1;
+
+            guiGraphics.fill(x, tabY, x + TAB_WIDTH, tabY + TAB_HEIGHT, bgColor);
+            guiGraphics.renderOutline(x, tabY, TAB_WIDTH, TAB_HEIGHT, borderColor);
+
+            String label = labels[i];
+            int labelWidth = this.font.width(label);
+            int labelX = x + (TAB_WIDTH - labelWidth) / 2;
+            int labelY = tabY + (TAB_HEIGHT - 8) / 2;
+            guiGraphics.drawString(this.font, label, labelX, labelY, textColor, false);
+        }
+    }
+
+    private void renderEmptyPrinciplesInfo(GuiGraphics guiGraphics, int centerX, int centerY) {
+        int offsetX = 22;
+        int offsetY = -80;
+        int textX = centerX + offsetX;
+        int textY = centerY + offsetY;
+
+        List<Component> lines = List.of(
+                Component.literal(""),
+                Component.literal("Magic principles are the").withColor(0x4D4942),
+                Component.literal("fundamental concepts upon").withColor(0x4D4942),
+                Component.literal("which spell structures").withColor(0x4D4942),
+                Component.literal("are based. They represent").withColor(0x4D4942),
+                Component.literal("behaviors and peculiarities.").withColor(0x4D4942),
+                Component.literal("There are currently 13").withColor(0x4D4942),
+                Component.literal("different principles known").withColor(0x4D4942),
+                Component.literal("to date and the mastery of").withColor(0x4D4942),
+                Component.literal("these defines a wizard's").withColor(0x4D4942),
+                Component.literal("power.").withColor(0x4D4942)
+        );
+
+        for (int i = 0; i < lines.size(); i++) {
+            guiGraphics.drawString(this.font, lines.get(i), textX, textY + i * 10, 0xFFFFFF, false);
         }
 
+    }
+    private void renderPrinciplesGrid(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         for (int i = 0; i < CATEGORIES.length; i++) {
-
             int row = i / ICONS_PER_ROW;
             int col = i % ICONS_PER_ROW;
             int x = leftPos + GRID_START_X + (col * ICON_SPACING);
@@ -129,7 +230,6 @@ public class PrinciplesScreen extends Screen {
         }
 
         for (int i = 0; i < CATEGORIES.length; i++) {
-
             int row = i / ICONS_PER_ROW;
             int col = i % ICONS_PER_ROW;
             int x = leftPos + GRID_START_X + (col * ICON_SPACING);
@@ -141,35 +241,7 @@ public class PrinciplesScreen extends Screen {
             }
         }
     }
-    private void renderInfoText(GuiGraphics guiGraphics, int centerX, int centerY) {
-        int offsetX = 30;
-        int offsetY = -80;
-        int textX = centerX + offsetX;
-        int textY = centerY + offsetY;
-
-        List<Integer> dominanLvls = (List<Integer>) ServerConfig.DOMINAN_LEVELS.get();
-
-        List<Component> lines = List.of(
-                Component.literal("Dominan Mastery").withStyle(ChatFormatting.BOLD).withColor(0x4D4942),
-                Component.literal("").withStyle(),
-                Component.literal("Minimum level required").withColor(0x4D4942),
-                Component.literal("in each principle per").withColor(0x4D4942),
-                Component.literal("spell rarity in order").withColor(0x4D4942),
-                Component.literal("to cast dominan spells.").withColor(0x4D4942),
-                Component.literal("").withStyle(),
-                Component.literal("• Legendary: "+dominanLvls.get(4)).withColor(0x997115),
-                Component.literal("• Epic: "+dominanLvls.get(3)).withColor(0x64397D),
-                Component.literal("• Rare: "+dominanLvls.get(2)).withColor(0x397D7D),
-                Component.literal("• Uncommon: "+dominanLvls.get(1)).withColor(0x528241),
-                Component.literal("• Common: "+dominanLvls.get(0)).withColor(0x403632)
-        );
-
-        for (int i = 0; i < lines.size(); i++) {
-            guiGraphics.drawString(this.font, lines.get(i), textX, textY + i * 10, 0xFFFFFF, false);
-        }
-    }
-
-    private void renderSelectedCategoryTooltip(GuiGraphics guiGraphics, String category, int level, float progress, int centerX, int centerY) {
+    private void renderSelectedPrincipleDetails(GuiGraphics guiGraphics, String category, int level, float progress, int centerX, int centerY) {
         List<Component> tooltip = new ArrayList<>();
 
         tooltip.add(Component.literal(PrinciplesProgressionManager.getCategoryDisplayName(category))
@@ -185,7 +257,6 @@ public class PrinciplesScreen extends Screen {
             tooltip.add(Component.literal(""));
             tooltip.add(Component.literal(""));
             tooltip.add(Component.literal(""));
-
         } else {
             tooltip.add(Component.literal(""));
             tooltip.add(Component.literal("Level: " + level + "/20")
@@ -209,7 +280,6 @@ public class PrinciplesScreen extends Screen {
         power = (double) Math.round(power * 100) /100;
         String sign = power >= 0 ? "+" : "";
         String powerMsg = Utils.stringTruncation(power, 2);
-        //ChatFormatting color = power < 0 ? ChatFormatting.RED : ChatFormatting.BLUE;
         int color = power < 0 ? 0xAD1330 : 0x192BB0;
 
         tooltip.add(Component.literal("• " + sign + powerMsg + "% Power")
@@ -320,8 +390,153 @@ public class PrinciplesScreen extends Screen {
                     .withStyle((additionalFatigue >= 0 ? ChatFormatting.RED : ChatFormatting.BLUE)));
         }
 
-        renderLargeIconWithTooltip(guiGraphics, category, level, progress, centerX, centerY, tooltip, isMaxLevel ? -1 : progress);
+        //renderLargeIconWithTooltip(guiGraphics, category, level, progress, centerX, centerY, tooltip, isMaxLevel ? -1 : progress);
 
+        renderLargeIconWithTooltip(guiGraphics, category, level, progress, centerX, centerY, tooltip, isMaxLevel ? -1 : progress);
+    }
+
+    private void renderBackButton(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        float scale = 1.3f;
+
+        int originalWidth = 288;
+        int originalHeight = 180;
+        int scaledWidth = (int) (originalWidth * scale);
+        int scaledHeight = (int) (originalHeight * scale);
+        int offsetX = leftPos + (WINDOW_WIDTH - scaledWidth) / 2;
+        int offsetY = topPos + (WINDOW_HEIGHT - scaledHeight) / 2;
+
+        int size = BACK_BUTTON_SIZE;
+        int marginRight = 20;
+        int marginBottom = 18;
+        int x = offsetX + scaledWidth - size - marginRight;
+        int y = offsetY + scaledHeight - size - marginBottom;
+
+        backButtonHovered = (mouseX >= x && mouseX <= x + size && mouseY >= y && mouseY <= y + size);
+        float arrowScale = 2f;
+        String arrow = "←";
+        PoseStack poseStack = guiGraphics.pose();
+        poseStack.pushPose();
+        poseStack.translate(x + size / 2f, y + size / 2f, 0);
+        poseStack.scale(arrowScale, arrowScale, 1.0f);
+
+        int arrowWidth = this.font.width(arrow);
+        int arrowHeight = this.font.lineHeight;
+        int drawX = -arrowWidth / 2;
+        int drawY = -arrowHeight / 2;
+        int color = backButtonHovered ? 0xEFBF04 : 0xD1BFA1;
+        guiGraphics.drawString(this.font, arrow, drawX, drawY, color, false);
+        poseStack.popPose();
+    }
+
+    private void renderDominanInfo(GuiGraphics guiGraphics, int centerX, int centerY) {
+        float scale = 1.3f;
+        int originalWidth = 288;
+        int originalHeight = 180;
+        int scaledWidth = (int) (originalWidth * scale);
+        int scaledHeight = (int) (originalHeight * scale);
+        int bookLeft = leftPos + (WINDOW_WIDTH - scaledWidth) / 2;
+
+        int marginLeft = 40;
+        int textX = bookLeft + marginLeft;
+        int textY = topPos + 35;
+
+        List<Component> lines = List.of(
+                Component.literal("").withStyle(),
+                Component.literal("This kind of spells are ").withColor(0x4D4942),
+                Component.literal("higher difficulty spells").withColor(0x4D4942),
+                Component.literal("due to their numerous   ").withColor(0x4D4942),
+                Component.literal("amount of principles    ").withColor(0x4D4942),
+                Component.literal("attached to them.       ").withColor(0x4D4942),
+                Component.literal("Dominan spells give x3  ").withColor(0x4D4942),
+                Component.literal("amount of xp in each    ").withColor(0x4D4942),
+                Component.literal("principle they have     ").withColor(0x4D4942),
+                Component.literal("after casting them.     ").withColor(0x4D4942)
+
+        );
+
+        for (int i = 0; i < lines.size(); i++) {
+            guiGraphics.drawString(this.font, lines.get(i), textX, textY + i * 10, 0xFFFFFF, false);
+        }
+    }
+    private void renderDominanMastery(GuiGraphics guiGraphics, int centerX, int centerY) {
+        int offsetX = 30;
+        int offsetY = -80;
+        int textX = centerX + offsetX;
+        int textY = centerY + offsetY;
+
+        List<Integer> dominanLvls = (List<Integer>) ServerConfig.DOMINAN_LEVELS.get();
+
+        List<Component> lines = List.of(
+                Component.literal("Dominan Mastery").withStyle(ChatFormatting.BOLD).withColor(0x4D4942),
+                Component.literal("").withStyle(),
+                Component.literal("Minimum level required").withColor(0x4D4942),
+                Component.literal("in each principle per").withColor(0x4D4942),
+                Component.literal("spell rarity in order").withColor(0x4D4942),
+                Component.literal("to cast dominan spells.").withColor(0x4D4942),
+                Component.literal("").withStyle(),
+                Component.literal("• Legendary: "+dominanLvls.get(4)).withColor(0x997115),
+                Component.literal("• Epic: "+dominanLvls.get(3)).withColor(0x64397D),
+                Component.literal("• Rare: "+dominanLvls.get(2)).withColor(0x397D7D),
+                Component.literal("• Uncommon: "+dominanLvls.get(1)).withColor(0x528241),
+                Component.literal("• Common: "+dominanLvls.get(0)).withColor(0x403632)
+        );
+
+        for (int i = 0; i < lines.size(); i++) {
+            guiGraphics.drawString(this.font, lines.get(i), textX, textY + i * 10, 0xFFFFFF, false);
+        }
+    }
+
+    private void renderEfficiencyLeft(GuiGraphics guiGraphics) {
+        float scale = 1.3f;
+        int originalWidth = 288;
+        int originalHeight = 180;
+        int scaledWidth = (int) (originalWidth * scale);
+        int scaledHeight = (int) (originalHeight * scale);
+        int bookLeft = leftPos + (WINDOW_WIDTH - scaledWidth) / 2;
+
+        int marginLeft = 40;
+        int textX = bookLeft + marginLeft;
+        int textY = topPos + 35;
+
+        List<Component> lines = List.of(
+                Component.literal("").withStyle(),
+                Component.literal("Efficiency consist in  ").withColor(0x4D4942),
+                Component.literal("the performance of mana").withColor(0x4D4942),
+                Component.literal("consumption ").withColor(0x4D4942),
+                Component.literal("amount of principles    ").withColor(0x4D4942),
+                Component.literal("attached to them.       ").withColor(0x4D4942),
+                Component.literal("Dominan spells give x3  ").withColor(0x4D4942),
+                Component.literal("amount of xp in each    ").withColor(0x4D4942),
+                Component.literal("principle they have     ").withColor(0x4D4942),
+                Component.literal("after casting them.     ").withColor(0x4D4942)
+
+        );
+
+        for (int i = 0; i < lines.size(); i++) {
+            guiGraphics.drawString(this.font, lines.get(i), textX, textY + i * 10, 0xFFFFFF, false);
+        }
+    }
+    private void renderEfficiencyRight(GuiGraphics guiGraphics, int centerX, int centerY, int level, int xp, int expForLvL) {
+        int offsetX = 30;
+        int offsetY = -80;
+        int textX = centerX + offsetX;
+        int textY = centerY + offsetY;
+
+        int percentage = (xp/expForLvL)*100;
+        int blacks = 10 - percentage;
+        String f = "⬛";
+        String b = "⬜";
+
+        List<Component> lines = List.of(
+                Component.literal("Efficiency level "+ level + "\uD83D\uDD25").withStyle(ChatFormatting.BOLD).withColor(0x4D4942),
+                Component.literal("").withStyle(),
+                Component.literal("< "+xp+"/"+expForLvL+" >").withColor(0x4D4942),
+                Component.literal(b.repeat(percentage) + f.repeat(blacks))
+        );
+
+        for (int i = 0; i < lines.size(); i++) {
+            guiGraphics.drawString(this.font, lines.get(i), textX, textY + i * 10, 0xFFFFFF, false);
+        }
     }
 
     private void renderLargeIconWithTooltip(GuiGraphics guiGraphics, String category, int level, float progress, int centerX, int centerY, List<Component> tooltipLines, float progressValue) {
@@ -369,8 +584,6 @@ public class PrinciplesScreen extends Screen {
             renderProgressBar(guiGraphics, progressValue, tooltipX, tooltipY + tooltipLines.size() * 10 + 5, 0);
         }
     }
-
-
     private double calculatePowerForCategory(String category, int level) {
         if (category.equals("usesShoot") || category.equals("createsAoeEntities") ||
             category.equals("usesSummon") || category.equals("usesTargeting")) {
@@ -379,42 +592,35 @@ public class PrinciplesScreen extends Screen {
             return Util.getPureModificator(level) * 100.0;
         }
     }
-
     private void renderProgressBar(GuiGraphics guiGraphics, float progress, int x, int y, int lineIndex) {
         int barWidth = 120;
         int barHeight = 6;
         int barX = x;
         int barY = y + lineIndex * 10 + 3;
 
-        // Fondo de la barra
         guiGraphics.fill(barX, barY, barX + barWidth, barY + barHeight, 0xFF8B7E6B);
 
         int progressWidth = (int) (barWidth * progress);
         if (progressWidth > 0) {
-            // Animación de brillo dorado
-            float time = (System.currentTimeMillis() % 4000) / 4000.0f; // Ciclo de 2 segundos
-            float pulse = 0.7f + 0.3f * (float) Math.sin(time * Math.PI * 2); // 0.7 a 1.3
 
-            // Color dorado base (0xFFD700)
+            float time = (System.currentTimeMillis() % 4000) / 4000.0f;
+            float pulse = 0.7f + 0.3f * (float) Math.sin(time * Math.PI * 2);
+
             int goldR = 0xFF;
             int goldG = 0xD7;
             int goldB = 0x00;
 
-            // Aplicar variación por el pulso
             goldR = Math.min(255, (int) (goldR * pulse));
             goldG = Math.min(255, (int) (goldG * pulse));
 
             int animatedColor = (0xFF << 24) | (goldR << 16) | (goldG << 8) | goldB;
 
-            // Dibujar barra con color animado
             guiGraphics.fill(barX, barY, barX + progressWidth, barY + barHeight, animatedColor);
 
         }
 
-        // Outline color dorado fijo
         guiGraphics.renderOutline(barX, barY, barWidth, barHeight, 0xFFD700);
     }
-
     private void renderTooltip(GuiGraphics guiGraphics, String category, int level, float progress, int mouseX, int mouseY) {
         List<Component> tooltip = new ArrayList<>();
         tooltip.add(Component.literal(PrinciplesProgressionManager.getCategoryDisplayName(category))
@@ -436,7 +642,6 @@ public class PrinciplesScreen extends Screen {
         }
         guiGraphics.renderTooltip(this.font, tooltip, Optional.empty(), mouseX, mouseY);
     }
-
     private void renderIcon(GuiGraphics guiGraphics, String category, int x, int y, int mouseX, int mouseY, int index, boolean isHovered) {
         int level = ClientCategoryLevelsData.getLevel(category);
         float progress = ClientCategoryLevelsData.getProgress(category);
@@ -482,7 +687,6 @@ public class PrinciplesScreen extends Screen {
             renderTooltip(guiGraphics, category, level, progress, mouseX, mouseY);
         }
     }
-
     private void renderProgressOutline(GuiGraphics guiGraphics, int x, int y, float progress) {
         int outlineThickness = 1;
         int totalPerimeter = (ICON_SIZE - 2) * 4;
@@ -524,35 +728,72 @@ public class PrinciplesScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        // Verificar clics en los iconos de la cuadrícula
-        for (int i = 0; i < CATEGORIES.length; i++) {
-            int row = i / ICONS_PER_ROW;
-            int col = i % ICONS_PER_ROW;
 
-            int x = leftPos + GRID_START_X + (col * ICON_SPACING);
-            int y = topPos + GRID_START_Y + (row * ICON_SPACING);
+        float scale = 1.3f;
+        int originalWidth = 288;
+        int originalHeight = 180;
+        int scaledWidth = (int) (originalWidth * scale);
+        int scaledHeight = (int) (originalHeight * scale);
+        int offsetX = leftPos + (WINDOW_WIDTH - scaledWidth) / 2;
+        int offsetY = topPos + (WINDOW_HEIGHT - scaledHeight) / 2;
 
-            if (isMouseOverIcon((int)mouseX, (int)mouseY, x, y)) {
+        int totalTabsWidth = TAB_WIDTH * 3 + TAB_SPACING * 2;
+        int startX = offsetX + (scaledWidth - totalTabsWidth) / 2;
+        int tabY = offsetY - TAB_HEIGHT - 5;
+
+        for (int i = 0; i < 3; i++) {
+            int x = startX + i * (TAB_WIDTH + TAB_SPACING);
+            if (mouseX >= x && mouseX <= x + TAB_WIDTH && mouseY >= tabY && mouseY <= tabY + TAB_HEIGHT) {
                 if (this.minecraft != null && this.minecraft.player != null) {
-                    this.minecraft.player.playSound(
-                            SoundEvents.UI_BUTTON_CLICK.value(),
-                            0.5f,
-                            1.0f
-                    );
+                    this.minecraft.player.playSound(SoundEvents.UI_BUTTON_CLICK.value(), 0.5f, 1.0f);
                 }
-
-                if (CATEGORIES[i].equals(selectedCategory)) {
-                    selectedCategory = null;
-                } else {
-                    selectedCategory = CATEGORIES[i];
-                    animationTimer = CENTER_ANIMATION_TIME;
-                }
+                currentSection = i;
+                selectedCategory = null;
+                animationTimer = 0;
+                backButtonHovered = false;
                 return true;
             }
         }
 
-        // Si se hace clic fuera de los iconos, deseleccionar
-        selectedCategory = null;
+        if (currentSection == SECTION_PRINCIPLES && selectedCategory != null) {
+            int marginRight = 20;
+            int marginBottom = 18;
+            int bx = offsetX + scaledWidth - BACK_BUTTON_SIZE - marginRight;
+            int by = offsetY + scaledHeight - BACK_BUTTON_SIZE - marginBottom;
+            if (mouseX >= bx && mouseX <= bx + BACK_BUTTON_SIZE && mouseY >= by && mouseY <= by + BACK_BUTTON_SIZE) {
+                if (this.minecraft != null && this.minecraft.player != null) {
+                    this.minecraft.player.playSound(SoundEvents.UI_BUTTON_CLICK.value(), 0.5f, 1.0f);
+                }
+                selectedCategory = null;
+                backButtonHovered = false;
+                return true;
+            }
+        }
+
+        if (currentSection == SECTION_PRINCIPLES) {
+            for (int i = 0; i < CATEGORIES.length; i++) {
+                int row = i / ICONS_PER_ROW;
+                int col = i % ICONS_PER_ROW;
+
+                int x = leftPos + GRID_START_X + (col * ICON_SPACING);
+                int y = topPos + GRID_START_Y + (row * ICON_SPACING);
+
+                if (isMouseOverIcon((int)mouseX, (int)mouseY, x, y)) {
+                    if (this.minecraft != null && this.minecraft.player != null) {
+                        this.minecraft.player.playSound(SoundEvents.UI_BUTTON_CLICK.value(), 0.5f, 1.0f);
+                    }
+
+                    if (CATEGORIES[i].equals(selectedCategory)) {
+                        selectedCategory = null;
+                    } else {
+                        selectedCategory = CATEGORIES[i];
+                        animationTimer = CENTER_ANIMATION_TIME;
+                    }
+                    return true;
+                }
+            }
+        }
+
         return super.mouseClicked(mouseX, mouseY, button);
     }
 

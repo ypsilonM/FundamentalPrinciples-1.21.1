@@ -143,7 +143,11 @@ public class Util {
     }
     //Efficiency leveling
     public static int getXpForEfficiencyLevel(int level) {
-        return (int) (10+10*(Math.pow(1.3, level)));
+        return (int) (50*level);
+    }
+    //Efficiency Mana Multiplier
+    public static double getEfficiencyMultiplier(int effLvl, boolean isCertum){
+        return 1+ ((0.6 + (effLvl*-0.12)) * (isCertum?0.5:1));
     }
 
     //Principles methods

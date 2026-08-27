@@ -54,7 +54,6 @@ public class ModEntityLootTableProvider extends EntityLootSubProvider {
                 LootTable.lootTable()
                         .withPool(createRunePool(3))
                         .withPool(createArcanePool(35, 45, 0.7F, 10, 12))
-
                         .withPool(createFurPool(1))
         );
         add(ModEntities.CHERRY_BIRD.get(),

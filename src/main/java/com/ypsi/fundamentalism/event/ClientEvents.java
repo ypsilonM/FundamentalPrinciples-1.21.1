@@ -1,29 +1,24 @@
 package com.ypsi.fundamentalism.event;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.ypsi.fundamentalism.ClientConfig;
 import com.ypsi.fundamentalism.FundamentalPrinciples;
 import com.ypsi.fundamentalism.attachments.FatigueManager;
+import com.ypsi.fundamentalism.attachments.YpsAttachments;
 import com.ypsi.fundamentalism.entity.spells.sacredDisk.SacredDiskRenderer;
 import com.ypsi.fundamentalism.entity.spells.thorn.ThornRenderer;
 import com.ypsi.fundamentalism.gui.PrincipleLevelUpToast;
 import com.ypsi.fundamentalism.gui.PrinciplesScreen;
 import com.ypsi.fundamentalism.gui.TierWheelOverlay;
-import com.ypsi.fundamentalism.item.ModFluids;
 import com.ypsi.fundamentalism.keybind.KeyState;
 import com.ypsi.fundamentalism.keybind.ModKeyBinds;
+import com.ypsi.fundamentalism.network.packets.ChargeBoostPacket;
 import com.ypsi.fundamentalism.network.packets.ClientToastPacket;
 import com.ypsi.fundamentalism.network.packets.ToggleReinforcementPacket;
 import com.ypsi.fundamentalism.render.ChargeSpellVisuals;
 import com.ypsi.fundamentalism.render.ReinforcementLayer;
-import io.redspace.ironsspellbooks.IronsSpellbooks;
-import io.redspace.ironsspellbooks.api.registry.AttributeRegistry;
 import io.redspace.ironsspellbooks.api.spells.SpellAnimations;
-import io.redspace.ironsspellbooks.config.ClientConfigs;
-import io.redspace.ironsspellbooks.fluids.SimpleClientFluidType;
-import io.redspace.ironsspellbooks.gui.overlays.ManaBarOverlay;
 import io.redspace.ironsspellbooks.player.ClientMagicData;
 import io.redspace.ironsspellbooks.player.ClientSpellCastHelper;
 import io.redspace.ironsspellbooks.render.animation.AnimationHelper;
@@ -43,11 +38,8 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.*;
-import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
-import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
-import top.theillusivec4.curios.api.CuriosTooltip;
 
 import java.util.ArrayList;
 
@@ -105,6 +97,27 @@ public class ClientEvents {
                         renderBottleExhaustionBar(guiGraphics, x, y, exhaustion, exhaustionLvl, player);
                     }
             );
+
+            event.registerAbove(
+                    VanillaGuiLayers.HOTBAR,
+                    ResourceLocation.fromNamespaceAndPath(FundamentalPrinciples.MOD_ID, "incantation"),
+                    (guiGraphics, partialTick) -> {
+                        Minecraft minecraft = Minecraft.getInstance();
+                        if (minecraft.player == null || minecraft.options.hideGui) return;
+                        Player player = minecraft.player;
+                        int incLvl = player.getData(YpsAttachments.BOOST.get());
+                        if (incLvl == 0) return;
+                        int screenWidth = minecraft.getWindow().getGuiScaledWidth();
+                        int screenHeight = minecraft.getWindow().getGuiScaledHeight();
+                        int centerX = screenWidth / 2;
+                        int centerY = screenHeight / 2;
+                        int x = centerX;
+                        int y = centerY;
+
+
+                        renderIncantations(guiGraphics, x, y, incLvl);
+                    }
+            );
         }
 
 
@@ -132,23 +145,19 @@ public class ClientEvents {
             gui.drawString(font, exhaustionText, (exhaustionX), (exhaustionY), exhaustionColor, true);
             poseStack.popPose();
         }
-        private static void renderExhaustionLevel(GuiGraphics gui, int bottleX, int bottleY, int exhaustionLvl, int height, int width) {
+        private static void renderIncantations(GuiGraphics gui, int bottleX, int bottleY, int incLvl) {
             Minecraft minecraft = Minecraft.getInstance();
             Font font = minecraft.font;
 
-            String levelText = String.valueOf(exhaustionLvl);
-            int levelX = bottleX + (width/2)-2;
-            int levelY = bottleY - height + 4;
+            String levelText = String.valueOf(incLvl);
 
             PoseStack poseStack = gui.pose();
 
             poseStack.pushPose();
-            int scaledLevelX = (int) (levelX);
-            int scaledLevelY = (int) (levelY);
+            int scaledLevelX = (int) (bottleX);
+            int scaledLevelY = (int) (bottleY);
 
-            int levelColor = getExhaustionColor(exhaustionLvl);
-
-            gui.drawString(font, levelText, scaledLevelX, scaledLevelY, levelColor, false);
+            gui.drawString(font, levelText, scaledLevelX, scaledLevelY, 0x000000, false);
 
             poseStack.popPose();
         }
@@ -177,6 +186,7 @@ public class ClientEvents {
 
         private static void addReinforcementLayerToRenderer(EntityRenderersEvent.AddLayers event, PlayerSkin.Model modelType) {
             EntityRenderer<? extends Player> renderer = event.getSkin(modelType);
+
             if (renderer instanceof LivingEntityRenderer) {
                 @SuppressWarnings("unchecked")
                 LivingEntityRenderer<Player, PlayerModel<Player>> playerRenderer =
@@ -203,6 +213,7 @@ public class ClientEvents {
             private static final ArrayList<KeyState> KEY_STATES = new ArrayList<>();
             private static final KeyState SELECTION = register(ModKeyBinds.SELECTION_KEY.get());
             private static final KeyState REINFORCE = register(ModKeyBinds.REINFORCE_KEY.get());
+            private static final KeyState BOOST = register(ModKeyBinds.BOOST_KEY.get());
             private static final KeyState CATEGORIES = register(ModKeyBinds.SPELL_CATEGORIES.get());
 
             @SubscribeEvent
@@ -228,13 +239,27 @@ public class ClientEvents {
                     return;
                 }
                handleRightClickSuppression(button, action);
-                if(REINFORCE.wasPressed()){
+
+                if(BOOST.wasPressed() && !ClientMagicData.isCasting() && player.getData(YpsAttachments.BOOST.get())<4){
+                    //minecraft.player.playSound(SoundEvents.ENCHANTMENT_TABLE_USE);
+                    PacketDistributor.sendToServer(new ChargeBoostPacket(false));
+                    SpellAnimations.BOW_CHARGE_ANIMATION.getForPlayer()
+                            .ifPresent(resourceLocation -> AnimationHelper.animatePlayerStart(minecraft.player, resourceLocation));
+                }
+                if(BOOST.wasReleased()){
+                    PacketDistributor.sendToServer(new ChargeBoostPacket(true));
+                    SpellAnimations.BOW_CHARGE_ANIMATION.getForPlayer()
+                            .ifPresent(resourceLocation -> AnimationHelper.cancelPlayerAnimation(minecraft.player));
+                }
+
+                if(REINFORCE.wasPressed() && !ClientMagicData.isCasting() && !BOOST.isDown() && !BOOST.wasPressed()){
                     minecraft.player.playSound(SoundEvents.END_PORTAL_FRAME_FILL, 0.9f, 0.7f);
                     SpellAnimations.SELF_CAST_ANIMATION.getForPlayer()
                             .ifPresent(resourceLocation -> AnimationHelper.animatePlayerStart(minecraft.player, resourceLocation));
                     PacketDistributor.sendToServer(new ToggleReinforcementPacket());
 
                 }
+
                 if(CATEGORIES.wasPressed()){
                     if (minecraft.screen == null) {
                         minecraft.player.playSound(SoundEvents.BOOK_PAGE_TURN, 1f, 1f);

@@ -73,7 +73,7 @@ public class ExhaustionCommand {
             int clampedAmount = Mth.clamp(amount, 0, maxEx);
             FatigueManager.setFatigueAmount(player, clampedAmount);
             player.getPersistentData().putInt("exhaustionTickCounter", 0);
-            player.getPersistentData().putInt("reduceCounter", 0);
+            player.getPersistentData().putInt("exhaustionLevelCounter", 0);
         }
         if (targets.size() == 1) {
             ServerPlayer player = targets.iterator().next();
@@ -94,7 +94,7 @@ public class ExhaustionCommand {
         for (ServerPlayer player : targets) {
             FatigueManager.addFatigue(player, amount);
             player.getPersistentData().putInt("exhaustionTickCounter", 0);
-            player.getPersistentData().putInt("reduceCounter", 0);
+            player.getPersistentData().putInt("exhaustionLevelCounter", 0);
         }
         if (targets.size() == 1) {
             ServerPlayer player = targets.iterator().next();
@@ -113,7 +113,7 @@ public class ExhaustionCommand {
         for (ServerPlayer player : targets) {
             FatigueManager.subtractFatigue(player, amount);
             player.getPersistentData().putInt("exhaustionTickCounter", 0);
-            player.getPersistentData().putInt("reduceCounter", 0);
+            player.getPersistentData().putInt("exhaustionLevelCounter", 0);
         }
         if (targets.size() == 1) {
             ServerPlayer player = targets.iterator().next();
@@ -133,7 +133,7 @@ public class ExhaustionCommand {
         for (ServerPlayer player : targets) {
             FatigueManager.cleanFatigue(player);
             player.getPersistentData().putInt("exhaustionTickCounter", 0);
-            player.getPersistentData().putInt("reduceCounter", 0);
+            player.getPersistentData().putInt("exhaustionLevelCounter", 0);
         }
         if (targets.size() == 1) {
             ServerPlayer player = targets.iterator().next();

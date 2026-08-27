@@ -7,12 +7,22 @@ import com.ypsi.fundamentalism.item.custom.NullifierBlade;
 import com.ypsi.fundamentalism.item.custom.FatigueReducerContainer;
 import com.ypsi.fundamentalism.item.custom.SpellbookCover;
 import com.ypsi.fundamentalism.item.custom.food.ManaFruit;
+import io.redspace.ironsspellbooks.api.registry.AttributeRegistry;
+import io.redspace.ironsspellbooks.compat.Curios;
+import io.redspace.ironsspellbooks.item.curios.CurioBaseItem;
+import io.redspace.ironsspellbooks.item.curios.SimpleDescriptiveCurio;
+import io.redspace.ironsspellbooks.item.weapons.AttributeContainer;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.*;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.DeferredSpawnEggItem;
+import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import top.theillusivec4.curios.api.CuriosApi;
 
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class ModItems {
@@ -73,6 +83,14 @@ public class ModItems {
 
     public static final DeferredItem<Item> URSIDAE_FUR = ITEMS.register("ursidae_fur",
             () -> new Item(new Item.Properties().stacksTo(8)));
+
+
+    public static final DeferredItem<CurioBaseItem> HIRSUTE_NECKLACE = ITEMS.register("hirsute_necklace",
+            () -> new CurioBaseItem(new Item.Properties().stacksTo(1).rarity(Rarity.RARE))
+                    .withAttributes(Curios.NECKLACE_SLOT, new AttributeContainer(AttributeRegistry.SPELL_RESIST, 0.25, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)));
+
+
+
     public static final DeferredItem<Item> SPELLBOOK_COVER = ITEMS.register("spellbook_cover",
             () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.COMMON)));
     public static final DeferredItem<Item> NOVICE_SPELLBOOK_COVER = ITEMS.register("novice_spellbook_cover",

@@ -23,7 +23,7 @@ public abstract class InscriptionMixin {
     public abstract Slot getSpellBookSlot();
     @Shadow(remap = false)
     public abstract Slot getScrollSlot();
-    //Lnet/neoforged/bus/api/IEventBus;post(Lnet/neoforged/bus/api/Event;)Lnet/neoforged/bus/api/Event
+
     @Inject(method = "clickMenuButton",
             at = @At(value = "INVOKE",
                     target = "Lio/redspace/ironsspellbooks/gui/inscription_table/InscriptionTableMenu;doInscription(I)V",

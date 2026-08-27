@@ -29,6 +29,7 @@ public class ModCreativeModTabs {
                         output.accept(ModItems.TONIC);
                         output.accept(ModItems.ANCIENT_SCROLL_CASE);
                         output.accept(ModItems.URSIDAE_FUR);
+                        output.accept(ModItems.HIRSUTE_NECKLACE);
                         output.accept(ModItems.SPELLBOOK_COVER);
                         output.accept(ModItems.NOVICE_SPELLBOOK_COVER);
                         output.accept(ModItems.ADEPT_SPELLBOOK_COVER);

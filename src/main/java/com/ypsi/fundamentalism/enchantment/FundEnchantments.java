@@ -20,17 +20,24 @@ public class FundEnchantments {
     public static void bootstrap(BootstrapContext<Enchantment> context){
 
         var items = context.lookup(Registries.ITEM);
+        var enchantments = context.lookup(Registries.ENCHANTMENT);
         var shieldTag = items.getOrThrow(Tags.Items.TOOLS_SHIELD);
 
-        register(context, AEGIS, Enchantment.enchantment(Enchantment.definition(
-                shieldTag,
-                shieldTag,
-                1,
-                5,
-                Enchantment.dynamicCost(5,7),
-                Enchantment.dynamicCost(25,7),
-                2,
-                EquipmentSlotGroup.MAINHAND, EquipmentSlotGroup.OFFHAND))
+        register(
+                context,
+                AEGIS,
+                Enchantment.enchantment(
+                        Enchantment.definition(
+                            shieldTag,
+                            shieldTag,
+                            1,
+                            5,
+                            Enchantment.dynamicCost(5,7),
+                            Enchantment.dynamicCost(25,7),
+                    2,
+                            EquipmentSlotGroup.MAINHAND, EquipmentSlotGroup.OFFHAND
+                        )
+                ).exclusiveWith(enchantments.getOrThrow(EnchantmentTags.ON_RANDOM_LOOT))
         );
 
     }

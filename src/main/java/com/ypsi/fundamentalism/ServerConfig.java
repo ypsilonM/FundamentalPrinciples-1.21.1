@@ -31,6 +31,9 @@ public class ServerConfig {
     public static ModConfigSpec.ConfigValue<List<? extends Double>> FATIGUE_SPELLPOWER;
     public static ModConfigSpec.DoubleValue MANA_REGEN_DEBUFF;
 
+    //Efficiency
+    public static ModConfigSpec.BooleanValue EFFICIENCY_ATTRIBUTE;
+
     //Principles
     public static ModConfigSpec.BooleanValue PRINCIPLES_SYSTEM;
     public static ModConfigSpec.DoubleValue BASE_PRINCIPLE_POWER;
@@ -175,6 +178,14 @@ public class ServerConfig {
                     .comment("The percentage multiplier of mana regen reduction per fatigue level. (DEFAULT -15% per fatigue level -> -60% in 4th fatigue level.")
                     .defineInRange("fatigueManaRegen", 0.15, 0, 0.25);
 
+        }
+        BUILDER.pop();
+
+        BUILDER.push("efficiency");
+        {
+            EFFICIENCY_ATTRIBUTE = BUILDER
+                    .worldRestart().comment("Whether efficiency stat should be active.")
+                    .define("efficiencyActive", true);
         }
         BUILDER.pop();
 
@@ -351,7 +362,7 @@ public class ServerConfig {
             MOB_STAR_ALIGNMENT = BUILDER
                     .worldRestart()
                     .comment("Chance of a melee spellcaster mob of landing a star alignment.")
-                    .defineInRange("mobStarAlignment", 0.05, 0, 1);
+                    .defineInRange("mobStarAlignment", 0.02, 0, 1);
             ALIGNMENT_MULTIPLIER = BUILDER
                     .worldRestart()
                     .comment("Damage Multiplier for star alignment critic.")

@@ -3,6 +3,7 @@ package com.ypsi.fundamentalism.mixins.principlesMixins;
 import com.ypsi.fundamentalism.ServerConfig;
 import com.ypsi.fundamentalism.attachments.FatigueManager;
 import com.ypsi.fundamentalism.attachments.PrinciplesProgressionManager;
+import com.ypsi.fundamentalism.attachments.YpsAttachments;
 import com.ypsi.fundamentalism.principleGen.SpellCategoriesGenerator;
 import com.ypsi.fundamentalism.util.Principles;
 import com.ypsi.fundamentalism.util.Util;
@@ -26,16 +27,36 @@ public abstract class CertumManaMixin {
 
         int originalCost = spell.getManaCost(spellLevel);
 
-        if(SpellCategoriesGenerator.isInCategory(spell.getSpellId(), "immutable")
-                && ServerConfig.ACTIVE_CERTUM.get()
-                && ServerConfig.PRINCIPLES_SYSTEM.get()){
+        int efficiencyLvl = 5;
+        if(ServerConfig.EFFICIENCY_ATTRIBUTE.get() && player != null)
+            efficiencyLvl = player.getData(YpsAttachments.CAST_EFFICIENCY.get()).getEfficiencyLevel();
 
-            int certumLevel = 0;
-            if(player!=null) {
-                certumLevel = PrinciplesProgressionManager.getCategoryLevel(player, Principles.CERTUM);
-                //int exLvl = player.getData(YpsAttachments.LEVEL_EXHAUSTION);
-                int exLvl = FatigueManager.getFatigueLevel(player);
-                originalCost = (int) (originalCost * (1 + Util.certumManaMultiplier(exLvl, certumLevel)));
+        if(ServerConfig.FATIGUE_SYSTEM.get() && ServerConfig.ACTIVE_CERTUM.get() && ServerConfig.PRINCIPLES_SYSTEM.get()){
+
+            if(SpellCategoriesGenerator.isInPrinciple(spell.getSpellId(), Principles.CERTUM)) {
+                int certumLevel = 0;
+                if (player != null) {
+                    certumLevel = PrinciplesProgressionManager.getCategoryLevel(player, Principles.CERTUM);
+                    int exLvl = FatigueManager.getFatigueLevel(player);
+                    originalCost = (int) (
+                            (originalCost * (1 + Util.certumManaMultiplier(exLvl, certumLevel))) * (
+                            ServerConfig.EFFICIENCY_ATTRIBUTE.get() ? Util.getEfficiencyMultiplier(efficiencyLvl, true) : 1)
+                    );
+                }
+            }else{
+                if(player != null) {
+                    originalCost = (int) (
+                            (originalCost) * (
+                                    ServerConfig.EFFICIENCY_ATTRIBUTE.get() ? Util.getEfficiencyMultiplier(efficiencyLvl, false) : 1)
+                    );
+                }
+            }
+        }else{
+            if(player != null) {
+                originalCost = (int) (
+                        (originalCost) * (
+                                ServerConfig.EFFICIENCY_ATTRIBUTE.get() ? Util.getEfficiencyMultiplier(efficiencyLvl, false) : 1)
+                );
             }
         }
         return originalCost;

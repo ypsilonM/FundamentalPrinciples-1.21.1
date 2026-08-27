@@ -108,6 +108,7 @@ config="${mod_id}.mixins.json"
 [[dependencies.${mod_id}]]
     modId="curios"
     type="required"
+    mandatory = true
     versionRange="[9.0.5+1.21.0,)"
     ordering="NONE"
     side="BOTH"

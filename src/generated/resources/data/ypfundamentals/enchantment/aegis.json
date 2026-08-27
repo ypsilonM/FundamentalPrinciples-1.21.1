@@ -3,6 +3,7 @@
   "description": {
     "translate": "enchantment.ypfundamentals.aegis"
   },
+  "exclusive_set": "#minecraft:on_random_loot",
   "max_cost": {
     "base": 25,
     "per_level_above_first": 7

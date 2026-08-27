@@ -1,4 +1,4 @@
-// 1.21.1	2026-07-30T23:10:29.5182704	Item Models: ypfundamentals
+// 1.21.1	2026-08-13T19:06:32.0400453	Item Models: ypfundamentals
 2ac47127a3ff003b7da1b2c95130d77dac112b9c assets/ypfundamentals/models/item/adept_spellbook_cover.json
 836ff1989ac123042f571b77991e5443d5e43257 assets/ypfundamentals/models/item/ancient_scroll_case.json
 70f8c64eccf2deef2ace4821114d73da3827b5cf assets/ypfundamentals/models/item/arcane_mixture.json
@@ -6,6 +6,7 @@ a2d11d1f93d27978d6acb6311113d9bb0eae41c7 assets/ypfundamentals/models/item/archm
 63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/ypfundamentals/models/item/cherry_bird_spawn_egg.json
 6c548fb9ca9a4c702547018971e56027b280e4d0 assets/ypfundamentals/models/item/flask.json
 63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/ypfundamentals/models/item/hemomancer_spawn_egg.json
+06f80d3e0f2eafa6c0425ec3d3d8c6d3b394542d assets/ypfundamentals/models/item/hirsute_necklace.json
 63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/ypfundamentals/models/item/imp_spawn_egg.json
 6eb1326b5e8fc3cc5837dcb0071007763755dbb6 assets/ypfundamentals/models/item/luminaire_extract.json
 9a1a9fcdcc48dad1c5f6150482b304b06f339d5a assets/ypfundamentals/models/item/mana_fruit.json

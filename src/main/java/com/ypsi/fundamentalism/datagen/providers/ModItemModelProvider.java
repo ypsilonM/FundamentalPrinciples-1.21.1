@@ -7,6 +7,7 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.neoforged.neoforge.client.model.generators.ItemModelBuilder;
 import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import top.theillusivec4.curios.api.CuriosApi;
 
 public class ModItemModelProvider extends ItemModelProvider {
     public ModItemModelProvider(PackOutput output, ExistingFileHelper existingFileHelper) {
@@ -30,6 +31,8 @@ public class ModItemModelProvider extends ItemModelProvider {
         basicItem(ModItems.SORCERER_SPELLBOOK_COVER.get());
         basicItem(ModItems.SCHOLAR_SPELLBOOK_COVER.get());
         basicItem(ModItems.ARCHMAGE_SPELLBOOK_COVER.get());
+
+        basicItem(ModItems.HIRSUTE_NECKLACE.get());
 
         generateTonicModels();
 

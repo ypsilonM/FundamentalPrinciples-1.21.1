@@ -38,9 +38,7 @@ public class ChargeSpellVisuals{
         @Override
         public void render(PoseStack poseStack, MultiBufferSource bufferSource, int pPackedLight, T entity, float pLimbSwing, float pLimbSwingAmount, float pPartialTick, float pAgeInTicks, float pNetHeadYaw, float pHeadPitch) {
 
-            if (isRenderingInGUI()) {
-                return;
-            }
+
             var syncedSpellData = ClientMagicData.getSyncedSpellData(entity);
             if (!syncedSpellData.isCasting()) {
                 return;
@@ -51,23 +49,7 @@ public class ChargeSpellVisuals{
             doRender(poseStack, bufferSource, pPackedLight, entity, spellId, false);
             poseStack.popPose();
         }
-        private boolean isRenderingInGUI() {
-            Minecraft mc = Minecraft.getInstance();
-            if (mc.screen != null) {
-                if (mc.screen instanceof CreativeModeInventoryScreen) {
-                    return true;
-                }
-            }
-            StackTraceElement[] stack = Thread.currentThread().getStackTrace();
-            for (int i = 0; i < Math.min(stack.length, 12); i++) {
-                if (stack[i].getClassName().contains("InventoryScreen") ||
-                        stack[i].getMethodName().contains("renderEntityInInventory")) {
-                    return true;
-                }
-            }
 
-            return false;
-        }
 
 
     }

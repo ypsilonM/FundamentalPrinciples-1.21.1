@@ -54,6 +54,9 @@ public abstract class PowerSpellsMixin {
             int exLvl = FatigueManager.getFatigueLevel(player);
             //int exLvl = player.getData(YpsAttachments.LEVEL_EXHAUSTION.get());
 
+            int incantationBuff = player.getData(YpsAttachments.BOOST.get());
+            exLvl = Math.max(exLvl-incantationBuff, 0);
+
             List<Double> fatiguePenalties = (List<Double>) ServerConfig.FATIGUE_SPELLPOWER.get();
             float ratio = 1;
 
